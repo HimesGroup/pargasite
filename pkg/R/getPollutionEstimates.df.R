@@ -11,6 +11,7 @@
 #' dat <- data.frame(Longitude, Latitude)
 #' getPollutionEstimates.df(dat, "01-2005", "12-2017")
 #' @importFrom magrittr %>%
+#' @export
 
 getPollutionEstimates.df <- function(data, monthyear_start,
                                       monthyear_end) {

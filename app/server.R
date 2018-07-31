@@ -11,8 +11,8 @@ library(akima)
 library(maptools)
 library(mapview)
 library(rgdal)
-source("../labelFormatFunction.R")
-devtools::load_all("~/Dropbox (Personal)/EPID_research/pargasite") #will need to change this to github version!
+source("labelFormatFunction.R")
+library(pargasite)
 
 full_usa = st_as_sf(map("state", plot = FALSE, fill = TRUE))
 

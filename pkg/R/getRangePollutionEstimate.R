@@ -13,6 +13,7 @@
 #' period, array will return a vector where each value corresponds to each month over the time period
 #' @examples
 #' getRangePollutionEstimate(-75.162, 39.9526, "PM2.5", "01-2005", "12-2017")
+#' @export
 
 getRangePollutionEstimate <- function(long, lat, pollutant = "PM2.5", monthyear_start,
                                       monthyear_end, result = "mean") {

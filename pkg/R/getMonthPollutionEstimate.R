@@ -8,6 +8,7 @@
 #' @param monthyear string represented as "month-year". Example: "12-2015".
 #' @examples
 #' getMonthPollutionEstimate(-75.162, 39.9526, "PM2.5", "12-2015")
+#' @export
 
 getMonthPollutionEstimate <- function(long, lat, pollutant = "PM2.5", monthyear) {
 
