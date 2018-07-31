@@ -1,22 +1,17 @@
 library(shiny)
-library(leaflet)
 library(sf)
 library(maps)
-library(ggplot2)
-library(usmap)
 library(dplyr)
 library(raster)
 library(sp)
-library(akima)
-library(maptools)
 library(mapview)
-library(rgdal)
 source("labelFormatFunction.R")
+source("month_to_num.R")
 library(pargasite)
 
 full_usa = st_as_sf(map("state", plot = FALSE, fill = TRUE))
 
-epa.sites <- read.csv("~/epa_data_2005to2015/epa_site_locations.csv")
+epa.sites <- read.csv("data/epa_site_locations.csv") 
 
 shinyServer(function(input, output, session){
 
