@@ -101,13 +101,16 @@ shinyServer(function(input, output, session){
       else paste0("")
     }
   })
-
+  
+  monthyear_start <- reactive({ paste0(month_to_num(input$start_month), "-", input$start_year) })
+  monthyear_end <- reactive({ paste0(month_to_num(input$start_month), "-", input$start_year) })
+  
   output$finalDownload <-
     downloadHandler(
       filename <- function() { "pargasite_file.csv" },
       content <- function(file){
         infile <- read.csv(input$user_file$datapath)
-        outfile <- pargasite::getPollutionEstimates.df(infile)
+        outfile <- pargasite::getPollutionEstimates.df(infile, monthyear_start(), monthyear_end())
         write.csv(outfile, file, row.names = FALSE)
       }
     )
