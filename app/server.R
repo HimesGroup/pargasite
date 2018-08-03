@@ -4,10 +4,29 @@ library(maps)
 library(dplyr)
 library(raster)
 library(sp)
-library(mapview)
+#library(mapview)
 source("labelFormatFunction.R")
 source("month_to_num.R")
 library(pargasite)
+
+## load in all bricks
+pm_yearly_brick_full <- brick("../../var/www/pm_yearly_brick_full.grd")
+ozone_yearly_brick_full <- brick("../../var/www/ozone_yearly_brick_full.grd")
+no2_yearly_brick_full <- brick("../../var/www/no2_yearly_brick_full.grd")
+so2_yearly_brick_full <- brick("../../var/www/so2_yearly_brick_full.grd")
+co_yearly_brick_full <- brick("../../var/www/co_yearly_brick_full.grd")
+
+pm_yearly_brick_cropped <- brick("../../var/www/pm_yearly_brick_cropped.grd")
+ozone_yearly_brick_cropped <- brick("../../var/www/ozone_yearly_brick_cropped.grd")
+no2_yearly_brick_cropped <- brick("../../var/www/no2_yearly_brick_cropped.grd")
+so2_yearly_brick_cropped <- brick("../../var/www/so2_yearly_brick_cropped.grd")
+co_yearly_brick_cropped <- brick("../../var/www/co_yearly_brick_cropped.grd")
+
+pm_monthly_brick <- brick("../../var/www/pm_monthly_brick.grd")
+ozone_monthly_brick <- brick("../../var/www/ozone_monthly_brick.grd")
+no2_monthly_brick <- brick("../../var/www/no2_monthly_brick.grd")
+so2_monthly_brick <- brick("../../var/www/so2_monthly_brick.grd")
+co_monthly_brick <- brick("../../var/www/co_monthly_brick.grd")
 
 full_usa = st_as_sf(map("state", plot = FALSE, fill = TRUE))
 
@@ -15,8 +34,25 @@ epa.sites <- read.csv("data/epa_site_locations.csv")
 
 shinyServer(function(input, output, session){
 
-  year.e <- reactive({ pargasite:::bricks.years[[input$year]] })
-  year.c <- reactive({ pargasite:::bricks.years.cropped[[input$year]] })
+  #year.e <- reactive({ pargasite:::bricks.years[[input$year]] })
+  #year.c <- reactive({ pargasite:::bricks.years.cropped[[input$year]] })
+  poll.e <- reactive({
+    switch(input$pollutant,
+           "PM2.5" = pm_yearly_brick_full,
+           "Ozone" = ozone_yearly_brick_full,
+           "NO2" = no2_yearly_brick_full,
+           "SO2" = so2_yearly_brick_full,
+           "CO" = co_yearly_brick_full)
+  })
+  
+  poll.c <- reactive({
+    switch(input$pollutant,
+           "PM2.5" = pm_yearly_brick_cropped,
+           "Ozone" = ozone_yearly_brick_cropped,
+           "NO2" = no2_yearly_brick_cropped,
+           "SO2" = so2_yearly_brick_cropped,
+           "CO" = co_yearly_brick_cropped)
+  })
 
   sites <- reactive({ filter(epa.sites, year == as.numeric(input$year) )})
 
@@ -30,24 +66,32 @@ shinyServer(function(input, output, session){
     )
   })
 
+  # ras.e <- reactive({
+  #   switch(input$pollutant,
+  #          "PM2.5" = year.e()[[1]],
+  #          "Ozone" = year.e()[[2]],
+  #          "NO2" = year.e()[[3]],
+  #          "SO2" = year.e()[[4]],
+  #          "CO" = year.e()[[5]]
+  #   )
+  # })
+  # 
+  # ras.c <- reactive({
+  #   switch(input$pollutant,
+  #          "PM2.5" = year.c()[[1]],
+  #          "Ozone" = year.c()[[2]],
+  #          "NO2" = year.c()[[3]],
+  #          "SO2" = year.c()[[4]],
+  #          "CO" = year.c()[[5]]
+  #   )
+  # })
+  
   ras.e <- reactive({
-    switch(input$pollutant,
-           "PM2.5" = year.e()[[1]],
-           "Ozone" = year.e()[[2]],
-           "NO2" = year.e()[[3]],
-           "SO2" = year.e()[[4]],
-           "CO" = year.e()[[5]]
-    )
+    poll.e[[(input$year-2004)]]
   })
-
+  
   ras.c <- reactive({
-    switch(input$pollutant,
-           "PM2.5" = year.c()[[1]],
-           "Ozone" = year.c()[[2]],
-           "NO2" = year.c()[[3]],
-           "SO2" = year.c()[[4]],
-           "CO" = year.c()[[5]]
-    )
+    poll.c[[(input$year-2004)]]
   })
 
   trunc.val <- reactive({
@@ -105,7 +149,7 @@ shinyServer(function(input, output, session){
       filename <- function() { "pargasite_file.csv" },
       content <- function(file){
         infile <- read.csv(input$user_file$datapath)
-        outfile <- pargasite::getPollutionEstimates.df(infile, monthyear_start(), monthyear_end())
+        outfile <- getPollutionEstimates.df.app(infile, monthyear_start(), monthyear_end())
         write.csv(outfile, file, row.names = FALSE)
       }
     )

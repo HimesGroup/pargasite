@@ -13,11 +13,11 @@
 getMonthPollutionEstimate <- function(long, lat, pollutant = "PM2.5", monthyear) {
 
   pollutant_brick <- switch(pollutant,
-                             "PM2.5" = pm_monthly_brick,
-                             "Ozone" = ozone_monthly_brick,
-                             "NO2" = no2_monthly_brick,
-                             "SO2" = so2_monthly_brick,
-                             "CO" = co_monthly_brick)
+                             "PM2.5" = download(pm_monthly_brick),
+                             "Ozone" = download(ozone_monthly_brick),
+                             "NO2" = download(no2_monthly_brick),
+                             "SO2" = download(so2_monthly_brick),
+                             "CO" = download(co_monthly_brick))
 
   month_year <- as.numeric(strsplit(monthyear, "-")[[1]])
   ind <- 12*(month_year[2]-2005) + month_year[1]

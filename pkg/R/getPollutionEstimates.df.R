@@ -22,8 +22,8 @@ getPollutionEstimates.df <- function(data, monthyear_start,
   month_year_end <- as.numeric(strsplit(monthyear_end, "-")[[1]])
   ind_end <- 12*(month_year_end[2]-2005) + month_year_end[1]
 
-  pollutant_bricks <- list(pm_monthly_brick, ozone_monthly_brick,
-                           no2_monthly_brick, so2_monthly_brick, co_monthly_brick)
+  pollutant_bricks <- list(download(pm_monthly_brick), download(ozone_monthly_brick),
+                           download(no2_monthly_brick), download(so2_monthly_brick), download(co_monthly_brick))
 
   subset_bricks <- lapply(pollutant_bricks, function(pollutant_brick){
     return(raster::subset(pollutant_brick, c(ind_start:ind_end))) })
