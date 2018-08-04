@@ -9,24 +9,18 @@ source("labelFormatFunction.R")
 source("month_to_num.R")
 library(pargasite)
 
-## load in all bricks
-pm_yearly_brick_full <- brick("../../var/www/pm_yearly_brick_full.grd")
-ozone_yearly_brick_full <- brick("../../var/www/ozone_yearly_brick_full.grd")
-no2_yearly_brick_full <- brick("../../var/www/no2_yearly_brick_full.grd")
-so2_yearly_brick_full <- brick("../../var/www/so2_yearly_brick_full.grd")
-co_yearly_brick_full <- brick("../../var/www/co_yearly_brick_full.grd")
-
-pm_yearly_brick_cropped <- brick("../../var/www/pm_yearly_brick_cropped.grd")
-ozone_yearly_brick_cropped <- brick("../../var/www/ozone_yearly_brick_cropped.grd")
-no2_yearly_brick_cropped <- brick("../../var/www/no2_yearly_brick_cropped.grd")
-so2_yearly_brick_cropped <- brick("../../var/www/so2_yearly_brick_cropped.grd")
-co_yearly_brick_cropped <- brick("../../var/www/co_yearly_brick_cropped.grd")
-
-pm_monthly_brick <- brick("../../var/www/pm_monthly_brick.grd")
-ozone_monthly_brick <- brick("../../var/www/ozone_monthly_brick.grd")
-no2_monthly_brick <- brick("../../var/www/no2_monthly_brick.grd")
-so2_monthly_brick <- brick("../../var/www/so2_monthly_brick.grd")
-co_monthly_brick <- brick("../../var/www/co_monthly_brick.grd")
+# ## load in all bricks
+# pm_yearly_brick_full <- brick("http://public.himeslab.org/pargasite_data/pm_yearly_brick_full.tif")
+# ozone_yearly_brick_full <- brick("http://public.himeslab.org/pargasite_data/ozone_yearly_brick_full.tif")
+# no2_yearly_brick_full <- brick("http://public.himeslab.org/pargasite_data/no2_yearly_brick_full.tif")
+# so2_yearly_brick_full <- brick("http://public.himeslab.org/pargasite_data/so2_yearly_brick_full.tif")
+# co_yearly_brick_full <- brick("http://public.himeslab.org/pargasite_data/co_yearly_brick_full.tif")
+# 
+# pm_yearly_brick_cropped <- brick("http://public.himeslab.org/pargasite_data/pm_yearly_brick_cropped.tif")
+# ozone_yearly_brick_cropped <- brick("http://public.himeslab.org/pargasite_data/ozne_yearly_brick_cropped.tif")
+# no2_yearly_brick_cropped <- brick("http://public.himeslab.org/pargasite_data/no2_yearly_brick_cropped.tif")
+# so2_yearly_brick_cropped <- brick("http://public.himeslab.org/pargasite_data/so2_yearly_brick_cropped.tif")
+# co_yearly_brick_cropped <- brick("http://public.himeslab.org/pargasite_data/co_yearly_brick_cropped.tif")
 
 full_usa = st_as_sf(map("state", plot = FALSE, fill = TRUE))
 
@@ -34,8 +28,6 @@ epa.sites <- read.csv("data/epa_site_locations.csv")
 
 shinyServer(function(input, output, session){
 
-  #year.e <- reactive({ pargasite:::bricks.years[[input$year]] })
-  #year.c <- reactive({ pargasite:::bricks.years.cropped[[input$year]] })
   poll.e <- reactive({
     switch(input$pollutant,
            "PM2.5" = pm_yearly_brick_full,
@@ -65,26 +57,6 @@ shinyServer(function(input, output, session){
            "CO" = "Mean carbon monoxide (CO) 1-hour average (1971 standard); Units = Parts per million"
     )
   })
-
-  # ras.e <- reactive({
-  #   switch(input$pollutant,
-  #          "PM2.5" = year.e()[[1]],
-  #          "Ozone" = year.e()[[2]],
-  #          "NO2" = year.e()[[3]],
-  #          "SO2" = year.e()[[4]],
-  #          "CO" = year.e()[[5]]
-  #   )
-  # })
-  # 
-  # ras.c <- reactive({
-  #   switch(input$pollutant,
-  #          "PM2.5" = year.c()[[1]],
-  #          "Ozone" = year.c()[[2]],
-  #          "NO2" = year.c()[[3]],
-  #          "SO2" = year.c()[[4]],
-  #          "CO" = year.c()[[5]]
-  #   )
-  # })
   
   ras.e <- reactive({
     poll.e[[(input$year-2004)]]
@@ -142,7 +114,7 @@ shinyServer(function(input, output, session){
   })
   
   monthyear_start <- reactive({ paste0(month_to_num(input$start_month), "-", input$start_year) })
-  monthyear_end <- reactive({ paste0(month_to_num(input$start_month), "-", input$start_year) })
+  monthyear_end <- reactive({ paste0(month_to_num(input$end_month), "-", input$end_year) })
   
   output$finalDownload <-
     downloadHandler(

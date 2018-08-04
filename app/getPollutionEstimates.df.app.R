@@ -1,3 +1,9 @@
+# pm_monthly_brick <- brick("http://public.himeslab.org/pargasite_data/pm_monthly_brick.tif")
+# ozone_monthly_brick <- brick("http://public.himeslab.org/pargasite_data/pm_monthly_brick.tif")
+# no2_monthly_brick <- brick("http://public.himeslab.org/pargasite_data/pm_monthly_brick.tif")
+# so2_monthly_brick <- brick("http://public.himeslab.org/pargasite_data/pm_monthly_brick.tif")
+# co_monthly_brick <- brick("http://public.himeslab.org/pargasite_data/pm_monthly_brick.tif")
+
 getPollutionEstimates.df.app <- function(data, monthyear_start,
                                      monthyear_end) {
   

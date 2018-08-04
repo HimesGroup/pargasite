@@ -22,6 +22,6 @@ getMonthPollutionEstimate <- function(long, lat, pollutant = "PM2.5", monthyear)
   month_year <- as.numeric(strsplit(monthyear, "-")[[1]])
   ind <- 12*(month_year[2]-2005) + month_year[1]
 
-  extract(pollutant_brick[[ind]], cbind(long,lat))
+  raster::extract(pollutant_brick[[ind]], cbind(long,lat))
 
 }

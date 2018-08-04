@@ -3,5 +3,6 @@
 export(getMonthPollutionEstimate)
 export(getPollutionEstimates.df)
 export(getRangePollutionEstimate)
+export(getUnits)
 export(getYearPollutionEstimate)
 importFrom(magrittr,"%>%")

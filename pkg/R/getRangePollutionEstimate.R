@@ -37,6 +37,7 @@ getRangePollutionEstimate <- function(long, lat, pollutant = "PM2.5", monthyear_
     return(mean(ests))
   }
   else if(result == "array"){
+    colnames(r) <- rep("", length(ests))
     return(ests)
   }
 
