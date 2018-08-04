@@ -4,23 +4,9 @@ library(maps)
 library(dplyr)
 library(raster)
 library(sp)
-#library(mapview)
 source("labelFormatFunction.R")
 source("month_to_num.R")
 library(pargasite)
-
-# ## load in all bricks
-# pm_yearly_brick_full <- brick("http://public.himeslab.org/pargasite_data/pm_yearly_brick_full.tif")
-# ozone_yearly_brick_full <- brick("http://public.himeslab.org/pargasite_data/ozone_yearly_brick_full.tif")
-# no2_yearly_brick_full <- brick("http://public.himeslab.org/pargasite_data/no2_yearly_brick_full.tif")
-# so2_yearly_brick_full <- brick("http://public.himeslab.org/pargasite_data/so2_yearly_brick_full.tif")
-# co_yearly_brick_full <- brick("http://public.himeslab.org/pargasite_data/co_yearly_brick_full.tif")
-# 
-# pm_yearly_brick_cropped <- brick("http://public.himeslab.org/pargasite_data/pm_yearly_brick_cropped.tif")
-# ozone_yearly_brick_cropped <- brick("http://public.himeslab.org/pargasite_data/ozne_yearly_brick_cropped.tif")
-# no2_yearly_brick_cropped <- brick("http://public.himeslab.org/pargasite_data/no2_yearly_brick_cropped.tif")
-# so2_yearly_brick_cropped <- brick("http://public.himeslab.org/pargasite_data/so2_yearly_brick_cropped.tif")
-# co_yearly_brick_cropped <- brick("http://public.himeslab.org/pargasite_data/co_yearly_brick_cropped.tif")
 
 full_usa = st_as_sf(map("state", plot = FALSE, fill = TRUE))
 
@@ -30,20 +16,20 @@ shinyServer(function(input, output, session){
 
   poll.e <- reactive({
     switch(input$pollutant,
-           "PM2.5" = pm_yearly_brick_full,
-           "Ozone" = ozone_yearly_brick_full,
-           "NO2" = no2_yearly_brick_full,
-           "SO2" = so2_yearly_brick_full,
-           "CO" = co_yearly_brick_full)
+           "PM2.5" = pargasite:::download(pm_yearly_brick_full),
+           "Ozone" = pargasite:::download(ozone_yearly_brick_full),
+           "NO2" = pargasite:::download(no2_yearly_brick_full),
+           "SO2" = pargasite:::download(so2_yearly_brick_full),
+           "CO" = pargasite:::download(co_yearly_brick_full))
   })
   
   poll.c <- reactive({
     switch(input$pollutant,
-           "PM2.5" = pm_yearly_brick_cropped,
-           "Ozone" = ozone_yearly_brick_cropped,
-           "NO2" = no2_yearly_brick_cropped,
-           "SO2" = so2_yearly_brick_cropped,
-           "CO" = co_yearly_brick_cropped)
+           "PM2.5" = pargasite:::download(pm_yearly_brick_cropped),
+           "Ozone" = pargasite:::download(ozone_yearly_brick_cropped),
+           "NO2" = pargasite:::download(no2_yearly_brick_cropped),
+           "SO2" = pargasite:::download(so2_yearly_brick_cropped),
+           "CO" = pargasite:::download(co_yearly_brick_cropped))
   })
 
   sites <- reactive({ filter(epa.sites, year == as.numeric(input$year) )})
@@ -59,11 +45,11 @@ shinyServer(function(input, output, session){
   })
   
   ras.e <- reactive({
-    poll.e[[(input$year-2004)]]
+    poll.e()[[(as.numeric(input$year)-2004)]]
   })
   
   ras.c <- reactive({
-    poll.c[[(input$year-2004)]]
+    poll.c()[[(as.numeric(input$year)-2004)]]
   })
 
   trunc.val <- reactive({
@@ -121,7 +107,7 @@ shinyServer(function(input, output, session){
       filename <- function() { "pargasite_file.csv" },
       content <- function(file){
         infile <- read.csv(input$user_file$datapath)
-        outfile <- getPollutionEstimates.df.app(infile, monthyear_start(), monthyear_end())
+        outfile <- getPollutionEstimates.df(infile, monthyear_start(), monthyear_end())
         write.csv(outfile, file, row.names = FALSE)
       }
     )
