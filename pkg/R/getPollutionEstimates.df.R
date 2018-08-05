@@ -27,11 +27,11 @@ getPollutionEstimates.df <- function(data, monthyear_start,
   subset_bricks <- lapply(pollutant_bricks, function(pollutant_brick){
     return(raster::subset(pollutant_brick, c(ind_start:ind_end))) })
 
-  data$pm_estimate <- rowMeans(raster::extract(subset_bricks[[1]], cbind(Longitude, Latitude)))
-  data$ozone_estimate <- rowMeans(raster::extract(subset_bricks[[2]], cbind(Longitude, Latitude)))
-  data$no2_estimate <- rowMeans(raster::extract(subset_bricks[[3]], cbind(Longitude, Latitude)))
-  data$so2_estimate <- rowMeans(raster::extract(subset_bricks[[4]], cbind(Longitude, Latitude)))
-  data$co_estimate <- rowMeans(raster::extract(subset_bricks[[5]], cbind(Longitude, Latitude)))
+  data$pm_estimate <- rowMeans(raster::extract(subset_bricks[[1]], cbind(data$Longitude, data$Latitude)))
+  data$ozone_estimate <- rowMeans(raster::extract(subset_bricks[[2]], cbind(data$Longitude, data$Latitude)))
+  data$no2_estimate <- rowMeans(raster::extract(subset_bricks[[3]], cbind(data$Longitude, data$Latitude)))
+  data$so2_estimate <- rowMeans(raster::extract(subset_bricks[[4]], cbind(data$Longitude, data$Latitude)))
+  data$co_estimate <- rowMeans(raster::extract(subset_bricks[[5]], cbind(data$Longitude, data$Latitude)))
   
   return(data)
 }
