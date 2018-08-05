@@ -107,7 +107,7 @@ shinyServer(function(input, output, session){
       filename <- function() { "pargasite_file.csv" },
       content <- function(file){
         infile <- read.csv(input$user_file$datapath)
-        outfile <- getPollutionEstimates.df(infile, monthyear_start(), monthyear_end())
+        outfile <- pargasite::getPollutionEstimates.df(dplyr::tbl_df(infile), monthyear_start(), monthyear_end())
         write.csv(outfile, file, row.names = FALSE)
       }
     )

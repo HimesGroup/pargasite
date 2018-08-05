@@ -10,7 +10,6 @@
 #' Latitude <- c(40.009376, 29.891901, 26.649124)
 #' dat <- data.frame(Longitude, Latitude)
 #' getPollutionEstimates.df(dat, "01-2005", "12-2017")
-#' @importFrom magrittr %>%
 #' @export
 
 getPollutionEstimates.df <- function(data, monthyear_start,
@@ -28,12 +27,11 @@ getPollutionEstimates.df <- function(data, monthyear_start,
   subset_bricks <- lapply(pollutant_bricks, function(pollutant_brick){
     return(raster::subset(pollutant_brick, c(ind_start:ind_end))) })
 
-  df <- data %>% dplyr::rowwise() %>% dplyr::mutate(
-    pm_estimate = mean(raster::extract(subset_bricks[[1]], cbind(Longitude, Latitude))),
-    ozone_estimate = mean(raster::extract(subset_bricks[[2]], cbind(Longitude, Latitude))),
-    no2_estimate = mean(raster::extract(subset_bricks[[3]], cbind(Longitude, Latitude))),
-    so2_estimate = mean(raster::extract(subset_bricks[[4]], cbind(Longitude, Latitude))),
-    co_estimate = mean(raster::extract(subset_bricks[[5]], cbind(Longitude, Latitude))))
-
-  return(df)
+  data$pm_estimate <- rowMeans(raster::extract(subset_bricks[[1]], cbind(Longitude, Latitude)))
+  data$ozone_estimate <- rowMeans(raster::extract(subset_bricks[[2]], cbind(Longitude, Latitude)))
+  data$no2_estimate <- rowMeans(raster::extract(subset_bricks[[3]], cbind(Longitude, Latitude)))
+  data$so2_estimate <- rowMeans(raster::extract(subset_bricks[[4]], cbind(Longitude, Latitude)))
+  data$co_estimate <- rowMeans(raster::extract(subset_bricks[[5]], cbind(Longitude, Latitude)))
+  
+  return(data)
 }
