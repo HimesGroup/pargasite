@@ -13,7 +13,7 @@ getYearPollutionEstimate(long, lat, pollutant = "PM2.5", year)
 
 \item{pollutant}{string, one of "PM2.5", "Ozone", "NO2", "SO2" or "CO". Default set to "PM2.5"}
 
-\item{year}{string represented as "year." Example: "2015".}
+\item{year}{string represented as "yyyy." Example: "2015".}
 }
 \description{
 Get estimate of a given pollutant for a given year (2005 to 2017). Derived from annual EPA files.

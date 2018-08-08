@@ -14,9 +14,9 @@ getRangePollutionEstimate(long, lat, pollutant = "PM2.5", monthyear_start,
 
 \item{pollutant}{string, one of "PM2.5", "Ozone", "NO2", "SO2" or "CO". Default set to "PM2.5"}
 
-\item{monthyear_start}{string represented as "month-year." Earliest available month-year: "01-2005".}
+\item{monthyear_start}{string represented as "mm-yyyy." Earliest available month-year: "01-2005".}
 
-\item{monthyear_end}{string represented as "month-year." Latest available month-year: "12-2017".}
+\item{monthyear_end}{string represented as "mm-yyyy." Latest available month-year: "12-2017".}
 
 \item{result}{string, one of "mean" or "array." Mean will return the average of the monthly estimates over the time
 period, array will return a vector where each value corresponds to each month over the time period}

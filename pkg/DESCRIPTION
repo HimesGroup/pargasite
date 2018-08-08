@@ -1,5 +1,5 @@
 Package: pargasite
-Title: Pollution and Health Risk Factor Geospatial Analysis
+Title: Pollution-Associated Risk Geospatial Analysis
 Version: 0.0.0.9000
 Authors@R: person("Rebecca", "Greenblatt", email = "rebecca.greenblatt@gmail.com", role = c("aut", "cre"))
 Description: This package provides raster layers from which pollution estimates 
@@ -8,7 +8,7 @@ Description: This package provides raster layers from which pollution estimates
   files from the United States Environmental Protection Agency (EPA) for years 2005 to 2017. 
   Estimates were calculated by taking the inverse distance-weighted average of the given pollutant 
   from the 5 nearest EPA monitoring sites. Annual estimates from annual files and monthly 
-  estimates from daily files.
+  estimates from daily files. See ../data_generation to learn how rasters were generated.
 Depends: R (>= 3.3.3)
 License: BSD 3-Clause License
 Encoding: UTF-8

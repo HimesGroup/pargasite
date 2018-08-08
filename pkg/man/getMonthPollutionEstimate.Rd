@@ -13,7 +13,7 @@ getMonthPollutionEstimate(long, lat, pollutant = "PM2.5", monthyear)
 
 \item{pollutant}{string, one of "PM2.5", "Ozone", "NO2", "SO2" or "CO". Default set to "PM2.5"}
 
-\item{monthyear}{string represented as "month-year". Example: "12-2015".}
+\item{monthyear}{string represented as "mm-yyyy". Example: "12-2015".}
 }
 \description{
 Get estimate of a given pollutant for a given month ("01-2005" - "12-2017"). Derived from daily EPA files.

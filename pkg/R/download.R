@@ -16,7 +16,7 @@ download <- function(getvar){
     
     url <- paste0("http://public.himeslab.org/pargasite_data/", var, ".tif")
     
-    download.file(url, getvar, mode = "wb")
+    download.file(url, getvar, mode = "wb", method = "curl")
     
     ras <- raster::brick(getvar)
     

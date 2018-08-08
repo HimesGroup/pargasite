@@ -5,7 +5,7 @@
 #' @param long numeric longitude value
 #' @param lat numeric latitude value
 #' @param pollutant string, one of "PM2.5", "Ozone", "NO2", "SO2" or "CO". Default set to "PM2.5"
-#' @param year string represented as "year." Example: "2015".
+#' @param year string represented as "yyyy." Example: "2015".
 #' @examples
 #' getYearPollutionEstimate(-75.162, 39.9526, "PM2.5", "2015")
 #' @export

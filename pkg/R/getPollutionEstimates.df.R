@@ -3,13 +3,13 @@
 #' Given a dataset with Longitude and Latitude columns, will return dataset with columns for each pollutant corresponding to the average of monthly estimates spanning requested time period. Monthly estimates derived from daily EPA files.
 #'
 #' @param data dataframe with numeric Longitude and Latitude columns
-#' @param monthyear_start string represented as "month-year". Earliest available month-year: "01-2005".
-#' @param monthyear_end string represented as "month-year". Latest available month-year: "12-2017".
+#' @param monthyear_start string represented as "mm-yyyy". Earliest available month-year: "01-2005".
+#' @param monthyear_end string represented as "mm-yyyy". Latest available month-year: "12-2017".
 #' @examples
 #' Longitude <- c(-75.133346, -96.27017, -80.448374)
 #' Latitude <- c(40.009376, 29.891901, 26.649124)
 #' dat <- data.frame(Longitude, Latitude)
-#' getPollutionEstimates.df(dat, "01-2005", "12-2017")
+#' getPollutionEstimates.df(dat, "01-2005", "12-2006")
 #' @export
 
 getPollutionEstimates.df <- function(data, monthyear_start,
