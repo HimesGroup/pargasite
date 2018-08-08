@@ -19,5 +19,5 @@ Both tools were made to assist with analyses of geocoded health data to study th
 
 Notes:
 - the raster layers accessible in the R package are not cropped to fit the United States, and instead are in the shape of a rectangle covering the region
-- Units of measurement are displayed in the shiny app once a pollutant is selected. In the package, use getUnits() to display a list of the units.
+- units of measurement are displayed in the shiny app once a pollutant is selected. In the package, use getUnits() to display a list of the units.
 
