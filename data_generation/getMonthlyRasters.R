@@ -18,8 +18,7 @@ library(gstat)
 fixData <- function(data, poll_standard){
   
   ## filter data to contiguous US 
-  ## get one row per site by averaging all entries - 
-    ## this step may need to be changed with better understanding of event type information
+  ## get one row per location by averaging all entries
   data$date <- as.Date(as.character(data$Date.Local))
   data$month <- as.numeric(format(data$date, "%m"))
   pollutant <- filter(data,

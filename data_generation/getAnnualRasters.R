@@ -12,8 +12,7 @@ library(rgdal)
 getRaster <- function(data, par_name, poll_standard){
   
   ## filter data to contiguous US 
-  ## get one row per site by averaging all entries - 
-     ## this step may need to be changed with better understanding of event type information
+  ## get one row per location by averaging all entries
   pollutant <- filter(data, 
                       Parameter.Name == par_name,  
                       Pollutant.Standard == poll_standard,
