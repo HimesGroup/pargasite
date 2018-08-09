@@ -20,4 +20,5 @@ Both tools were made to assist with analyses of geocoded health data to study th
 Notes:
 - the raster layers accessible in the R package are not cropped to fit the United States, and instead are in the shape of a rectangle covering the region
 - units of measurement are displayed in the shiny app once a pollutant is selected. In the package, use getUnits() to display a list of the units.
+- the first time a raster brick object is loaded in the package, it will take a while because it has to retrieve the data from online. However, it will store the brick in a temporary file, so it will load much more quickly thereafter. 
 
