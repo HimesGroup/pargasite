@@ -139,7 +139,11 @@ devtools::install_github(&quot;HimesGroup/pargasite&quot;, subdir = &quot;pkg&qu
 library(pander)</code></pre>
 <div id="read-in-latitude-and-longitude-information-data" class="section level4">
 <h4>Read in latitude and longitude information data</h4>
-<p>The file should be a csv file with two columns in the following order - * Latitude * Longitude</p>
+<p>The sample input file should be a csv file with two columns in the following order:</p>
+<ul>
+<li>Latitude</li>
+<li>Longitude</li>
+</ul>
 <pre class="r"><code>res_df &lt;- read.csv(&quot;pargasite_sample_input_file.csv&quot;)
 pandoc.table(res_df)</code></pre>
 <pre><code>## 
@@ -204,8 +208,8 @@ pander(unlist(res_lst))</code></pre>
 ## resolution  : 0.09011544, 0.09016097  (x, y)
 ## extent      : -124.6813, -67.00742, 25.12993, 49.38323  (xmin, xmax, ymin, ymax)
 ## coord. ref. : +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0 
-## data source : /private/var/folders/2q/z6tjvctn6xdbk8dgdchpt2vr_zwv_7/T/RtmpbtPed3/file908719b46ca9 
-## names       : file908719b46ca9.86</code></pre>
+## data source : /private/var/folders/2q/z6tjvctn6xdbk8dgdchpt2vr_zwv_7/T/RtmpSmcnmP/file95238ea403c 
+## names       : file95238ea403c.86</code></pre>
 <hr />
 </div>
 <div id="getunits" class="section level4">
