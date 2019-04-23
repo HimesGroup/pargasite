@@ -3,7 +3,7 @@ Pollution-Associated Risk Geospatial Analysis SITE
 
 In this folder you will find a shiny app (/app), a version of which is also hosted on pargasite.org. 
 
-You will also find an R package (/pkg) that can be downloaded with devtools::install_github("HimesGroup/pargasite", subdir = "pkg").
+You will also find an R package (/pkg) that can be downloaded with devtools::install_github("HimesGroup/pargasite", subdir = "pkg"). You can refer to files in the examples folder which help illustrate the use of all functions in this package. 
 
 Lastly, you will find code we used to generate the data used in both the website and the package.
 
