@@ -31,7 +31,8 @@ library(pander)
 
 #### Read in latitude and longitude information data
 
-The file should be a csv file with two columns in the following order -
+The sample input file should be a csv file with two columns in the following order:
+
 * Latitude
 * Longitude
 
