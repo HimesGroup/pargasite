@@ -1,0 +1,122 @@
+---
+title: 'PARGASITE: demo analysis using R package'
+author: 'Avantika Diwadkar (avantika.diwadkar@pennmedicine.upenn.edu)'
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: TRUE
+    depth: 3
+editor_options: 
+  chunk_output_type: console
+---
+***
+
+**Pollution-Associated Risk Geospatial Analysis SITE**
+
+Pargasite uses publicly available data from the United States Environmental Protection Agency (EPA). We have no affiliation with the EPA. From this data, we generated monthly and yearly raster files (Jan 2005 to Dec 2017) for PM2.5, Ozone, NO2, SO2, and CO covering the contiguous US using inverse distance weighted interpolation from the 5 nearest EPA monitoring stations. The R package allows the user to obtain a more customized output as compared to the website (http://pargasite.org/) and work with the raster layers directly. 
+
+Install the prerequisite R packages if they do not exist:
+
+```{r eval=F, echo=T}
+library(devtools)
+devtools::install_github("HimesGroup/pargasite", subdir = "pkg")
+```
+
+Load necessary packages: 
+
+```{r eval=T, echo=T,warning=FALSE,message=FALSE}
+library(pargasite)
+library(pander)
+```
+
+#### Read in latitude and longitude information data
+
+The sample input file should be a csv file with two columns in the following order:
+
+* Latitude
+* Longitude
+
+```{r eval=T, echo=T,warning=FALSE,message=FALSE}
+res_df <- read.csv("pargasite_sample_input_file.csv")
+pandoc.table(res_df)
+```
+___
+
+#### getMonthPollutionEstimate
+
+Get pollution estimates for pollutant of your choice (PM2.5, Ozone, NO2, SO2 and CO) using lat and long values as input for a given month-year.
+```{r eval=T, echo=T,warning=FALSE,message=FALSE}
+long <- as.vector(res_df$Longitude)
+lat <- as.vector(res_df$Latitude)
+res_lst <- list()
+for (i in seq(1,nrow(res_df))){
+  res <- getMonthPollutionEstimate(long[i], lat[i], pollutant = "PM2.5", monthyear="12-2017")
+  res_lst[i] = res
+}
+pander(unlist(res_lst))
+```
+
+___
+
+#### getPollutionEstimates.df
+
+Given a dataset with Longitude and Latitude columns, will return dataset with columns for each pollutant corresponding to the average of monthly estimates spanning requested time period.
+
+```{r eval=T, echo=T,warning=FALSE,message=FALSE}
+getPollutionEstimates.df(res_df, monthyear_start="01-2005", monthyear_end="12-2006")
+```
+
+___
+
+#### getRangePollutionEstimate
+
+Get estimate of a given pollutant for a given time period as defined by month-year to month-year. The result can be an average over the time period or an array with values corresponding to each month.
+```{r eval=T, echo=T,warning=FALSE,message=FALSE}
+res_lst <- list()
+for (i in seq(1,nrow(res_df))){
+  res <- getRangePollutionEstimate(long[i], lat[i], pollutant = "PM2.5", monthyear_start="01-2005", monthyear_end="12-2006", result = "mean")
+  res_lst[i] = res
+}
+pander(unlist(res_lst))
+```
+
+___
+
+#### getRaster
+
+Get pre-generated raster layer for a given pollutant for a month or year in 2005 to 2017
+```{r eval=T, echo=T,warning=FALSE,message=FALSE}
+getRaster(pollutant="PM2.5", month_or_year="02-2012")
+```
+
+___
+
+#### getUnits
+
+Get standard and units of measurement for pollution variables
+```{r eval=T, echo=T,warning=FALSE,message=FALSE}
+getUnits()
+```
+
+___
+
+#### getYearPollutionEstimate
+
+Get estimate of a given pollutant for a given year (2005 to 2017). Derived from annual EPA files.
+```{r eval=T, echo=T,warning=FALSE,message=FALSE}
+res_lst <- list()
+for (i in seq(1,nrow(res_df))){
+  res <- getYearPollutionEstimate(long[i], lat[i], pollutant = "PM2.5", year="2015")
+   res_lst[i] = res
+}
+pander(unlist(res_lst))
+```
+
+___
+
+#### Session information
+
+```{r sessioninfo, eval=T, echo=F}
+pander(sessionInfo())
+```
+
