@@ -18,12 +18,20 @@
 getRangePollutionEstimate <- function(long, lat, pollutant = "PM2.5", monthyear_start,
                                       monthyear_end, result = "mean") {
 
-  pollutant_brick <- switch(pollutant,
+  if(lat < 20){
+    pollutant_brick <- switch(pollutant,
+                              "PM2.5" = download(pr_pm_monthly_brick),
+                              "Ozone" = download(pr_ozone_monthly_brick),
+                              "NO2" = download(pr_no2_monthly_brick),
+                              "SO2" = download(pr_so2_monthly_brick),
+                              "CO" = download(pr_co_monthly_brick))
+  } else {pollutant_brick <- switch(pollutant,
                             "PM2.5" = download(pm_monthly_brick),
                             "Ozone" = download(ozone_monthly_brick),
                             "NO2" = download(no2_monthly_brick),
                             "SO2" = download(so2_monthly_brick),
                             "CO" = download(co_monthly_brick))
+  }
 
   month_year_start <- as.numeric(strsplit(monthyear_start, "-")[[1]])
   ind_start <- 12*(month_year_start[2]-2005) + month_year_start[1]
