@@ -1,7 +1,6 @@
 #' Get pollution estimates for dataset
 #'
-#' Given a dataset with Longitude and Latitude columns, will return dataset with columns for each pollutant corresponding to the average of monthly estimates spanning requested time period. Monthly estimates derived from daily EPA files.
-#' Only for data within the contiguous US. For locations in Puerto Rico, see getPollutionEstimatesPR.df
+#' Given a dataset with Longitude and Latitude columns (case sensitive), will return dataset with columns for each pollutant corresponding to the average of monthly estimates spanning requested time period. Monthly estimates derived from daily EPA files.
 #'
 #' @param data dataframe with numeric Longitude and Latitude columns
 #' @param monthyear_start string represented as "mm-yyyy". Earliest available month-year: "01-2005".
@@ -25,14 +24,30 @@ getPollutionEstimates.df <- function(data, monthyear_start,
   pollutant_bricks <- list(download(pm_monthly_brick), download(ozone_monthly_brick),
                            download(no2_monthly_brick), download(so2_monthly_brick), download(co_monthly_brick))
 
+  pollutant_bricks_pr <- list(download(pr_pm_monthly_brick), download(pr_ozone_monthly_brick),
+                           download(pr_no2_monthly_brick), download(pr_so2_monthly_brick), download(pr_co_monthly_brick))
+
+  dat <- filter(data, Latitude > 20)
+  dat_pr <- filter(data, Latitude < 20)
+
   subset_bricks <- lapply(pollutant_bricks, function(pollutant_brick){
     return(raster::subset(pollutant_brick, c(ind_start:ind_end))) })
 
-  data$pm_estimate <- rowMeans(raster::extract(subset_bricks[[1]], cbind(data$Longitude, data$Latitude)))
-  data$ozone_estimate <- rowMeans(raster::extract(subset_bricks[[2]], cbind(data$Longitude, data$Latitude)))
-  data$no2_estimate <- rowMeans(raster::extract(subset_bricks[[3]], cbind(data$Longitude, data$Latitude)))
-  data$so2_estimate <- rowMeans(raster::extract(subset_bricks[[4]], cbind(data$Longitude, data$Latitude)))
-  data$co_estimate <- rowMeans(raster::extract(subset_bricks[[5]], cbind(data$Longitude, data$Latitude)))
+  subset_bricks_pr <- lapply(pollutant_bricks_pr, function(pollutant_brick_pr){
+    return(raster::subset(pollutant_brick_pr, c(ind_start:ind_end))) })
 
-  return(data)
+  dat$pm_estimate <- rowMeans(raster::extract(subset_bricks[[1]], cbind(dat$Longitude, dat$Latitude)))
+  dat$ozone_estimate <- rowMeans(raster::extract(subset_bricks[[2]], cbind(dat$Longitude, dat$Latitude)))
+  dat$no2_estimate <- rowMeans(raster::extract(subset_bricks[[3]], cbind(dat$Longitude, dat$Latitude)))
+  dat$so2_estimate <- rowMeans(raster::extract(subset_bricks[[4]], cbind(dat$Longitude, dat$Latitude)))
+  dat$co_estimate <- rowMeans(raster::extract(subset_bricks[[5]], cbind(dat$Longitude, dat$Latitude)))
+
+  dat_pr$pm_estimate <- rowMeans(raster::extract(subset_bricks_pr[[1]], cbind(dat_pr$Longitude, dat_pr$Latitude)), na.rm = TRUE)
+  dat_pr$ozone_estimate <- rowMeans(raster::extract(subset_bricks_pr[[2]], cbind(dat_pr$Longitude, dat_pr$Latitude)), na.rm = TRUE)
+  dat_pr$no2_estimate <- rowMeans(raster::extract(subset_bricks_pr[[3]], cbind(dat_pr$Longitude, dat_pr$Latitude)), na.rm = TRUE)
+  dat_pr$so2_estimate <- rowMeans(raster::extract(subset_bricks_pr[[4]], cbind(dat_pr$Longitude, dat_pr$Latitude)), na.rm = TRUE)
+  dat_pr$co_estimate <- rowMeans(raster::extract(subset_bricks_pr[[5]], cbind(dat_pr$Longitude, dat_pr$Latitude)), na.rm = TRUE)
+
+  toReturn <- rbind(dat, dat_pr)
+  return(toReturn)
 }

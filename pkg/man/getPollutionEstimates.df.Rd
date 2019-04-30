@@ -14,8 +14,7 @@ getPollutionEstimates.df(data, monthyear_start, monthyear_end)
 \item{monthyear_end}{string represented as "mm-yyyy". Latest available month-year: "12-2017".}
 }
 \description{
-Given a dataset with Longitude and Latitude columns, will return dataset with columns for each pollutant corresponding to the average of monthly estimates spanning requested time period. Monthly estimates derived from daily EPA files.
-Only for data within the contiguous US. For locations in Puerto Rico, see getPollutionEstimatesPR.df
+Given a dataset with Longitude and Latitude columns (case sensitive), will return dataset with columns for each pollutant corresponding to the average of monthly estimates spanning requested time period. Monthly estimates derived from daily EPA files.
 }
 \examples{
 Longitude <- c(-75.133346, -96.27017, -80.448374)

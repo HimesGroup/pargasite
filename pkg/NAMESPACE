@@ -2,7 +2,6 @@
 
 export(getMonthPollutionEstimate)
 export(getPollutionEstimates.df)
-export(getPollutionEstimatesPR.df)
 export(getRangePollutionEstimate)
 export(getRaster)
 export(getRasterPR)
