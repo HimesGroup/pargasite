@@ -42,7 +42,7 @@ getRangePollutionEstimate <- function(long, lat, pollutant = "PM2.5", monthyear_
   brick_sub <- raster::subset(pollutant_brick, c(ind_start:ind_end))
   ests <- raster::extract(brick_sub, cbind(long,lat))
   if(result == "mean"){
-    return(mean(ests))
+    return(mean(ests, na.rm = TRUE))
   }
   else if(result == "array"){
     colnames(r) <- rep("", length(ests))
