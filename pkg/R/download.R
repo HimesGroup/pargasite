@@ -16,7 +16,7 @@ download <- function(getvar){
     
     url <- paste0("https://s3.amazonaws.com/pargasitedata/", var, ".tif")
     
-    download.file(url, getvar, mode = "wb", method = "curl")
+    download.file(url, getvar, mode = "wb", method = "auto")
     
     ras <- raster::brick(getvar)
     
