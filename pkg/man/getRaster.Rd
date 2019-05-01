@@ -15,5 +15,5 @@ getRaster(pollutant, month_or_year)
 Get pre-generated raster layer for a given pollutant for a month or year in 2005 to 2017.
 }
 \examples{
-getYearPollutionEstimate("PM2.5", "02-2012")
+getRaster("PM2.5", "02-2012")
 }
