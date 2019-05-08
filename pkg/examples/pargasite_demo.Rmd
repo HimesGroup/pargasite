@@ -91,6 +91,15 @@ getRaster(pollutant="PM2.5", month_or_year="02-2012")
 
 ___
 
+#### getRaster for Puerto Rico
+
+Get pre-generated raster layer for a given pollutant for a month or year in 2005 to 2017 specifically for Puerto Rico.
+
+```{r eval=T, echo=T,warning=FALSE,message=FALSE}
+getRasterPR(pollutant="PM2.5", month_or_year="02-2012")
+```
+
+
 #### getUnits
 
 Get standard and units of measurement for pollution variables
