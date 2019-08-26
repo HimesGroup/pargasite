@@ -1,3 +1,7 @@
+#.libPaths("/home/rebecca/R/x86_64-pc-linux-gnu-library/3.4/")
+.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/")
+
+library(leaflet)
 library(shiny)
 library(sf)
 library(maps)
@@ -6,34 +10,44 @@ library(raster)
 library(sp)
 source("labelFormatFunction.R")
 source("month_to_num.R")
-library(pargasite)
+source("getPollutionEstimates.R")
 
+## load in annual bricks for full data
+pm_yearly_brick_full <- brick("../../../../var/www/pargasite_data/pm_yearly_brick_full.tif")
+ozone_yearly_brick_full <- brick("../../../../var/www/pargasite_data/ozone_yearly_brick_full.tif")
+no2_yearly_brick_full <- brick("../../../../var/www/pargasite_data/no2_yearly_brick_full.tif")
+so2_yearly_brick_full <- brick("../../../../var/www/pargasite_data/so2_yearly_brick_full.tif")
+co_yearly_brick_full <- brick("../../../../var/www/pargasite_data/co_yearly_brick_full.tif")
+
+pm_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/pm_yearly_brick_cropped.tif")
+ozone_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/ozone_yearly_brick_cropped.tif")
+no2_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/no2_yearly_brick_cropped.tif")
+so2_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/so2_yearly_brick_cropped.tif")
+co_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/co_yearly_brick_cropped.tif")
+
+## load in annual bricks for Puerto Rico
+pm_yearly_brick_full_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_pm_annual_1km_brick.tif")
+ozone_yearly_brick_full_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_ozone_annual_1km_brick.tif")
+no2_yearly_brick_full_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_no2_annual_1km_brick.tif")
+so2_yearly_brick_full_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_so2_annual_1km_brick.tif")
+co_yearly_brick_full_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_co_annual_1km_brick.tif")
+
+pm_yearly_brick_cropped_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_pm_annual_1km_brick_cropped.tif")
+ozone_yearly_brick_cropped_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_ozone_annual_1km_brick_cropped.tif")
+no2_yearly_brick_cropped_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_no2_annual_1km_brick_cropped.tif")
+so2_yearly_brick_cropped_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_so2_annual_1km_brick_cropped.tif")
+co_yearly_brick_cropped_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_co_annual_1km_brick_cropped.tif")
+
+
+#EPA sites
+epa.sites <- read.csv("/srv/shiny-server/pargasite/data/epa_site_locations.csv") 
+
+#Map
 full_usa = st_as_sf(map("state", plot = FALSE, fill = TRUE))
 
-epa.sites <- read.csv("data/epa_site_locations.csv") 
-
 shinyServer(function(input, output, session){
-
-  poll.e <- reactive({
-    switch(input$pollutant,
-           "PM2.5" = pargasite:::download(pm_yearly_brick_full),
-           "Ozone" = pargasite:::download(ozone_yearly_brick_full),
-           "NO2" = pargasite:::download(no2_yearly_brick_full),
-           "SO2" = pargasite:::download(so2_yearly_brick_full),
-           "CO" = pargasite:::download(co_yearly_brick_full))
-  })
   
-  poll.c <- reactive({
-    switch(input$pollutant,
-           "PM2.5" = pargasite:::download(pm_yearly_brick_cropped),
-           "Ozone" = pargasite:::download(ozone_yearly_brick_cropped),
-           "NO2" = pargasite:::download(no2_yearly_brick_cropped),
-           "SO2" = pargasite:::download(so2_yearly_brick_cropped),
-           "CO" = pargasite:::download(co_yearly_brick_cropped))
-  })
-
-  sites <- reactive({ filter(epa.sites, year == as.numeric(input$year) )})
-
+  #Standard output
   output$notes <- reactive({
     switch(input$pollutant,
            "PM2.5" = "Mean PM2.5 24-hour average (2012 standard); Units = Micrograms/cubic meter",
@@ -44,14 +58,6 @@ shinyServer(function(input, output, session){
     )
   })
   
-  ras.e <- reactive({
-    poll.e()[[(as.numeric(input$year)-2004)]]
-  })
-  
-  ras.c <- reactive({
-    poll.c()[[(as.numeric(input$year)-2004)]]
-  })
-
   trunc.val <- reactive({
     switch(input$pollutant,
            "PM2.5" = 14,
@@ -61,56 +67,169 @@ shinyServer(function(input, output, session){
            "CO" = 0.5
     )
   })
+  
+  #EPA sites
+  sites <- reactive({filter(epa.sites, year == as.numeric(input$year) )})
 
+  #FULL USA
+  poll.e <- reactive({
+    switch(input$pollutant,
+           "PM2.5" = pm_yearly_brick_full,
+           "Ozone" = ozone_yearly_brick_full,
+           "NO2" = no2_yearly_brick_full,
+           "SO2" = so2_yearly_brick_full,
+           "CO" = co_yearly_brick_full)
+  })
+  
+  poll.c <- reactive({
+    switch(input$pollutant,
+           "PM2.5" = pm_yearly_brick_cropped,
+           "Ozone" = ozone_yearly_brick_cropped,
+           "NO2" = no2_yearly_brick_cropped,
+           "SO2" = so2_yearly_brick_cropped,
+           "CO" = co_yearly_brick_cropped)
+  })
+  
+
+  #Reactive elements to get data
+  ras.e <- reactive({
+    poll.e()[[(as.numeric(input$year)-2004)]]
+  })
+  
+  ras.c <- reactive({
+    poll.c()[[(as.numeric(input$year)-2004)]]
+  })
+  
   ras.t <- reactive({
     reclassify(ras.c(), c(trunc.val(), Inf, trunc.val()))
   })
-
-  palette = reactive({
-    colorNumeric(rev(terrain.colors(8)), values(ras.t()), na.color = "transparent")
+  
+  
+  #Puerto Rico only
+  poll.epr <- reactive({
+    switch(input$pollutant,
+           "PM2.5" = pm_yearly_brick_full_pr,
+           "Ozone" = ozone_yearly_brick_full_pr,
+           "NO2" = no2_yearly_brick_full_pr,
+           "SO2" = so2_yearly_brick_full_pr,
+           "CO" = co_yearly_brick_full_pr)
   })
-
-  output$map <- renderLeaflet({
+  
+  poll.cpr <- reactive({
+    switch(input$pollutant,
+           "PM2.5" = pm_yearly_brick_cropped_pr,
+           "Ozone" = ozone_yearly_brick_cropped_pr,
+           "NO2" = no2_yearly_brick_cropped_pr,
+           "SO2" = so2_yearly_brick_cropped_pr,
+           "CO" = co_yearly_brick_cropped_pr)
+  })
+  
+  
+  #Reactive elements to get data
+  ras.epr <- reactive({
+    poll.epr()[[(as.numeric(input$year)-2004)]]
+  })
+  
+  ras.cpr <- reactive({
+    poll.cpr()[[(as.numeric(input$year)-2004)]]
+  })
+  
+  ras.tpr <- reactive({
+    reclassify(ras.cpr(), c(trunc.val(), Inf, trunc.val()))
+  })
+  
+  #Color palette for rasters
+  #USA
+  palette = reactive({
+    colorNumeric(rev(terrain.colors(8)), c(values(ras.t()),values(ras.tpr())), na.color = "transparent")
+  })
+  
+  #PR
+  palette.pr = reactive({
+    colorNumeric(rev(terrain.colors(8)), values(ras.tpr()), na.color = "transparent")
+  })
+  
+  #Warning message for Puerto Rico
+  message <- paste(sep = "<br/>",
+                   "No values available",
+                   "for Puerto Rico")
+  
+  #Base map
+  fmap <- reactive({
     leaflet(full_usa) %>% addTiles() %>%
       setView(-98.35, 39.5, zoom = 4) %>%
-      addRasterImage(x = ras.t(), colors = palette(), method = "ngb") %>%
+      addRasterImage(x = ras.t(), colors = palette(), method = "ngb", opacity = 0.7) %>%
       addPolygons(color = "black", weight = 1, fillColor = "transparent") %>%
-      addLegend(pal = colorNumeric(terrain.colors(8), values(ras.t()), na.color = "transparent"),
-                values = values(ras.t()),
-                labFormat = myLabelFormat(t.val = trunc.val()),
-                position = "bottomleft") %>%
       addCircleMarkers(lng = sites()$Longitude, lat = sites()$Latitude, radius = 0.001, group = "Plot EPA Site Locations") %>%
       addLayersControl(overlayGroups = c("Plot EPA Site Locations"), options = layersControlOptions(collapsed = FALSE)) %>%
       hideGroup(c("Plot EPA Site Locations"))
   })
-
+  
+  #Add Puerto Rico raster if values available
+  output$map <- renderLeaflet({
+    if(!all(is.na(values(ras.tpr())))){
+      fmap() %>%
+    addRasterImage(x = ras.tpr(), colors = palette.pr(), method = "ngb", opacity = 0.7) %>%
+    addLegend(pal = colorNumeric(terrain.colors(8), c(values(ras.t()),values(ras.tpr())), na.color = "transparent"),
+              values = c(values(ras.t()),values(ras.tpr())),
+              labFormat = myLabelFormat(t.val = trunc.val()),
+              position = "bottomleft") 
+    } else {fmap() %>% 
+        addLegend(pal = colorNumeric(terrain.colors(8), values(ras.t()), na.color = "transparent"),
+                  values = values(ras.t()),
+                  labFormat = myLabelFormat(t.val = trunc.val()),
+                  position = "bottomleft") %>%
+        addPopups(-66.48, 18.24, message,options = popupOptions(closeButton = TRUE)) 
+        }
+  })
+  
+  
+  ##Display values on clicking
   output$latlong <- renderText({
     if(!is.null(input$map_click)){
       paste0("(", round(input$map_click$lat,2), ", ", round(input$map_click$lng, 2), ")")
-    }
-  })
-
+    } else paste0("")
+    })
+  
   output$pollutant_val <- renderText({
     if(!is.null(input$map_click)){
       if(!is.na(raster::extract(ras.e(), cbind(input$map_click$lng, input$map_click$lat)))) {
         paste0(input$pollutant, " estimate = ", round(raster::extract(ras.e(), cbind(input$map_click$lng, input$map_click$lat)),2))
+      }else if(!is.na(raster::extract(ras.epr(), cbind(input$map_click$lng, input$map_click$lat)))) {
+        paste0(input$pollutant, " estimate = ", round(raster::extract(ras.epr(), cbind(input$map_click$lng, input$map_click$lat)),2))
       }
       else paste0("")
-    }
-  })
+    }})
   
+  
+  #Monthly data
   monthyear_start <- reactive({ paste0(month_to_num(input$start_month), "-", input$start_year) })
   monthyear_end <- reactive({ paste0(month_to_num(input$end_month), "-", input$end_year) })
   
+  #Download results
   output$finalDownload <-
     downloadHandler(
-      filename <- function() { "pargasite_file.csv" },
+      filename <- function() { paste("pargasite-", Sys.Date(), ".csv", sep="") },
       content <- function(file){
         infile <- read.csv(input$user_file$datapath)
-        outfile <- pargasite::getPollutionEstimates.df(dplyr::tbl_df(infile), monthyear_start(), monthyear_end())
+        outfile1 <- getPollutionEstimates.df.app(as.data.frame(infile), monthyear_start(), monthyear_end(),"USA")
+        outfile2 <- getPollutionEstimates.df.app(as.data.frame(infile), monthyear_start(), monthyear_end(),"PR")
+        outfile <- rbind(outfile1, outfile2)
+        outfile <- outfile[rowSums(is.na(outfile)) <= 4,]
         write.csv(outfile, file, row.names = FALSE)
       }
     )
-
+  
+  
+  output$downloadData <- downloadHandler(
+    filename = function() {
+      "pargasite_sample_input_file.csv"
+    },
+    content = function(file) {
+      sample_input <- read.csv("data/pargasite_sample_input_file.csv")
+      write.csv(sample_input, file,row.names = FALSE)
+    }
+  )
+  
 })
 
