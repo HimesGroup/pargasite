@@ -7,6 +7,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 <meta name="author" content="Avantika Diwadkar (avantika.diwadkar@pennmedicine.upenn.edu)" />
@@ -70,9 +71,7 @@ h6 {
 </style>
 
 
-</head>
 
-<body>
 
 <style type="text/css">
 .main-container {
@@ -97,22 +96,80 @@ img {
 button.code-folding-btn:focus {
   outline: none;
 }
+summary {
+  display: list-item;
+}
 </style>
 
 
 
-<div class="container-fluid main-container">
-
 <!-- tabsets -->
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-</script>
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
 
 <!-- code folding -->
 
 
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
 
 
 
@@ -122,8 +179,8 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">PARGASITE: demo analysis using R package</h1>
-<h4 class="author"><em>Avantika Diwadkar (<a href="mailto:avantika.diwadkar@pennmedicine.upenn.edu">avantika.diwadkar@pennmedicine.upenn.edu</a>)</em></h4>
-<h4 class="date"><em>23 April, 2019</em></h4>
+<h4 class="author">Avantika Diwadkar (<a href="mailto:avantika.diwadkar@pennmedicine.upenn.edu">avantika.diwadkar@pennmedicine.upenn.edu</a>)</h4>
+<h4 class="date">11 October, 2019</h4>
 
 </div>
 
@@ -202,15 +259,28 @@ pander(unlist(res_lst))</code></pre>
 <h4>getRaster</h4>
 <p>Get pre-generated raster layer for a given pollutant for a month or year in 2005 to 2017</p>
 <pre class="r"><code>getRaster(pollutant=&quot;PM2.5&quot;, month_or_year=&quot;02-2012&quot;)</code></pre>
-<pre><code>## class       : RasterLayer 
-## band        : 86  (of  162  bands)
-## dimensions  : 269, 640, 172160  (nrow, ncol, ncell)
-## resolution  : 0.09011544, 0.09016097  (x, y)
-## extent      : -124.6813, -67.00742, 25.12993, 49.38323  (xmin, xmax, ymin, ymax)
-## coord. ref. : +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0 
-## data source : /private/var/folders/2q/z6tjvctn6xdbk8dgdchpt2vr_zwv_7/T/RtmpSmcnmP/file95238ea403c 
-## names       : file95238ea403c.86</code></pre>
+<pre><code>## class      : RasterLayer 
+## band       : 86  (of  162  bands)
+## dimensions : 269, 640, 172160  (nrow, ncol, ncell)
+## resolution : 0.09011544, 0.09016097  (x, y)
+## extent     : -124.6813, -67.00742, 25.12993, 49.38323  (xmin, xmax, ymin, ymax)
+## crs        : +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0 
+## source     : /private/var/folders/2q/z6tjvctn6xdbk8dgdchpt2vr_zwv_7/T/RtmpMFY6mB/file629d8d26db6 
+## names      : file629d8d26db6.86</code></pre>
 <hr />
+</div>
+<div id="getraster-for-puerto-rico" class="section level4">
+<h4>getRaster for Puerto Rico</h4>
+<p>Get pre-generated raster layer for a given pollutant for a month or year in 2005 to 2017 specifically for Puerto Rico.</p>
+<pre class="r"><code>getRasterPR(pollutant=&quot;PM2.5&quot;, month_or_year=&quot;02-2012&quot;)</code></pre>
+<pre><code>## class      : RasterLayer 
+## band       : 86  (of  156  bands)
+## dimensions : 8, 19, 152  (nrow, ncol, ncell)
+## resolution : 0.09228147, 0.085171  (x, y)
+## extent     : -67.32771, -65.57436, 17.8965, 18.57787  (xmin, xmax, ymin, ymax)
+## crs        : +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0 
+## source     : /private/var/folders/2q/z6tjvctn6xdbk8dgdchpt2vr_zwv_7/T/RtmpMFY6mB/file629d12053321 
+## names      : file629d12053321.86</code></pre>
 </div>
 <div id="getunits" class="section level4">
 <h4>getUnits</h4>
@@ -251,7 +321,7 @@ pander(unlist(res_lst))</code></pre>
 <p><strong>locale:</strong> en_US.UTF-8||en_US.UTF-8||en_US.UTF-8||C||en_US.UTF-8||en_US.UTF-8</p>
 <p><strong>attached base packages:</strong> <em>stats</em>, <em>graphics</em>, <em>grDevices</em>, <em>utils</em>, <em>datasets</em>, <em>methods</em> and <em>base</em></p>
 <p><strong>other attached packages:</strong> <em>pander(v.0.6.3)</em> and <em>pargasite(v.0.0.0.9000)</em></p>
-<p><strong>loaded via a namespace (and not attached):</strong> <em>Rcpp(v.0.12.19)</em>, <em>codetools(v.0.2-15)</em>, <em>lattice(v.0.20-35)</em>, <em>digest(v.0.6.18)</em>, <em>rprojroot(v.1.3-2)</em>, <em>grid(v.3.5.0)</em>, <em>backports(v.1.1.2)</em>, <em>magrittr(v.1.5)</em>, <em>evaluate(v.0.12)</em>, <em>stringi(v.1.2.4)</em>, <em>raster(v.2.8-19)</em>, <em>sp(v.1.3-1)</em>, <em>rmarkdown(v.1.10)</em>, <em>rgdal(v.1.3-6)</em>, <em>tools(v.3.5.0)</em>, <em>stringr(v.1.3.1)</em>, <em>yaml(v.2.2.0)</em>, <em>compiler(v.3.5.0)</em>, <em>htmltools(v.0.3.6)</em> and <em>knitr(v.1.20)</em></p>
+<p><strong>loaded via a namespace (and not attached):</strong> <em>Rcpp(v.1.0.1)</em>, <em>knitr(v.1.23)</em>, <em>raster(v.2.9-23)</em>, <em>magrittr(v.1.5)</em>, <em>tidyselect(v.0.2.5)</em>, <em>lattice(v.0.20-38)</em>, <em>R6(v.2.4.0)</em>, <em>rlang(v.0.4.0)</em>, <em>stringr(v.1.4.0)</em>, <em>dplyr(v.0.8.3)</em>, <em>tools(v.3.5.0)</em>, <em>rgdal(v.1.4-4)</em>, <em>grid(v.3.5.0)</em>, <em>xfun(v.0.8)</em>, <em>htmltools(v.0.3.6)</em>, <em>yaml(v.2.2.0)</em>, <em>digest(v.0.6.20)</em>, <em>assertthat(v.0.2.1)</em>, <em>tibble(v.2.1.3)</em>, <em>crayon(v.1.3.4)</em>, <em>purrr(v.0.3.2)</em>, <em>codetools(v.0.2-16)</em>, <em>glue(v.1.3.1)</em>, <em>evaluate(v.0.14)</em>, <em>rmarkdown(v.1.14)</em>, <em>sp(v.1.3-1)</em>, <em>stringi(v.1.4.3)</em>, <em>compiler(v.3.5.0)</em>, <em>pillar(v.1.4.2)</em> and <em>pkgconfig(v.2.0.2)</em></p>
 </div>
 
 
@@ -271,6 +341,23 @@ $(document).ready(function () {
 
 
 </script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
