@@ -188,6 +188,7 @@ summary {
 <hr />
 <p><strong>Pollution-Associated Risk Geospatial Analysis SITE</strong></p>
 <p>Pargasite uses publicly available data from the United States Environmental Protection Agency (EPA). We have no affiliation with the EPA. From this data, we generated monthly and yearly raster files (Jan 2005 to Dec 2017) for PM2.5, Ozone, NO2, SO2, and CO covering the contiguous US using inverse distance weighted interpolation from the 5 nearest EPA monitoring stations. The R package allows the user to obtain a more customized output as compared to the website (<a href="http://pargasite.org/" class="uri">http://pargasite.org/</a>) and work with the raster layers directly.</p>
+<p>You can refer to our published work here: Greenblatt RE, Himes BE. Facilitating Inclusion of Geocoded Pollution Data into Health Studies. AMIA Jt Summits Transl Sci Proc. 2019;2019:553–561.(PMID: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6568125/">31259010</a>)</p>
 <p>Install the prerequisite R packages if they do not exist:</p>
 <pre class="r"><code>library(devtools)
 devtools::install_github(&quot;HimesGroup/pargasite&quot;, subdir = &quot;pkg&quot;)</code></pre>
@@ -265,8 +266,8 @@ pander(unlist(res_lst))</code></pre>
 ## resolution : 0.09011544, 0.09016097  (x, y)
 ## extent     : -124.6813, -67.00742, 25.12993, 49.38323  (xmin, xmax, ymin, ymax)
 ## crs        : +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0 
-## source     : /private/var/folders/2q/z6tjvctn6xdbk8dgdchpt2vr_zwv_7/T/RtmpMFY6mB/file629d8d26db6 
-## names      : file629d8d26db6.86</code></pre>
+## source     : /private/var/folders/2q/z6tjvctn6xdbk8dgdchpt2vr_zwv_7/T/Rtmpwl9iBL/file63b247166291 
+## names      : file63b247166291.86</code></pre>
 <hr />
 </div>
 <div id="getraster-for-puerto-rico" class="section level4">
@@ -279,8 +280,8 @@ pander(unlist(res_lst))</code></pre>
 ## resolution : 0.09228147, 0.085171  (x, y)
 ## extent     : -67.32771, -65.57436, 17.8965, 18.57787  (xmin, xmax, ymin, ymax)
 ## crs        : +proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0 
-## source     : /private/var/folders/2q/z6tjvctn6xdbk8dgdchpt2vr_zwv_7/T/RtmpMFY6mB/file629d12053321 
-## names      : file629d12053321.86</code></pre>
+## source     : /private/var/folders/2q/z6tjvctn6xdbk8dgdchpt2vr_zwv_7/T/Rtmpwl9iBL/file63b254632f65 
+## names      : file63b254632f65.86</code></pre>
 </div>
 <div id="getunits" class="section level4">
 <h4>getUnits</h4>
