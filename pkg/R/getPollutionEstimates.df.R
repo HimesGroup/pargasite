@@ -27,8 +27,8 @@ getPollutionEstimates.df <- function(data, monthyear_start,
   pollutant_bricks_pr <- list(download(pr_pm_monthly_brick), download(pr_ozone_monthly_brick),
                            download(pr_no2_monthly_brick), download(pr_so2_monthly_brick), download(pr_co_monthly_brick))
 
-  dat <- filter(data, Latitude > 20)
-  dat_pr <- filter(data, Latitude < 20)
+  dat <- dplyr::filter(data, Latitude > 20)
+  dat_pr <- dplyr::filter(data, Latitude < 20)
 
   subset_bricks <- lapply(pollutant_bricks, function(pollutant_brick){
     return(raster::subset(pollutant_brick, c(ind_start:ind_end))) })
