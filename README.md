@@ -1,5 +1,4 @@
-# pargasite
-Pollution-Associated Risk Geospatial Analysis SITE
+# Pollution-Associated Risk Geospatial Analysis SITE (pargasite)
 
 Pollution-Associated Risk Geospatial Analysis SITE (PARGASITE) is an online web-application and R package that can be used to estimate levels of pollutants in the U.S. for 1997 through 2019 at user-defined geographic locations and time ranges. Measures correspond to monthly and yearly raster files (Jan 2005 to Dec 2019) for PM2.5, Ozone, NO2, SO2, and CO covering the US and Puerto Rico that were created from United States Environmental Protection Agency (EPA) regulatory monitor data. The R package allows the user to obtain more customized output as well as work with the raster layers directly.
 
