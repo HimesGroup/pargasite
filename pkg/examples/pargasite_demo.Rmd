@@ -13,7 +13,7 @@ editor_options:
 
 **Pollution-Associated Risk Geospatial Analysis SITE**
 
-Pargasite uses publicly available data from the United States Environmental Protection Agency (EPA). We have no affiliation with the EPA. From this data, we generated monthly and yearly raster files (Jan 2005 to Dec 2017) for PM2.5, Ozone, NO2, SO2, and CO covering the contiguous US using inverse distance weighted interpolation from the 5 nearest EPA monitoring stations. The R package allows the user to obtain a more customized output as compared to the website (http://pargasite.org/) and work with the raster layers directly. 
+Pargasite uses publicly available data from the United States Environmental Protection Agency (EPA). We have no affiliation with the EPA. From this data, we generated monthly and yearly raster files (Jan 1997 to Dec 2019) for PM2.5, Ozone, NO2, SO2, and CO covering the contiguous US using inverse distance weighted interpolation from the 5 nearest EPA monitoring stations. The R package allows the user to obtain a more customized output as compared to the website (http://pargasite.org/) and work with the raster layers directly. 
 
 You can refer to our published work here:
 Greenblatt RE, Himes BE. Facilitating Inclusion of Geocoded Pollution Data into Health Studies. AMIA Jt Summits Transl Sci Proc. 2019;2019:553–561.(PMID: [31259010](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6568125/))
@@ -87,7 +87,7 @@ ___
 
 #### getRaster
 
-Get pre-generated raster layer for a given pollutant for a month or year in 2005 to 2017
+Get pre-generated raster layer for a given pollutant for a month or year in 1997 to 2019
 ```{r eval=T, echo=T,warning=FALSE,message=FALSE}
 getRaster(pollutant="PM2.5", month_or_year="02-2012")
 ```
@@ -96,7 +96,7 @@ ___
 
 #### getRaster for Puerto Rico
 
-Get pre-generated raster layer for a given pollutant for a month or year in 2005 to 2017 specifically for Puerto Rico.
+Get pre-generated raster layer for a given pollutant for a month or year in 1997 to 2019 specifically for Puerto Rico.
 
 ```{r eval=T, echo=T,warning=FALSE,message=FALSE}
 getRasterPR(pollutant="PM2.5", month_or_year="02-2012")
@@ -114,7 +114,7 @@ ___
 
 #### getYearPollutionEstimate
 
-Get estimate of a given pollutant for a given year (2005 to 2017). Derived from annual EPA files.
+Get estimate of a given pollutant for a given year (1997 to 2019). Derived from annual EPA files.
 ```{r eval=T, echo=T,warning=FALSE,message=FALSE}
 res_lst <- list()
 for (i in seq(1,nrow(res_df))){

@@ -1,6 +1,6 @@
 #' Get raster layer for a given year or month-year for Puerto Rico.
 #'
-#' Get pre-generated raster layer for a given pollutant for a month or year in 2005 to 2017.
+#' Get pre-generated raster layer for a given pollutant for a month or year in 1997 to 2019.
 #'
 #' @param pollutant string, one of "PM2.5", "Ozone", "NO2", "SO2", "CO"
 #' @param  month_or_year string represented as "mm-yyyy" or "yyyy". Ex: "02-2012" or "2012".

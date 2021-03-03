@@ -1,6 +1,6 @@
 #' Get pollution estimate for a given year
 #'
-#' Get estimate of a given pollutant for a given year (2005 to 2017). Derived from annual EPA files.
+#' Get estimate of a given pollutant for a given year (1997 to 2019). Derived from annual EPA files.
 #'
 #' @param long numeric longitude value
 #' @param lat numeric latitude value
