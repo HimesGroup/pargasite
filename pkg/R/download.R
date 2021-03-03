@@ -14,7 +14,9 @@ download <- function(getvar){
     
     getvar <- tempfile()
     
-    url <- paste0("https://s3.amazonaws.com/pargasitedata/", var, ".tif")
+    #url <- paste0("https://s3.amazonaws.com/pargasitedata/", var, ".tif")
+    
+    url <- paste0("https://public.himeslab.dev/pargasite/", var, ".tif")
     
     download.file(url, getvar, mode = "wb", method = "auto")
     
