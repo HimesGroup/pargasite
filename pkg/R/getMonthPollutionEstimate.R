@@ -1,6 +1,6 @@
 #' Get pollution estimate for a given month
 #'
-#' Get estimate of a given pollutant for a given month ("01-2005" - "12-2017"). Derived from daily EPA files.
+#' Get estimate of a given pollutant for a given month ("01-1997" - "12-2019"). Derived from daily EPA files.
 #'
 #' @param long numeric longitude value
 #' @param lat numeric latitude value
