@@ -1,5 +1,5 @@
 #.libPaths("/home/rebecca/R/x86_64-pc-linux-gnu-library/3.4/")
-.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/")
+#.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/")
 
 library(leaflet)
 library(shiny)
@@ -12,35 +12,39 @@ source("labelFormatFunction.R")
 source("month_to_num.R")
 source("getPollutionEstimates.R")
 
-## load in annual bricks for full data
-pm_yearly_brick_full <- brick("../../../../var/www/pargasite_data/pm_yearly_brick_full.tif")
-ozone_yearly_brick_full <- brick("../../../../var/www/pargasite_data/ozone_yearly_brick_full.tif")
-no2_yearly_brick_full <- brick("../../../../var/www/pargasite_data/no2_yearly_brick_full.tif")
-so2_yearly_brick_full <- brick("../../../../var/www/pargasite_data/so2_yearly_brick_full.tif")
-co_yearly_brick_full <- brick("../../../../var/www/pargasite_data/co_yearly_brick_full.tif")
+#set colors
+#replace terrain.colors(8)
+map_colors <- c("#8c2d04","#cc4c02","#ec7014","#fe9929","#fec44f","#fee391","#fff7bc","#ffffe5")
 
-pm_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/pm_yearly_brick_cropped.tif")
-ozone_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/ozone_yearly_brick_cropped.tif")
-no2_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/no2_yearly_brick_cropped.tif")
-so2_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/so2_yearly_brick_cropped.tif")
-co_yearly_brick_cropped <- brick("../../../../var/www/pargasite_data/co_yearly_brick_cropped.tif")
+## load in annual bricks for full data
+pm_yearly_brick_full <- brick("pargasite_rasters/Annual/10km_rasters/pm_yearly_brick_full_10km.tif")
+ozone_yearly_brick_full <- brick("pargasite_rasters/Annual/10km_rasters/ozone_yearly_brick_full_10km.tif")
+no2_yearly_brick_full <- brick("pargasite_rasters/Annual/10km_rasters/no2_yearly_brick_full_10km.tif")
+so2_yearly_brick_full <- brick("pargasite_rasters/Annual/10km_rasters/so2_yearly_brick_full_10km.tif")
+co_yearly_brick_full <- brick("pargasite_rasters/Annual/10km_rasters/co_yearly_brick_full_10km.tif")
+
+pm_yearly_brick_cropped <- brick("pargasite_rasters/Annual/10km_rasters/pm_yearly_brick_full_10km_cropped.tif")
+ozone_yearly_brick_cropped <- brick("pargasite_rasters/Annual/10km_rasters/ozone_yearly_brick_full_10km_cropped.tif")
+no2_yearly_brick_cropped <- brick("pargasite_rasters/Annual/10km_rasters/no2_yearly_brick_full_10km_cropped.tif")
+so2_yearly_brick_cropped <- brick("pargasite_rasters/Annual/10km_rasters/so2_yearly_brick_full_10km_cropped.tif")
+co_yearly_brick_cropped <- brick("pargasite_rasters/Annual/10km_rasters/co_yearly_brick_full_10km_cropped.tif")
 
 ## load in annual bricks for Puerto Rico
-pm_yearly_brick_full_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_pm_annual_1km_brick.tif")
-ozone_yearly_brick_full_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_ozone_annual_1km_brick.tif")
-no2_yearly_brick_full_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_no2_annual_1km_brick.tif")
-so2_yearly_brick_full_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_so2_annual_1km_brick.tif")
-co_yearly_brick_full_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_co_annual_1km_brick.tif")
+pm_yearly_brick_full_pr <- brick("pargasite_rasters/Annual/1km_rasters/pr_pm_annual_1km_brick.tif")
+ozone_yearly_brick_full_pr <- brick("pargasite_rasters/Annual/1km_rasters/pr_ozone_annual_1km_brick.tif")
+no2_yearly_brick_full_pr <- brick("pargasite_rasters/Annual/1km_rasters/pr_no2_annual_1km_brick.tif")
+so2_yearly_brick_full_pr <- brick("pargasite_rasters/Annual/1km_rasters/pr_so2_annual_1km_brick.tif")
+co_yearly_brick_full_pr <- brick("pargasite_rasters/Annual/1km_rasters/pr_co_annual_1km_brick.tif")
 
-pm_yearly_brick_cropped_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_pm_annual_1km_brick_cropped.tif")
-ozone_yearly_brick_cropped_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_ozone_annual_1km_brick_cropped.tif")
-no2_yearly_brick_cropped_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_no2_annual_1km_brick_cropped.tif")
-so2_yearly_brick_cropped_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_so2_annual_1km_brick_cropped.tif")
-co_yearly_brick_cropped_pr <- brick("/srv/shiny-server/databases/pr_1km/pr_co_annual_1km_brick_cropped.tif")
+pm_yearly_brick_cropped_pr <- brick("pargasite_rasters/Annual/1km_rasters/pr_pm_annual_1km_brick_cropped.tif")
+ozone_yearly_brick_cropped_pr <- brick("pargasite_rasters/Annual/1km_rasters/pr_ozone_annual_1km_brick_cropped.tif")
+no2_yearly_brick_cropped_pr <- brick("pargasite_rasters/Annual/1km_rasters/pr_no2_annual_1km_brick_cropped.tif")
+so2_yearly_brick_cropped_pr <- brick("pargasite_rasters/Annual/1km_rasters/pr_so2_annual_1km_brick_cropped.tif")
+co_yearly_brick_cropped_pr <- brick("pargasite_rasters/Annual/1km_rasters/pr_co_annual_1km_brick_cropped.tif")
 
 
 #EPA sites
-epa.sites <- read.csv("/srv/shiny-server/pargasite/data/epa_site_locations.csv") 
+epa.sites <- read.csv("data/epa_site_locations.csv") 
 
 #Map
 full_usa = st_as_sf(map("state", plot = FALSE, fill = TRUE))
@@ -93,11 +97,11 @@ shinyServer(function(input, output, session){
 
   #Reactive elements to get data
   ras.e <- reactive({
-    poll.e()[[(as.numeric(input$year)-2004)]]
+    poll.e()[[(as.numeric(input$year)-1996)]]
   })
   
   ras.c <- reactive({
-    poll.c()[[(as.numeric(input$year)-2004)]]
+    poll.c()[[(as.numeric(input$year)-1996)]]
   })
   
   ras.t <- reactive({
@@ -127,11 +131,11 @@ shinyServer(function(input, output, session){
   
   #Reactive elements to get data
   ras.epr <- reactive({
-    poll.epr()[[(as.numeric(input$year)-2004)]]
+    poll.epr()[[(as.numeric(input$year)-1996)]]
   })
   
   ras.cpr <- reactive({
-    poll.cpr()[[(as.numeric(input$year)-2004)]]
+    poll.cpr()[[(as.numeric(input$year)-1996)]]
   })
   
   ras.tpr <- reactive({
@@ -141,12 +145,12 @@ shinyServer(function(input, output, session){
   #Color palette for rasters
   #USA
   palette = reactive({
-    colorNumeric(rev(terrain.colors(8)), c(values(ras.t()),values(ras.tpr())), na.color = "transparent")
+    colorNumeric(rev(map_colors), c(values(ras.t()),values(ras.tpr())), na.color = "transparent")
   })
   
   #PR
   palette.pr = reactive({
-    colorNumeric(rev(terrain.colors(8)), values(ras.tpr()), na.color = "transparent")
+    colorNumeric(rev(map_colors), values(ras.tpr()), na.color = "transparent")
   })
   
   #Warning message for Puerto Rico
@@ -170,13 +174,15 @@ shinyServer(function(input, output, session){
     if(!all(is.na(values(ras.tpr())))){
       fmap() %>%
     addRasterImage(x = ras.tpr(), colors = palette.pr(), method = "ngb", opacity = 0.7) %>%
-    addLegend(pal = colorNumeric(terrain.colors(8), c(values(ras.t()),values(ras.tpr())), na.color = "transparent"),
+    addLegend(pal = colorNumeric(map_colors, c(values(ras.t()),values(ras.tpr())), na.color = "transparent"),
               values = c(values(ras.t()),values(ras.tpr())),
+              title = paste0(input$pollutant),
               labFormat = myLabelFormat(t.val = trunc.val()),
               position = "bottomleft") 
     } else {fmap() %>% 
-        addLegend(pal = colorNumeric(terrain.colors(8), values(ras.t()), na.color = "transparent"),
+        addLegend(pal = colorNumeric(map_colors, values(ras.t()), na.color = "transparent"),
                   values = values(ras.t()),
+                  title = paste0(input$pollutant),
                   labFormat = myLabelFormat(t.val = trunc.val()),
                   position = "bottomleft") %>%
         addPopups(-66.48, 18.24, message,options = popupOptions(closeButton = TRUE)) 
@@ -226,8 +232,9 @@ shinyServer(function(input, output, session){
       "pargasite_sample_input_file.csv"
     },
     content = function(file) {
+      #cat("\n", file = "data/pargasite_sample_input_file.csv", append = TRUE)
       sample_input <- read.csv("data/pargasite_sample_input_file.csv")
-      write.csv(sample_input, file,row.names = FALSE)
+      write.csv(sample_input, file,row.names = FALSE, quote = FALSE)
     }
   )
   

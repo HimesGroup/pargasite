@@ -1,5 +1,5 @@
 #.libPaths("/home/rebecca/R/x86_64-pc-linux-gnu-library/3.4/")
-.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/")
+#.libPaths("/home/maya/R/x86_64-pc-linux-gnu-library/3.4/")
 
 library(leaflet)
 
@@ -27,7 +27,7 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                     h4("Map View"),
                     selectizeInput(inputId = "year",
                                    label = "Year",
-                                   choices = c("2005":"2017"),
+                                   choices = c("1997":"2019"),
                                    selected = "2017",
                                    multiple = FALSE),
                     selectizeInput(inputId = "pollutant",
@@ -50,7 +50,7 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                                                multiple = FALSE)),
                       column(6, selectizeInput(inputId = "start_year",
                                                label = "Start Year",
-                                               choices = c("2005":"2017"),
+                                               choices = c("1997":"2019"),
                                                selected = "2015",
                                                multiple = FALSE))),
                     fluidRow(
@@ -62,7 +62,7 @@ shinyUI(fluidPage(theme = "bootstrap.css",
                                                multiple = FALSE)),
                       column(6, selectizeInput(inputId = "end_year",
                                                label = "End Year",
-                                               choices = c("2005":"2017"),
+                                               choices = c("1997":"2019"),
                                                selected = "2015",
                                                multiple = FALSE))),
                     h5(p("Choose .csv file with Latitude and Longitude columns. A sample input file can be downloaded",downloadLink("downloadData", "here."))),
