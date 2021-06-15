@@ -72,6 +72,17 @@ shinyServer(function(input, output, session){
     )
   })
   
+  #Units of measurement
+  units <- reactive({
+    switch(input$pollutant,
+           "PM2.5" = "ug/m3",
+           "Ozone" = "ppm",
+           "NO2" = "ppb",
+           "SO2" = "ppb",
+           "CO" = "ppm"
+    )
+  })
+  
   #EPA sites
   sites <- reactive({filter(epa.sites, year == as.numeric(input$year) )})
 
@@ -176,13 +187,13 @@ shinyServer(function(input, output, session){
     addRasterImage(x = ras.tpr(), colors = palette.pr(), method = "ngb", opacity = 0.7) %>%
     addLegend(pal = colorNumeric(map_colors, c(values(ras.t()),values(ras.tpr())), na.color = "transparent"),
               values = c(values(ras.t()),values(ras.tpr())),
-              title = paste0(input$pollutant),
+              title = paste0(input$pollutant," (",units(),")"),
               labFormat = myLabelFormat(t.val = trunc.val()),
               position = "bottomleft") 
     } else {fmap() %>% 
         addLegend(pal = colorNumeric(map_colors, values(ras.t()), na.color = "transparent"),
                   values = values(ras.t()),
-                  title = paste0(input$pollutant),
+                  title = paste0(input$pollutant," (",units(),")"),
                   labFormat = myLabelFormat(t.val = trunc.val()),
                   position = "bottomleft") %>%
         addPopups(-66.48, 18.24, message,options = popupOptions(closeButton = TRUE)) 
@@ -222,6 +233,7 @@ shinyServer(function(input, output, session){
         outfile2 <- getPollutionEstimates.df.app(as.data.frame(infile), monthyear_start(), monthyear_end(),"PR")
         outfile <- rbind(outfile1, outfile2)
         outfile <- outfile[rowSums(is.na(outfile)) <= 4,]
+        outfile$Time_range <- toString(paste0(monthyear_start(), " to ", monthyear_end()))
         write.csv(outfile, file, row.names = FALSE)
       }
     )
