@@ -16,10 +16,10 @@ getPollutionEstimates.df <- function(data, monthyear_start,
                                       monthyear_end) {
 
   month_year_start <- as.numeric(strsplit(monthyear_start, "-")[[1]])
-  ind_start <- 12*(month_year_start[2]-2005) + month_year_start[1]
+  ind_start <- 12*(month_year_start[2]-1997) + month_year_start[1]
 
   month_year_end <- as.numeric(strsplit(monthyear_end, "-")[[1]])
-  ind_end <- 12*(month_year_end[2]-2005) + month_year_end[1]
+  ind_end <- 12*(month_year_end[2]-1997) + month_year_end[1]
 
   pollutant_bricks <- list(download(pm_monthly_brick), download(ozone_monthly_brick),
                            download(no2_monthly_brick), download(so2_monthly_brick), download(co_monthly_brick))
