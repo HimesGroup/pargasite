@@ -7,12 +7,12 @@
 #' @param long numeric longitude value
 #' @param lat numeric latitude value
 #' @param pollutant string, one of "PM2.5", "Ozone", "NO2", "SO2" or "CO". Default set to "PM2.5"
-#' @param monthyear_start string represented as "mm-yyyy." Earliest available month-year: "01-2005".
-#' @param monthyear_end string represented as "mm-yyyy." Latest available month-year: "12-2017".
+#' @param monthyear_start string represented as "mm-yyyy." Earliest available month-year: "01-1997".
+#' @param monthyear_end string represented as "mm-yyyy." Latest available month-year: "12-2019".
 #' @param result string, one of "mean" or "array." Mean will return the average of the monthly estimates over the time
 #' period, array will return a vector where each value corresponds to each month over the time period
 #' @examples
-#' getRangePollutionEstimate(-75.162, 39.9526, "PM2.5", "01-2005", "12-2017")
+#' getRangePollutionEstimate(-75.162, 39.9526, "PM2.5", "01-1997", "12-2019")
 #' @export
 
 getRangePollutionEstimate <- function(long, lat, pollutant = "PM2.5", monthyear_start,
@@ -34,10 +34,10 @@ getRangePollutionEstimate <- function(long, lat, pollutant = "PM2.5", monthyear_
   }
 
   month_year_start <- as.numeric(strsplit(monthyear_start, "-")[[1]])
-  ind_start <- 12*(month_year_start[2]-1996) + month_year_start[1]
+  ind_start <- 12*(month_year_start[2]-1997) + month_year_start[1]
 
   month_year_end <- as.numeric(strsplit(monthyear_end, "-")[[1]])
-  ind_end <- 12*(month_year_end[2]-1996) + month_year_end[1]
+  ind_end <- 12*(month_year_end[2]-1997) + month_year_end[1]
 
   brick_sub <- raster::subset(pollutant_brick, c(ind_start:ind_end))
   ests <- raster::extract(brick_sub, cbind(long,lat))
