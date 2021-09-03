@@ -19,7 +19,7 @@ getRasterPR <- function(pollutant, month_or_year){
                          "SO2" = download(pr_so2_annual_brick),
                          "CO" = download(pr_co_annual_brick)
     )
-    ind <- as.numeric(month_or_year)-2004
+    ind <- as.numeric(month_or_year)-1995
 
     r <- poll_brick[[ind]]
     return(r)
@@ -35,7 +35,7 @@ getRasterPR <- function(pollutant, month_or_year){
                          "CO" = download(pr_co_monthly_brick))
 
     month_year <- as.numeric(strsplit(month_or_year, "-")[[1]])
-    ind <- 12*(month_year[2]-2005) + month_year[1]
+    ind <- 12*(month_year[2]-1996) + month_year[1]
 
     r <- poll_brick[[ind]]
     return(r)
