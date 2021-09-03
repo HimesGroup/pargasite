@@ -34,10 +34,10 @@ getRangePollutionEstimate <- function(long, lat, pollutant = "PM2.5", monthyear_
   }
 
   month_year_start <- as.numeric(strsplit(monthyear_start, "-")[[1]])
-  ind_start <- 12*(month_year_start[2]-2005) + month_year_start[1]
+  ind_start <- 12*(month_year_start[2]-1996) + month_year_start[1]
 
   month_year_end <- as.numeric(strsplit(monthyear_end, "-")[[1]])
-  ind_end <- 12*(month_year_end[2]-2005) + month_year_end[1]
+  ind_end <- 12*(month_year_end[2]-1996) + month_year_end[1]
 
   brick_sub <- raster::subset(pollutant_brick, c(ind_start:ind_end))
   ests <- raster::extract(brick_sub, cbind(long,lat))
