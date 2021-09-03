@@ -28,7 +28,7 @@ getYearPollutionEstimate <- function(long, lat, pollutant = "PM2.5", year){
                             "CO" = download(co_yearly_brick_full))
   }
 
-  raster::extract(pollutant_brick[[(as.numeric(year)-2004)]], cbind(long, lat))
+  raster::extract(pollutant_brick[[(as.numeric(year)-1996)]], cbind(long, lat))
 
 }
 
