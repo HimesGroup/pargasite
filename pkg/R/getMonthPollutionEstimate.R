@@ -21,7 +21,7 @@ getMonthPollutionEstimate <- function(long, lat, pollutant = "PM2.5", monthyear)
                               "CO" = download(pr_co_monthly_brick))
 
     month_year <- as.numeric(strsplit(monthyear, "-")[[1]])
-    ind <- 12*(month_year[2]-2005) + month_year[1]
+    ind <- 12*(month_year[2]-1996) + month_year[1]
 
     raster::extract(pollutant_brick[[ind]], cbind(long,lat))
   } else {
@@ -34,7 +34,7 @@ getMonthPollutionEstimate <- function(long, lat, pollutant = "PM2.5", monthyear)
                               "CO" = download(co_monthly_brick))
 
     month_year <- as.numeric(strsplit(monthyear, "-")[[1]])
-    ind <- 12*(month_year[2]-2005) + month_year[1]
+    ind <- 12*(month_year[2]-1996) + month_year[1]
 
     raster::extract(pollutant_brick[[ind]], cbind(long,lat))
   }
