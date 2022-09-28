@@ -2,18 +2,18 @@
 
 Authors: Rebecca Greenblatt, Avantika Diwadkar, Nisha Narayanan, Blance Himes
 
-Pollution-Associated Risk Geospatial Analysis SITE (PARGASITE) is an online web-application and R package that can be used to estimate levels of pollutants in the U.S. for 1997 through 2019 at user-defined geographic locations and time ranges. Measures correspond to monthly and yearly raster files (Jan 2005 to Dec 2019) for PM2.5, Ozone, NO2, SO2, and CO covering the US and Puerto Rico that were created from United States Environmental Protection Agency (EPA) regulatory monitor data. The R package allows the user to obtain more customized output as well as work with the raster layers directly.
+Pollution-Associated Risk Geospatial Analysis SITE (PARGASITE) is an online web-application and R package that can be used to estimate levels of pollutants in the U.S. for 1997 through 2021 at user-defined geographic locations and time ranges. Measures correspond to monthly and yearly raster files (Jan 2005 to Dec 2021) for PM2.5, Ozone, NO2, SO2, and CO covering the US and Puerto Rico that were created from United States Environmental Protection Agency (EPA) regulatory monitor data. The R package allows the user to obtain more customized output as well as work with the raster layers directly.
 
-In this folder you will find a shiny app (/app), a version of which is also hosted on pargasite.org. 
+In this repository you will first find a shiny app (/app), a version of which is also hosted on pargasite.org. 
 
 You will also find an R package (/pkg) that can be downloaded with devtools::install_github("HimesGroup/pargasite", subdir = "pkg"). You can refer to files in the examples folder which help illustrate the use of all functions in this package. 
 
-Lastly, you will find code we used to generate the data used in both the website and the package.
+Lastly, you will find the code we used to generate the data used in both the website and the package.
 
 Pargasite uses publicly available data from the United States Environmental Protection Agency (EPA). We have no affiliation with the EPA. 
-From this data, we generated the monthly and yearly raster files (Jan 2005 to Dec 2017) for PM2.5, Ozone, NO2, SO2, and CO using inverse distance weighted interpolation from the 5 nearest EPA monitoring stations.
+From this data, we generated the monthly and yearly raster files (Jan 2005 to Dec 2021) for PM2.5, Ozone, NO2, SO2, and CO using inverse distance weighted interpolation from the 5 nearest EPA monitoring stations.
 
-The website and R package provide similar functionality. Their specific contributions include:
+Please not that the website and R package provide similar functionality. Their specific contributions include:
 - the website provides visualization of the raster layers as well as the ability to upload a geocoded dataset then download one with pargasite estimates without interfacing with R.  
 - the R package allows the user to obtain more customized output as well as work with the raster layers directly 
 
