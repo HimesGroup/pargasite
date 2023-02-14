@@ -57,6 +57,7 @@ getMMSALevelPollutantValue <- function(year, pollutant = "PM2.5", mmsa_shp) {
   final_df_mmsa <- dplyr::summarise(final_df_mmsa, Mean = mean(Value), Median = median(Value), SD = sd(Value))
   mmsa_df <- data.frame(GEOID = mmsa_shp$GEOID, MMSA = mmsa_shp$NAME)
   final_df_mmsa <- merge(mmsa_df, final_df_mmsa, by = "GEOID")
+  final_df_mmsa <- merge(final_df_mmsa, mmsa_df, by = "GEOID")
 
   return(final_df_mmsa)
 

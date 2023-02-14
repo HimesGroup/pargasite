@@ -57,6 +57,7 @@ getTractLevelPollutantValue <- function(year, pollutant = "PM2.5", tracts_shp) {
   final_df_tract <- dplyr::summarise(final_df_tract, Mean = mean(Value), Median = median(Value), SD = sd(Value))
   tracts_df <- data.frame(GEOID = tracts_shp$GEOID, Tracts = tracts_shp$NAMELSAD)
   final_df_tract <- merge(tracts_df, final_df_tract, by = "GEOID")
+  final_df_tract <- merge(final_df_tract, tracts_df, by = "GEOID")
 
   return(final_df_tract)
 
