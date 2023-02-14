@@ -48,13 +48,15 @@ getTractLevelPollutantValue <- function(year, pollutant = "PM2.5", tracts_shp) {
   poly_tract <- sapply(tracts_shp_sp@polygons, function(x) x@labpt)
   poly_tract_df <- t(poly_tract)
   poly_tract_df <- as.data.frame(poly_tract_df)
-  poly_tract_df$tract <- tracts_shp$NAMELSAD
-  tracts_final <- poly_tract_df$tract[indices2]
+  poly_tract_df$GEOID<- tracts_shp$GEOID
+  tracts_final <- poly_tract_df$GEOID[indices2]
 
-  final_df_tract <- data.frame(tract = tracts_final, Value = Pollutant_df$Pollutant_Value)
+  final_df_tract <- data.frame(GEOID = tracts_final, Value = Pollutant_df$Pollutant_Value)
   final_df_tract <- na.omit(final_df_tract)
-  final_df_tract <- dplyr::group_by(final_df_tract, tract)
+  final_df_tract <- dplyr::group_by(final_df_tract, GEOID)
   final_df_tract <- dplyr::summarise(final_df_tract, Mean = mean(Value), Median = median(Value), SD = sd(Value))
+  tracts_df <- data.frame(GEOID = tracts_shp$GEOID, Tracts = tracts_shp$NAMELSAD)
+  final_df_tract <- merge(tracts_df, final_df_tract, by = "GEOID")
 
   return(final_df_tract)
 
