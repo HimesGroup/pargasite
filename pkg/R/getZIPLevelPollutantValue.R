@@ -37,7 +37,7 @@ getZIPLevelPollutantValue <- function(year, pollutant = "PM2.5", zipcode_master)
   Pollutant_df <- rbind(x_1,x_2)
   lat_long <- data.frame(Pollutant_df$Longitude, Pollutant_df$Latitude)
   pointsSP <- sp::SpatialPoints(lat_long,
-                            proj4string=CRS("+proj=longlat +datum=WGS84"))
+                            proj4string=sp::CRS("+proj=longlat +datum=WGS84"))
 
   shp_sp <- sf::as_Spatial(zipcode_master$geometry)
   CRS.new <- sp::CRS("+proj=longlat +datum=WGS84")
