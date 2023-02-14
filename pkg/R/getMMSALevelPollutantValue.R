@@ -48,13 +48,15 @@ getMMSALevelPollutantValue <- function(year, pollutant = "PM2.5", mmsa_shp) {
   poly_mmsa <- sapply(mmsa_shp_sp@polygons, function(x) x@labpt)
   poly_mmsa_df <- t(poly_mmsa)
   poly_mmsa_df <- as.data.frame(poly_mmsa_df)
-  poly_mmsa_df$MMSA <- mmsa_shp$NAME
-  mmsa_final <- poly_mmsa_df$MMSA[indices2]
+  poly_mmsa_df$GEOID <- mmsa_shp$GEOID
+  mmsa_final <- poly_mmsa_df$GEOID[indices2]
 
-  final_df_mmsa <- data.frame(MMSA = mmsa_final, Value = Pollutant_df$Pollutant_Value)
+  final_df_mmsa <- data.frame(GEOID = mmsa_final, Value = Pollutant_df$Pollutant_Value)
   final_df_mmsa <- na.omit(final_df_mmsa)
-  final_df_mmsa <- dplyr::group_by(final_df_mmsa, MMSA)
+  final_df_mmsa <- dplyr::group_by(final_df_mmsa, GEOID)
   final_df_mmsa <- dplyr::summarise(final_df_mmsa, Mean = mean(Value), Median = median(Value), SD = sd(Value))
+  mmsa_df <- data.frame(GEOID = mmsa_shp$GEOID, MMSA = mmsa_shp$NAME)
+  final_df_mmsa <- merge(final_df_mmsa, mmsa_df, by = "GEOID")
 
   return(final_df_mmsa)
 
