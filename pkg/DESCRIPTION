@@ -1,7 +1,7 @@
 Package: pargasite
 Title: Pollution-Associated Risk Geospatial Analysis
 Version: 0.0.0.1000
-Authors@R: person("Rebecca", "Greenblatt", email = "rebecca.greenblatt@gmail.com", role = c("aut", "cre")), person("Nisha", "Narayanan", email = "narayanannnisha5@gmail.com", role = c("aut", "cre"))
+Authors@R: c(person("Rebecca", "Greenblatt", email = "rebecca.greenblatt@gmail.com", role = c("aut", "cre")), person("Nisha", "Narayanan", email = "narayanannnisha5@gmail.com", role = c("aut", "cre")))
 Description: This package provides raster layers from which pollution estimates 
   can be extracted for latitude longitude coordinates within the contiguous United 
   States at a 10km x 10km resolution. The recent modified version of the package also allows 
