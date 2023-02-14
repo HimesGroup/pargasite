@@ -1,14 +1,14 @@
-#' Get census MMSA level pollutant values for a year
+#' Get census tract level pollutant values for a year
 #'
-#' Given a year and type of pollutant, the function will return the corresponding mean pollutant values for each MMSA.
+#' Given a year and type of pollutant, the function will return the corresponding mean pollutant values for each census tract.
 #'
 #' @param year numeric represented as yyyy. Earliest available year: "1997".
 #' @param pollutant string, can be one of "PM2.5", "Ozone", "NO2", "SO2" or "CO". Default set to "PM2.5"
-#' @param mmsa_shp dataframe extracted from tigris library that contains the tract names and geometry of all census tracts (tracts(state = NULL, county = NULL, cb = TRUE, year = NULL))
+#' @param tracts_shp dataframe extracted from tigris library that contains the tract names and geometry of all census tracts (tracts(state = NULL, county = NULL, cb = TRUE, year = NULL))
 #' @export
 
-#mmsa_shp <- core_based_statistical_areas(cb = FALSE, resolution = "500k", year = NULL)
-getMMSALevelPollutantValue <- function(year, pollutant = "PM2.5", mmsa_shp) {
+#tracts_shp <- tracts(state = NULL, county = NULL, cb = TRUE, year = NULL)
+getTractLevelPollutantValue <- function(year, pollutant = "PM2.5", tracts_shp) {
   Raster_PR_Full <- switch(pollutant,
                            "PM2.5" = download(pr_pm_annual_brick),
                            "Ozone" = download(pr_ozone_annual_brick),
@@ -37,25 +37,25 @@ getMMSALevelPollutantValue <- function(year, pollutant = "PM2.5", mmsa_shp) {
   Pollutant_df <- rbind(x_1,x_2)
   lat_long <- data.frame(Pollutant_df$Longitude, Pollutant_df$Latitude)
   pointsSP <- sp::SpatialPoints(lat_long,
-                                proj4string=sp::CRS("+proj=longlat +datum=WGS84"))
+                            proj4string=sp::CRS("+proj=longlat +datum=WGS84"))
 
-  mmsa_shp_sp <- sf::as_Spatial(mmsa_shp$geometry)
+  tracts_shp_sp <- sf::as_Spatial(tracts_shp$geometry)
   CRS.new <- sp::CRS("+proj=longlat +datum=WGS84")
   sp::proj4string(pointsSP) <- CRS.new
-  sp::proj4string(mmsa_shp_sp) <- CRS.new
-  indices2 <- sp::over(pointsSP, mmsa_shp_sp)
+  sp::proj4string(tracts_shp_sp) <- CRS.new
+  indices2 <- sp::over(pointsSP, tracts_shp_sp)
 
-  poly_mmsa <- sapply(mmsa_shp_sp@polygons, function(x) x@labpt)
-  poly_mmsa_df <- t(poly_mmsa)
-  poly_mmsa_df <- as.data.frame(poly_mmsa_df)
-  poly_mmsa_df$MMSA <- mmsa_shp$NAME
-  mmsa_final <- poly_mmsa_df$MMSA[indices2]
+  poly_tract <- sapply(tracts_shp_sp@polygons, function(x) x@labpt)
+  poly_tract_df <- t(poly_tract)
+  poly_tract_df <- as.data.frame(poly_tract_df)
+  poly_tract_df$tract <- tracts_shp$NAMELSAD
+  tracts_final <- poly_tract_df$tract[indices2]
 
-  final_df_mmsa <- data.frame(MMSA = mmsa_final, Value = Pollutant_df$Pollutant_Value)
-  final_df_mmsa <- na.omit(final_df_mmsa)
-  final_df_mmsa <- dplyr::group_by(final_df_mmsa, MMSA)
-  final_df_mmsa <- dplyr::summarise(final_df_mmsa, Mean = mean(Value), Median = median(Value), SD = sd(Value))
+  final_df_tract <- data.frame(tract = tracts_final, Value = Pollutant_df$Pollutant_Value)
+  final_df_tract <- na.omit(final_df_tract)
+  final_df_tract <- dplyr::group_by(final_df_tract, tract)
+  final_df_tract <- dplyr::summarise(final_df_tract, Mean = mean(Value), Median = median(Value), SD = sd(Value))
 
-  return(final_df_mmsa)
+  return(final_df_tract)
 
 }

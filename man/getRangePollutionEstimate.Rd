@@ -4,8 +4,14 @@
 \alias{getRangePollutionEstimate}
 \title{Get pollution estimate over time period}
 \usage{
-getRangePollutionEstimate(long, lat, pollutant = "PM2.5", monthyear_start,
-  monthyear_end, result = "mean")
+getRangePollutionEstimate(
+  long,
+  lat,
+  pollutant = "PM2.5",
+  monthyear_start,
+  monthyear_end,
+  result = "mean"
+)
 }
 \arguments{
 \item{long}{numeric longitude value}

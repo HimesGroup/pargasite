@@ -1,0 +1,1 @@
+utils::globalVariables(c("pr_pm_annual_brick", "pr_ozone_annual_brick", "pr_no2_annual_brick", 'pr_so2_annual_brick', "pr_co_annual_brick", "pm_yearly_brick_full", "ozone_yearly_brick_full", "no2_yearly_brick_full", "so2_yearly_brick_full", "co_yearly_brick_full", "County", 'Pollutant_Value', "MMSA", "Latitude", "Longitude"))
