@@ -92,7 +92,7 @@ tract_level_pollutant_value <- getTractLevelPollutantValue(2021, "PM2.5", tract_
 The first step is to get the counties shape files from tigris and it can be done using the "zctas" function. Check the column names of the final data frame. If the column name is not ZCTA5CE20 for the ZIPCODE, rename the columns as required (GEOID in this case is same as the ZIPCODE - rename either of those before using in the function). Followed by this, use the "getZIPLevelPollutantValue" from PARGASITE to get the pollutant value for each county. The function requires three variables to be passed along - year (anything between 1997 to 2021), Pollutant (one among PM2.5, CO, Ozone, NO2, and SO2), and the ZIPCODE shape file data frame (as provided by tigris). The final data frame returned will have 4 columns (ZIPCODE, Mean Pollutant Value, Median Pollutant Value, SD of Pollutant values). See example below.
 
 ```{r, eval = F, echo = T}
-zipcode_shp <- zipcode_master <- zctas(cb = FALSE, starts_with = NULL, year = NULL, state = "2021") #replace 2021 with the required year
+zipcode_shp <- zipcode_master <- zctas(cb = FALSE, starts_with = NULL, state = NULL, year = "2021") #replace 2021 with the required year
 
 zipcode_level_pollutant_value <- getZIPLevelPollutantValue(2021, "PM2.5", zipcode_shp) # replace 2021 with required year
 ```
