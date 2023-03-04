@@ -43,8 +43,8 @@ getCountyLevelPollutantValue <- function(year, pollutant = "PM2.5", counties_shp
 
   counties_shp_sp <- sf::as_Spatial(counties_shp$geometry)
   CRS.new <- sp::CRS("+proj=longlat +datum=WGS84")
-  sp::proj4string(pointsSP) <- CRS.new
-  sp::proj4string(counties_shp_sp) <- CRS.new
+  pointsSP <- sp::spTransform(pointsSP, CRS.new)
+  counties_shp_sp <- sp::spTransform(counties_shp_sp, CRS.new)
   indices2 <- sp::over(pointsSP, counties_shp_sp)
 
   poly_counties <- sapply(counties_shp_sp@polygons, function(x) x@labpt)

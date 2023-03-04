@@ -41,8 +41,8 @@ getMMSALevelPollutantValue <- function(year, pollutant = "PM2.5", mmsa_shp) {
 
   mmsa_shp_sp <- sf::as_Spatial(mmsa_shp$geometry)
   CRS.new <- sp::CRS("+proj=longlat +datum=WGS84")
-  sp::proj4string(pointsSP) <- CRS.new
-  sp::proj4string(mmsa_shp_sp) <- CRS.new
+  pointsSP <- sp::spTransform(pointsSP, CRS.new)
+  mmsa_shp_sp <- sp::spTransform(mmsa_shp_sp, CRS.new)
   indices2 <- sp::over(pointsSP, mmsa_shp_sp)
 
   poly_mmsa <- sapply(mmsa_shp_sp@polygons, function(x) x@labpt)

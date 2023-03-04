@@ -41,8 +41,8 @@ getZIPLevelPollutantValue <- function(year, pollutant = "PM2.5", zipcode_master)
 
   shp_sp <- sf::as_Spatial(zipcode_master$geometry)
   CRS.new <- sp::CRS("+proj=longlat +datum=WGS84")
-  sp::proj4string(pointsSP) <- CRS.new
-  sp::proj4string(shp_sp) <- CRS.new
+  pointsSP <- sp::spTransform(pointsSP, CRS.new)
+  shp_sp <- sp::spTransform(shp_sp, CRS.new)
   indices2 <- sp::over(pointsSP, shp_sp)
 
   poly_zip <- sapply(shp_sp@polygons, function(x) x@labpt)

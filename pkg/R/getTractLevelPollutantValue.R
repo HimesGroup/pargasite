@@ -41,8 +41,8 @@ getTractLevelPollutantValue <- function(year, pollutant = "PM2.5", tracts_shp) {
 
   tracts_shp_sp <- sf::as_Spatial(tracts_shp$geometry)
   CRS.new <- sp::CRS("+proj=longlat +datum=WGS84")
-  sp::proj4string(pointsSP) <- CRS.new
-  sp::proj4string(tracts_shp_sp) <- CRS.new
+  pointsSP <- sp::spTransform(pointsSP, CRS.new)
+  tracts_shp_sp <- sp::spTransform(tracts_shp_sp, CRS.new)
   indices2 <- sp::over(pointsSP, tracts_shp_sp)
 
   poly_tract <- sapply(tracts_shp_sp@polygons, function(x) x@labpt)
