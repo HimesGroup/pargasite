@@ -7,9 +7,9 @@ Pollution-Associated Risk Geospatial Analysis SITE (PARGASITE) is an online web 
 
 In this repository you will first find a shiny app (/app), a version of which is also hosted on https://pargasite.org/. 
 
-You will also find an R package (/pkg) that can be downloaded with devtools::install_github("HimesGroup/pargasite", subdir = "pkg"). You can refer to files in the examples folder which help illustrate the use of all functions in this package. 
+You will also find an R package (/pkg) that can be downloaded with devtools::install_github("HimesGroup/pargasite", subdir = "pkg"). 
 
-Lastly, you will find the code we used to generate the data used in both the website and the package.
+Lastly, you will find the code we used to generate the data (/data_generation) used in both the website and the package.
 
 ## Data 
 
@@ -29,6 +29,6 @@ The website and R package are similar, but some of their specific functions incl
 
 5) The latest updates to the R package allows the user to work with the raster layers and download the pollutant values at MMSA, Counties, Census Tracts, and ZIPCODE level. Example use cases can be found at /pkg/examples/.
 
-##Reference
+## Reference
 
 Greenblatt RE, Himes BE. Facilitating Inclusion of Geocoded Pollution Data into Health Studies. AMIA Jt Summits Transl Sci Proc. 2019;2019:553–561.(PMID: 31259010)
