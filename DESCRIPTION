@@ -1,20 +1,32 @@
 Package: pargasite
-Title: Pollution and Health Risk Factor Geospatial Analysis
+Title: Pollution-Associated Risk Geospatial Analysis
 Version: 0.0.0.9000
-Authors@R: person("Rebecca", "Greenblatt", email = "rebecca.greenblatt@gmail.com", role = c("aut", "cre"))
-Description: This package provides raster layers from which pollution estimates 
-  can be extracted for latitude longitude coordinates within the contiguous United 
-  States at a 10km x 10km resolution. Data is based on publicly available, pre-generated 
-  files from the United States Environmental Protection Agency (EPA) for years 2005 to 2017. 
-  Estimates were calculated by taking the inverse distance-weighted average of the given pollutant 
-  from the 5 nearest EPA monitoring sites. Annual estimates from annual files and monthly 
-  estimates from daily files.
-Depends: R (>= 3.3.3)
-License: BSD 3-Clause License
+Authors@R: c(
+    person(given = "Jaehyun",
+           family = "Joo",
+           role = c("aut", "cre")),
+    person(given = "Rebecca",
+           family = "Greenblatt",
+           role = c("aut")),
+    person(given = "Avantika",
+           family = "Diwadkar",
+           role = c("aut")),
+    person(given = "Nisha",
+           family = "Narayanan"),
+           role = c("aut")),
+    person(given = "Blanca",
+           family = "Himes",
+           role = c("aut"))
+           )
+Description: This package provides raster layers from which pollution estimates
+             can be extracted for latitude longitude coordinates within the
+             contiguous United States at a 10km x 10km resolution. The recent
+             modified version of the package also allows the user to download
+             the pollutant data at the county, MMSA, census tract and zipcode
+             level. Data is based on publicly available, pre-generated files
+             from the United States Environmental Protection Agency (EPA) for
+             years 1997 to 2021.
+License: BSD_3_clause + file LICENSE
 Encoding: UTF-8
-LazyData: true
-Imports: 
-  dplyr,
-  raster,
-  magrittr
+Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
