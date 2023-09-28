@@ -4,7 +4,8 @@ Version: 0.0.0.9000
 Authors@R: c(
     person(given = "Jaehyun",
            family = "Joo",
-           role = c("aut", "cre")),
+           role = c("aut", "cre"),
+           email = "jaehyun.joo@outlook.com"),
     person(given = "Rebecca",
            family = "Greenblatt",
            role = c("aut")),
@@ -12,7 +13,7 @@ Authors@R: c(
            family = "Diwadkar",
            role = c("aut")),
     person(given = "Nisha",
-           family = "Narayanan"),
+           family = "Narayanan",
            role = c("aut")),
     person(given = "Blanca",
            family = "Himes",
@@ -22,7 +23,7 @@ Description: This package provides raster layers from which pollution estimates
              can be extracted for latitude longitude coordinates within the
              contiguous United States at a 10km x 10km resolution. The recent
              modified version of the package also allows the user to download
-             the pollutant data at the county, MMSA, census tract and zipcode
+             the pollutant data at the county, CBSA, census tract and zipcode
              level. Data is based on publicly available, pre-generated files
              from the United States Environmental Protection Agency (EPA) for
              years 1997 to 2021.
@@ -30,3 +31,10 @@ License: BSD_3_clause + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+Imports:
+    dplyr,
+    gstat,
+    sf,
+    stars (>= 0.6-5)
+Depends:
+    R (>= 4.0.0)
