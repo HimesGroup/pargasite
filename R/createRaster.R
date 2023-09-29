@@ -3,11 +3,13 @@ create_grid <- function(map_source = c("TIGER", "GADM"),
                         crs = 6350, # CONUS Albers 6350; Puerto Rico 6566
                         cell_size = 10000) {
   map_source <- match.arg(map_source)
-  map_crs <- if (map_source == "TIGER") 4269 else 4326 # TL NAD83; GADM; WGS84
-  bounding_box <- st_bbox(c(xmin = minlon, xmax = maxlon,
-                            ymin = minlat, ymax = maxlat),
-                          crs = st_crs(map_crs))
-  wkt_filter <- st_as_text(st_as_sfc(bounding_box))
+  map_crs <- if (map_source == "TIGER") 4269 else 4326 # TL: NAD83; GADM: WGS84
+  ## bounding_box <- st_bbox(c(xmin = minlon, xmax = maxlon,
+  ##                           ymin = minlat, ymax = maxlat),
+  ##                         crs = st_crs(map_crs))
+  ## wkt_filter <- st_as_text(st_as_sfc(bounding_box))
+  wkt_filter <- .get_wkt_filter(minlon = minlon, maxlon = maxlon,
+                                minlat = minlat, maxlat = maxlat, crs = map_crs)
   if (map_source == "TIGER") {
     us_shape <- get_tl_shape(wkt_filter = wkt_filter)
   } else {
@@ -20,6 +22,14 @@ create_grid <- function(map_source = c("TIGER", "GADM"),
   us_shape <- st_as_sfc(st_transform(us_shape, crs))
   st_as_stars(st_bbox(us_shape), dx = cell_size, dy = cell_size) |>
     st_crop(us_shape)
+}
+
+.get_wkt_filter <- function(minlat, maxlat, minlon, maxlon, crs) {
+  ## crs argument may not be necessary
+  bounding_box <- st_bbox(c(xmin = minlon, xmax = maxlon,
+                            ymin = minlat, ymax = maxlat),
+                          crs = st_crs(crs))
+  st_as_text(st_as_sfc(bounding_box))
 }
 
 get_raster <- function(parameter_code, pollutant_standard = NULL,
