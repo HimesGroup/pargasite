@@ -6,7 +6,7 @@
   setNames(
     idw(arithmetic_mean ~ 1, x, base_grid,
         nmax = nmax, debug.level = 0)["var1.pred"],
-    pollutant_standard
+    .make_names(pollutant_standard)
   )
 }
 

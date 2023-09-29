@@ -4,6 +4,11 @@
 ## Check list with all NULL values
 .is_nulllist <- function(x) all(sapply(x, is.null))
 
+## `make.names` with underscore
+.make_names <- function(names, ...) {
+  gsub("\\.", "_", tolower(make.names(names = names, ...)))
+}
+
 ## Print data.frame in error message
 .capture_df <- function(x) paste(capture.output(x), collapse = "\n")
 

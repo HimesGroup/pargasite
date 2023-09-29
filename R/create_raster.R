@@ -4,10 +4,6 @@ create_grid <- function(map_source = c("TIGER", "GADM"),
                         cell_size = 10000) {
   map_source <- match.arg(map_source)
   map_crs <- if (map_source == "TIGER") 4269 else 4326 # TL: NAD83; GADM: WGS84
-  ## bounding_box <- st_bbox(c(xmin = minlon, xmax = maxlon,
-  ##                           ymin = minlat, ymax = maxlat),
-  ##                         crs = st_crs(map_crs))
-  ## wkt_filter <- st_as_text(st_as_sfc(bounding_box))
   wkt_filter <- .get_wkt_filter(minlon = minlon, maxlon = maxlon,
                                 minlat = minlat, maxlat = maxlat, crs = map_crs)
   if (map_source == "TIGER") {
