@@ -149,7 +149,7 @@ get_raster <- function(parameter_code, pollutant_standard = NULL,
       out <- by(x, x$month, function(y) .run_idw(y, us_grid, nmax), simplify = FALSE)
       do.call(c, c(out, along = "month"))
     }, simplify = FALSE)
-    do.call(c, d)
+    setNames(do.call(c, d), .make_names(names(d)))
   } else {
     d <- raqs::aqs_annualdata("byBox", aqs_variables, header = FALSE)
     if (is.null(d)) {
@@ -164,7 +164,7 @@ get_raster <- function(parameter_code, pollutant_standard = NULL,
     d <- .aqs_transform(d, target_crs = crs)
     d <- by(d, d$pollutant_standard, function(x) .run_idw(x, us_grid, nmax),
             simplify = FALSE)
-    do.call(c, d)
+    setNames(do.call(c, d), .make_names(names(d)))
   }
 }
 

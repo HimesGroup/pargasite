@@ -34,8 +34,12 @@ RoxygenNote: 7.2.3
 Imports:
     dplyr,
     gstat,
+    leaflet,
     rlang,
     sf,
+    shiny,
+    shinycssloaders,
+    shinythemes,
     stars (>= 0.6-5)
 Depends:
     R (>= 4.0.0)

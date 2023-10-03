@@ -10,7 +10,7 @@
 ]
 
 .criteria_pollutants <- setNames(
-  .criteria_pollutants, c("parameter_code", "parameter")
+  .criteria_pollutants, .make_names(names(.criteria_pollutants))
 )
 
 ## Pollutant Standards
@@ -18,10 +18,13 @@
   "https://aqs.epa.gov/aqsweb/documents/codetables/pollutant_standards.csv"
 )
 .pollutant_standards <- setNames(
-  .pollutant_standards[, c("Parameter.Code", "Parameter",
-                           "Pollutant.Standard.Short.Name")],
-  c("parameter_code", "parameter", "pollutant_standard")
+  .pollutant_standards, .make_names(names(.pollutant_standards))
+  ## .pollutant_standards[, c("Parameter.Code", "Parameter",
+  ##                          "Pollutant.Standard.Short.Name")],
+  ## c("parameter_code", "parameter", "pollutant_standard")
 )
+idx <- names(.pollutant_standards) == "pollutant_standard_short_name"
+names(.pollutant_standards)[idx] <- "pollutant_standard"
 
 ## Merge info
 .criteria_pollutants <- merge(.criteria_pollutants, .pollutant_standards)
@@ -55,7 +58,20 @@ conus_filter <- st_bbox(
 .us_pr <- ne[ne$ADMIN == "Puerto Rico", ] |>
   st_as_sfc()
 
+## Temporary for package develop
+## Eventually data will be provided by users
+mozone <- get_raster(44201, NULL, year = 2005:2007, nmax = 10, cell_size = 20000)
+mno2 <- get_raster(42602, NULL, year = 2005:2007, nmax = 10, cell_size = 20000)
+.yy <- c(mozone, mno2)
+
+pm25 <- get_raster(88101, NULL, year = 2005:2006, by_month = TRUE, cell_size = 20000)
+co <- get_raster(42101, NULL, year = 2005:2006, by_month = TRUE,
+                 download_chunk_size = "2-week", cell_size = 20000)
+.mm <- c(pm25, co)
+
 ## Save internal dataset
 format(object.size(list(.criteria_pollutants, .us_conus, .us_pr)), "Mb")
-usethis::use_data(.criteria_pollutants, .us_conus, .us_pr,
+usethis::use_data(.criteria_pollutants, .us_conus, .us_pr, .yy, .mm,
                   internal = TRUE, overwrite = TRUE)
+
+
