@@ -18,7 +18,8 @@ run_pargasite <- function(x, summarize_by = c("state", "county", "cbsa")) {
       st_crs(x)
     )
     summary_state <- aggregate(x, by = tl_state, FUN = function(x) mean(x, na.rm = TRUE))
-    options(pargasite.summary_state = summary_state)
+    options(pargasite.summary_state = summary_state,
+            pargasite.map_state = tl_state)
   }
   if ("county" %in% summarize_by) {
     message("[Generating county-level summary...]")
@@ -27,7 +28,8 @@ run_pargasite <- function(x, summarize_by = c("state", "county", "cbsa")) {
       st_crs(x)
     )
     summary_county <- aggregate(x, by = tl_county, FUN = function(x) mean(x, na.rm = TRUE))
-    options(pargasite.summary_county = summary_county)
+    options(pargasite.summary_county = summary_county,
+            pargasite.map_county = tl_county)
   }
   if ("cbsa" %in% summarize_by) {
     message("[Generating CBSA-level summary...]")
@@ -36,7 +38,8 @@ run_pargasite <- function(x, summarize_by = c("state", "county", "cbsa")) {
       st_crs(x)
     )
     summary_cbsa <- aggregate(x, by = tl_cbsa, FUN = function(x) mean(x, na.rm = TRUE))
-    options(pargasite.summary_cbsa = summary_cbsa)
+    options(pargasite.summary_cbsa = summary_cbsa,
+            pargasite.map_cbsa = tl_cbsa)
   }
   shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE))
 }

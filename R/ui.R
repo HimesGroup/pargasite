@@ -12,7 +12,7 @@ ui <- fluidPage(
       width = 3
     ),
     mainPanel(
-      shinycssloaders::withSpinner(leafletOutput("us_map", width = "100%", height = 800))
+      withSpinner(leafletOutput("us_map", width = "100%", height = 800))
     )
   )
 )

@@ -59,7 +59,11 @@ pollutant_ui <- function(pollutant_list, year_list, month_list = NULL,
           choices = summary_list,
           inline = TRUE
         )
-      }
+      },
+      hr(),
+      h4("Pollutant value", style = "font-weight: bold; color: #9ccc65"),
+      ## h5(textOutput("pollutant_val"))
+      h5(shiny::htmlOutput("pollutant_val"))
     )
   )
 }

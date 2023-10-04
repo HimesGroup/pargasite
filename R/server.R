@@ -5,8 +5,13 @@ server <- function(input, output, session) {
   pargasite.summary_state <- getOption("pargasite.summary_state")
   pargasite.summary_county <- getOption("pargasite.summary_county")
   pargasite.summary_cbsa <- getOption("pargasite.summary_cbsa")
+  pargasite.map_state <- getOption("pargasite.map_state")
+  pargasite.map_county <- getOption("pargasite.map_county")
+  pargasite.map_cbsa <- getOption("pargasite.map_cbsa")
   options(pargasite.dat = NULL, pargasite.summary_state = NULL,
-          pargasite.summary_county = NULL, pargasite.summary_cbsa = NULL)
+          pargasite.summary_county = NULL, pargasite.summary_cbsa = NULL,
+          pargasite.map_state = NULL, pargasite.map_county = NULL,
+          pargasite.map_cbsa = NULL)
 
   ## Some preprocessing
   pollutant_list <- .recover_from_standard(pargasite.dat)
@@ -21,11 +26,14 @@ server <- function(input, output, session) {
   if (!is.null(pargasite.summary_county)) summary_list <- c(summary_list, "County")
   if (!is.null(pargasite.summary_cbsa)) summary_list <- c(summary_list, "CBSA")
 
+  ## Render UI
   output$pollutant_ui <- renderUI(
     tagList(
       pollutant_ui(pollutant_list, year_list, month_list, summary_list)
     )
   )
+
+  ## Pollutant information
   observeEvent(input$pollutant, {
     ## List a selected pollutant information
     pollutant_idx <- which(
@@ -50,18 +58,6 @@ server <- function(input, output, session) {
 
   ## Choose data by user's selections
   pargasite_dat <- reactive({
-    ## Shiny renderUI may initiate input as NULL
-    ## if (is.null(input$summary)) {
-    ##   toget <- "pargasite.dat"
-    ## } else {
-    ##   toget <- switch(input$summary,
-    ##               "None" = "pargasite.dat",
-    ##               "State" = "pargasite.summary_state",
-    ##               "County" = "pargasite.summary_county",
-    ##               "CBSA" = "pargasite.summary_cbsa"
-    ##               )
-    ## }
-    ## d <- getOption(toget)
     if (is.null(input$summary)) {
       d <- pargasite.dat
     } else {
@@ -94,28 +90,31 @@ server <- function(input, output, session) {
     d
   })
 
+  ## Draw map
   observeEvent({
     pargasite_dat()
   }, {
-    min_val <- min(pargasite_dat()[[1]], na.rm = TRUE)
-    max_val <- max(pargasite_dat()[[1]], na.rm = TRUE)
-    pal <- colorNumeric("Spectral", domain = c(min_val, max_val), na.color = "transparent", reverse = TRUE)
+    min_val <- min(pargasite_dat()[[1]], na.rm = TRUE) * 0.85
+    max_val <- max(pargasite_dat()[[1]], na.rm = TRUE) * 1.15
+    pal <- colorNumeric("Spectral", domain = c(min_val, max_val),
+                        na.color = "transparent", reverse = TRUE)
     ## For sorting add legend; clunky
-    pal_rev <- colorNumeric("Spectral", domain = c(min_val, max_val), na.color = "transparent", reverse = FALSE)
-    p <- leaflet::leaflet(options = leafletOptions(minZoom = 4)) |>
+    pal_rev <- colorNumeric("Spectral", domain = c(min_val, max_val),
+                            na.color = "transparent", reverse = FALSE)
+    ## map_dat <- st_transform(st_as_sf(pargasite_dat()), 4326)
+    p <- leaflet::leaflet(options = leafletOptions(minZoom = 3)) |>
       addTiles() |>
       setView(lng = -98.58, lat = 39.33, zoom = 4)
     if (is.null(input$summary) || input$summary == "None") {
       p <- p |>
-        ## addPolygons(data = st_transform(st_as_sf(pargasite_dat()), 4326),
-        ##             stroke = FALSE, fillColor = ~pal(st_as_sf(pargasite_dat())[[1]]), fillOpacity = 0.5)
-      addRasterImage(as(pargasite_dat(), "Raster"), color = pal, opacity = 0.5)
-      ## addRasterImage(as(st_warp(pargasite_dat(), crs = 4326), "Raster"), color = pal, opacity = 0.5)
+        ## addRasterImage with project = TRUE will project data to the leaflet map CRS
+        addRasterImage(as(pargasite_dat(), "Raster"), color = pal, opacity = 0.5)
     } else {
+      ## Avoid addPolygons due to performance issue
+      r <- st_as_sf(pargasite_dat()) |>
+        stars::st_rasterize(dx = 10000)
       p <- p |>
-        addPolygons(data = st_transform(st_as_sf(pargasite_dat()), 4326),
-                    stroke = TRUE, color = "darkgray", opacity = 0.5, weight = 1,
-                    fillColor = ~pal(st_as_sf(pargasite_dat())[[1]]), fillOpacity = 0.5)
+        addRasterImage(as(r, "Raster"), color = pal, opacity = 0.5)
     }
     p <- p |>
       ## leaflet::addLegend(position = "bottomright", pal = pal, values = c(min_val, max_val))
@@ -124,4 +123,83 @@ server <- function(input, output, session) {
     output$us_map <- renderLeaflet(p)
   })
 
+  ## Display pollutant level based upon mouse click event
+  output$pollutant_val <- renderText({
+    if (!is.null(input$us_map_click)) {
+      click_pos <- st_point(c(input$us_map_click$lng, input$us_map_click$lat)) |>
+        st_sfc(crs = 4326) |>
+        st_transform(st_crs(pargasite_dat()))
+      if (is.null(input$summary) || input$summary == "None") {
+        pollutant_val <- round(st_extract(pargasite_dat(), st_coordinates(click_pos)), 3)
+        if (is.na(pollutant_val)) pollutant_val <- "out of bounds"
+        paste0("(", round(input$us_map_click$lng,2), ", ",
+               round(input$us_map_click$lat, 2), "):  ",
+               pollutant_val)
+      } else {
+        m <- switch(
+          input$summary,
+          "State" = pargasite.map_state,
+          "County" = pargasite.map_county,
+          "CBSA" = pargasite.map_cbsa
+        )
+        ## st_extract not work? perhaps data is multipolygon?
+        ## pollutant_val <- round(st_extract(pargasite_dat(), sf::st_coordinates(click_pos)), 2)
+        val_idx <- sf::st_within(click_pos, st_as_sf(pargasite_dat()))[[1]]
+        pollutant_val <- round(st_as_sf(pargasite_dat())[[1]][val_idx], 3)
+        name_idx <- sf::st_within(click_pos, m)[[1]]
+        if (length(pollutant_val) == 0) {
+          paste0("(", round(input$us_map_click$lng,2), ", ",
+                 round(input$us_map_click$lat, 2), "):  ",
+                 "out of bounds")
+        } else {
+          if (input$summary == "State") {
+            paste0(m$NAME[name_idx], ":  ", pollutant_val)
+          } else {
+            paste0(m$NAMELSAD[name_idx], ":  ", pollutant_val)
+          }
+        }
+      }
+    } else {
+      "<font color='#FF0000'><b>Click the map to retrieve a pollutant value.</b></font>"
+    }
+  })
+
+  ## output$pollutant_val <- renderText({
+  ##   if (is.null(input$summary) || input$summary == "None") {
+  ##     if(!is.null(input$us_map_click)) {
+  ##       click_pos <- sf::st_sfc(sf::st_point(c(input$us_map_click$lng, input$us_map_click$lat)), crs = 4326) |>
+  ##         st_transform(st_crs(pargasite_dat()))
+  ##       pollutant_val <- round(stars::st_extract(pargasite_dat(), sf::st_coordinates(click_pos)), 2)
+  ##       if (is.na(pollutant_val)) pollutant_val <- "Not Available"
+  ##       paste0("(", round(input$us_map_click$lng,2), ", ",
+  ##              round(input$us_map_click$lat, 2), "):  ",
+  ##              pollutant_val)
+  ##     } else {
+  ##       ""
+  ##     }
+  ##   } else {
+  ##     m <- switch(
+  ##       input$summary,
+  ##       "State" = pargasite.map_state,
+  ##       "County" = pargasite.map_county,
+  ##       "CBSA" = pargasite.map_cbsa
+  ##     )
+  ##     if (!is.null(input$us_map_click)) {
+  ##       click_pos <- sf::st_sfc(sf::st_point(c(input$us_map_click$lng, input$us_map_click$lat)), crs = 4326) |>
+  ##         st_transform(st_crs(m))
+  ##       ## st_extract not working? perhaps data is multipolygon?
+  ##       ## pollutant_val <- round(stars::st_extract(pargasite_dat(), sf::st_coordinates(click_pos)), 2)
+  ##       val_idx <- sf::st_within(click_pos, st_as_sf(pargasite_dat()))[[1]]
+  ##       pollutant_val <- round(st_as_sf(pargasite_dat())[[1]][val_idx], 2)
+  ##       name_idx <- sf::st_within(click_pos, m)[[1]]
+  ##       if (input$summary == "State") {
+  ##         paste0(m$NAME[name_idx], ":  ", pollutant_val)
+  ##       } else {
+  ##         paste0(m$NAMELSAD[name_idx], ":  ", pollutant_val)
+  ##       }
+  ##     } else {
+  ##       "Not Available"
+  ##     }
+  ##   }
+  ## })
 }
