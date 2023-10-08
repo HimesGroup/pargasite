@@ -101,92 +101,92 @@ get_raster <- function(parameter_code, pollutant_standard = NULL,
   }
 }
 
-## Error handling for NULL
-.get_and_process_aqs_data <- function(parameter_code, pollutant_standard,
-                                      year, by_month, crs,
-                                      aqs_email, aqs_key, minlat, maxlat,
-                                      minlon, maxlon, us_grid, nmax,
-                                      download_chunk_size) {
+## ## Error handling for NULL
+## .get_and_process_aqs_data <- function(parameter_code, pollutant_standard,
+##                                       year, by_month, crs,
+##                                       aqs_email, aqs_key, minlat, maxlat,
+##                                       minlon, maxlon, us_grid, nmax,
+##                                       download_chunk_size) {
 
-  ## Fetching data from AQS
-  message("Processing year: ", year)
-  aqs_variables <- list(
-    email = aqs_email, key = aqs_key, param = parameter_code,
-    bdate = paste0(year, "0101"), edate = paste0(year, "1231"),
-    minlat = minlat, maxlat = maxlat, minlon = minlon, maxlon = maxlon
-  )
-  if (by_month) {
-    date_seq <- .gen_dl_chunk_seq(year, download_chunk_size)
-    d <- Map(function(x, y, z) {
-      aqs_variables <- replace(aqs_variables, c("bdate", "edate"), c(x, y))
-      current_chunk <- paste0(.to_ymd(x), "-", .to_ymd(y))
-      message("- requesting: ", current_chunk)
-      aqs_data <- raqs::aqs_dailydata("byBox", aqs_variables, header = FALSE)
-      if (is.null(aqs_data)) {
-        ## No matched data
-        return(NULL)
-      }
-      aqs_data <- aqs_data[aqs_data$pollutant_standard %in% pollutant_standard, ]
-      aqs_data$month <- format(as.Date(as.character(aqs_data$date_local)), "%m")
-      if (getOption("raqs.delay_between_req") > 0 &&
-          z != length(date_seq$bdate)) {
-        .sys_sleep_pb(getOption("raqs.delay_between_req"))
-      }
-      aqs_data
-    }, date_seq$bdate, date_seq$edate, seq_along(date_seq$bdate),
-    USE.NAMES = FALSE)
-    d <- do.call(rbind, d)
-    if (is.null(d)) {
-      ## No matched data
-      return(NULL)
-    }
-    d <- aggregate(
-      arithmetic_mean ~ latitude + longitude + pollutant_standard + month + datum,
-      FUN = mean, data = d
-    )
-    d <- .aqs_transform(d, target_crs = crs)
-    d <- by(d, d$pollutant_standard, function(x) {
-      out <- by(x, x$month, function(y) .run_idw(y, us_grid, nmax), simplify = FALSE)
-      do.call(c, c(out, along = "month"))
-    }, simplify = FALSE)
-    setNames(do.call(c, d), .make_names(names(d)))
-  } else {
-    d <- raqs::aqs_annualdata("byBox", aqs_variables, header = FALSE)
-    if (is.null(d)) {
-      ## No matched data
-      return(NULL)
-    }
-    d <- d[d$pollutant_standard %in% pollutant_standard, ]
-    d <- aggregate(
-      arithmetic_mean ~ latitude + longitude + pollutant_standard + datum,
-      FUN = mean, data = d
-    )
-    d <- .aqs_transform(d, target_crs = crs)
-    d <- by(d, d$pollutant_standard, function(x) .run_idw(x, us_grid, nmax),
-            simplify = FALSE)
-    setNames(do.call(c, d), .make_names(names(d)))
-  }
-}
+##   ## Fetching data from AQS
+##   message("Processing year: ", year)
+##   aqs_variables <- list(
+##     email = aqs_email, key = aqs_key, param = parameter_code,
+##     bdate = paste0(year, "0101"), edate = paste0(year, "1231"),
+##     minlat = minlat, maxlat = maxlat, minlon = minlon, maxlon = maxlon
+##   )
+##   if (by_month) {
+##     date_seq <- .gen_dl_chunk_seq(year, download_chunk_size)
+##     d <- Map(function(x, y, z) {
+##       aqs_variables <- replace(aqs_variables, c("bdate", "edate"), c(x, y))
+##       current_chunk <- paste0(.to_ymd(x), "-", .to_ymd(y))
+##       message("- requesting: ", current_chunk)
+##       aqs_data <- raqs::aqs_dailydata("byBox", aqs_variables, header = FALSE)
+##       if (is.null(aqs_data)) {
+##         ## No matched data
+##         return(NULL)
+##       }
+##       aqs_data <- aqs_data[aqs_data$pollutant_standard %in% pollutant_standard, ]
+##       aqs_data$month <- format(as.Date(as.character(aqs_data$date_local)), "%m")
+##       if (getOption("raqs.delay_between_req") > 0 &&
+##           z != length(date_seq$bdate)) {
+##         .sys_sleep_pb(getOption("raqs.delay_between_req"))
+##       }
+##       aqs_data
+##     }, date_seq$bdate, date_seq$edate, seq_along(date_seq$bdate),
+##     USE.NAMES = FALSE)
+##     d <- do.call(rbind, d)
+##     if (is.null(d)) {
+##       ## No matched data
+##       return(NULL)
+##     }
+##     d <- aggregate(
+##       arithmetic_mean ~ latitude + longitude + pollutant_standard + month + datum,
+##       FUN = mean, data = d
+##     )
+##     d <- .aqs_transform(d, target_crs = crs)
+##     d <- by(d, d$pollutant_standard, function(x) {
+##       out <- by(x, x$month, function(y) .run_idw(y, us_grid, nmax), simplify = FALSE)
+##       do.call(c, c(out, along = "month"))
+##     }, simplify = FALSE)
+##     setNames(do.call(c, d), .make_names(names(d)))
+##   } else {
+##     d <- raqs::aqs_annualdata("byBox", aqs_variables, header = FALSE)
+##     if (is.null(d)) {
+##       ## No matched data
+##       return(NULL)
+##     }
+##     d <- d[d$pollutant_standard %in% pollutant_standard, ]
+##     d <- aggregate(
+##       arithmetic_mean ~ latitude + longitude + pollutant_standard + datum,
+##       FUN = mean, data = d
+##     )
+##     d <- .aqs_transform(d, target_crs = crs)
+##     d <- by(d, d$pollutant_standard, function(x) .run_idw(x, us_grid, nmax),
+##             simplify = FALSE)
+##     setNames(do.call(c, d), .make_names(names(d)))
+##   }
+## }
 
-.mget_and_process_aqs_data <- function(parameter_code, pollutant_standard,
-                                       year, by_month, crs,
-                                       aqs_email, aqs_key, minlat, maxlat,
-                                       minlon, maxlon, us_grid, nmax,
-                                       download_chunk_size) {
-  Map(function(x, y) {
-      aqs_data <- .get_and_process_aqs_data(
-        parameter_code = parameter_code, pollutant_standard = pollutant_standard,
-        year = x, by_month = by_month, crs = crs,
-        aqs_email = aqs_email, aqs_key = aqs_key,
-        minlat = minlat, maxlat = maxlat, minlon = minlon, maxlon = maxlon,
-        us_grid = us_grid, nmax = nmax, download_chunk_size = download_chunk_size
-      )
-      if (getOption("raqs.delay_between_req") > 0 && y != length(year)) {
-        .sys_sleep_pb(getOption("raqs.delay_between_req"))
-      }
-      aqs_data
-  }, year, seq_along(year), USE.NAMES = FALSE)
-}
+## .mget_and_process_aqs_data <- function(parameter_code, pollutant_standard,
+##                                        year, by_month, crs,
+##                                        aqs_email, aqs_key, minlat, maxlat,
+##                                        minlon, maxlon, us_grid, nmax,
+##                                        download_chunk_size) {
+##   Map(function(x, y) {
+##       aqs_data <- .get_and_process_aqs_data(
+##         parameter_code = parameter_code, pollutant_standard = pollutant_standard,
+##         year = x, by_month = by_month, crs = crs,
+##         aqs_email = aqs_email, aqs_key = aqs_key,
+##         minlat = minlat, maxlat = maxlat, minlon = minlon, maxlon = maxlon,
+##         us_grid = us_grid, nmax = nmax, download_chunk_size = download_chunk_size
+##       )
+##       if (getOption("raqs.delay_between_req") > 0 && y != length(year)) {
+##         .sys_sleep_pb(getOption("raqs.delay_between_req"))
+##       }
+##       aqs_data
+##   }, year, seq_along(year), USE.NAMES = FALSE)
+## }
 
 .aqs_transform <- function(x, target_crs = 6350) {
   x <- by(x, x$datum, function(y) {

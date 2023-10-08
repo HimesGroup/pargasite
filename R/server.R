@@ -35,10 +35,21 @@ server <- function(input, output, session) {
 
   ## Pollutant information
   observeEvent(input$pollutant, {
+    output$dat_src <- renderText(
+      if ("month" %ni% dimnames(pargasite.dat)) {
+        "EPA's AQS API annualData service"
+      } else {
+        "EPA's AQS API dailyData service"
+      }
+    )
+    output$dat_field <- renderText(
+      .map_standard_to_field(input$pollutant)
+    )
     ## List a selected pollutant information
     pollutant_idx <- which(
       .criteria_pollutants$pollutant_standard == input$pollutant
     )
+    output$pollutant_std <- renderText(input$pollutant)
     output$pollutant_desc <- renderText(
       .criteria_pollutants$pollutant_standard_description[pollutant_idx]
     )
@@ -57,6 +68,7 @@ server <- function(input, output, session) {
   })
 
   ## Choose data by user's selections
+  ## To do: uniform legend scale for the same pollutant
   pargasite_dat <- reactive({
     if (is.null(input$summary)) {
       d <- pargasite.dat
@@ -82,7 +94,7 @@ server <- function(input, output, session) {
     }
     if ("month" %in% dimnames(d)) {
       if (!is.null(input$month)) {
-        d <- dimsub(d, dim = "month", value = input$month)
+        d <- dimsub(d, dim = "month", value = input$month, drop = TRUE)
       } else {
         d <- dimsub(d, dim = "month", value = st_get_dimension_values(d, "month")[1], drop = TRUE)
       }
@@ -160,7 +172,8 @@ server <- function(input, output, session) {
         }
       }
     } else {
-      "<font color='#FF0000'><b>Click the map to retrieve a pollutant value.</b></font>"
+      ## "<font color='#DC4C64'><b>Click the map to retrieve a pollutant value.</b></font>"
+      "<b>Click the map to retrieve a pollutant value.</b>"
     }
   })
 

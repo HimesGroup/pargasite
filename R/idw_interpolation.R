@@ -1,4 +1,4 @@
-.run_idw <- function(x, base_grid, nmax) {
+.run_idw <- function(x, base_grid, field, nmax) {
   ## pollutant_standard <- unique(x$pollutant_standard) # supposed to be length 1
   if (is.numeric(nmax) && length(nmax) > 1) {
     nmax <- .nmax_loocv(x, nmax)
@@ -8,8 +8,10 @@
   ##       nmax = nmax, debug.level = 0)["var1.pred"],
   ##   .make_names(pollutant_standard)
   ## )
-  idw(arithmetic_mean ~ 1, x, base_grid,
+  idw(as.formula(paste0(field, " ~ 1")), x, base_grid,
       nmax = nmax, debug.level = 0)["var1.pred"]
+  ## idw(arithmetic_mean ~ 1, x, base_grid,
+  ##     nmax = nmax, debug.level = 0)["var1.pred"]
   ## setNames(res, .make_names(names(res)))
 }
 

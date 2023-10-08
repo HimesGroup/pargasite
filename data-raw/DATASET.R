@@ -28,9 +28,32 @@ names(.pollutant_standards)[idx] <- "pollutant_standard"
 
 ## Merge info
 .criteria_pollutants <- merge(.criteria_pollutants, .pollutant_standards)
+## Keep only current standards
+ids_to_keep <- c(
+  ## Lead 3-month 2009
+  2,
+  ## CO 1-hour 1971, CO 8-hour 1971
+  3, 4,
+  ## NO2 1-hour 2010, NO2 Annual 1971
+  8, 20,
+  ## PM10 24-hour 2006
+  12,
+  ## SO2 1-hour 2010
+  19,
+  ## PM2.5 24-hour 2012, PM2.5 Annual 2012,
+  21, 22,
+  ## Ozone 8-hour 2015
+  23
+)
+
+.criteria_pollutants <- .criteria_pollutants[
+  .criteria_pollutants$pollutant_standard_id %in% ids_to_keep,
+  ]
 .criteria_pollutants <- .criteria_pollutants[
   with(.criteria_pollutants, order(parameter_code, parameter, pollutant_standard)),
-]
+  ]
+
+
 
 ## USA CONUS and Puerto Rico shape files using Natural Earth data:
 ## Downloads Admin 0 without boundary lakes:
