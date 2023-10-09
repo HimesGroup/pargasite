@@ -30,7 +30,7 @@
 ## Lead 3-Month 2009: too few site; exclude
 
 .get_and_process_aqs_data <- function(parameter_code, pollutant_standard,
-                                      value_column, year, by_month, crs,
+                                      event_handle, year, by_month, crs,
                                       aqs_email, aqs_key, minlat, maxlat,
                                       minlon, maxlon, us_grid, nmax,
                                       download_chunk_size) {
@@ -54,7 +54,7 @@
         return(NULL)
       }
       aqs_data <- aqs_data[aqs_data$pollutant_standard %in% pollutant_standard, ]
-      aqs_data <- aqs_data[aqs_data$event_type %in% c("Events Excluded", "No Events"), ]
+      aqs_data <- aqs_data[aqs_data$event_type %in% c(event_handle, "No Events"), ]
       aqs_data$month <- format(as.Date(as.character(aqs_data$date_local)), "%m")
       if (getOption("raqs.delay_between_req") > 0 &&
           z != length(date_seq$bdate)) {
@@ -96,7 +96,7 @@
       return(NULL)
     }
     d <- d[d$pollutant_standard %in% pollutant_standard, ]
-    d <- d[d$event_type %in% c("Events Excluded", "No Events"), ]
+    d <- d[d$event_type %in% c(event_handle, "No Events"), ]
     ## d <- aggregate(
     ##   arithmetic_mean ~ latitude + longitude + pollutant_standard + datum,
     ##   FUN = mean, data = d
@@ -115,14 +115,14 @@
 
 
 .mget_and_process_aqs_data <- function(parameter_code, pollutant_standard,
-                                       year, by_month, crs,
+                                       event_handle, year, by_month, crs,
                                        aqs_email, aqs_key, minlat, maxlat,
                                        minlon, maxlon, us_grid, nmax,
                                        download_chunk_size) {
   Map(function(x, y) {
     aqs_data <- .get_and_process_aqs_data(
       parameter_code = parameter_code, pollutant_standard = pollutant_standard,
-      year = x, by_month = by_month, crs = crs,
+      event_handle = event_handle, year = x, by_month = by_month, crs = crs,
       aqs_email = aqs_email, aqs_key = aqs_key,
       minlat = minlat, maxlat = maxlat, minlon = minlon, maxlon = maxlon,
       us_grid = us_grid, nmax = nmax, download_chunk_size = download_chunk_size
@@ -133,10 +133,4 @@
     aqs_data
   }, year, seq_along(year), USE.NAMES = FALSE)
 }
-
-
-## mozone <- get_raster(44201, NULL, year = 2020:2022, nmax = Inf, cell_size = 10000)
-## mozone <- get_raster(44201, NULL, year = 2022, nmax = Inf, cell_size = 10000, by_month = TRUE, download_chunk_size = "2-week")
-## mno2 <- get_raster(42602, NULL, year = 2005:2007, nmax = 10, cell_size = 20000)
-## .yy <- c(mozone, mno2)
 

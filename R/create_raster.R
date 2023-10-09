@@ -29,6 +29,8 @@ create_grid <- function(map_source = c("TIGER", "GADM"),
 }
 
 get_raster <- function(parameter_code, pollutant_standard = NULL,
+                       event_handle = c("Events Included", "Events Excluded",
+                                        "Concurred Events Excluded"),
                        year,  by_month = FALSE,
                        minlat = 24, maxlat = 50, minlon = -124, maxlon = -66,
                        crs = 6350, cell_size = 10000,
@@ -58,6 +60,8 @@ get_raster <- function(parameter_code, pollutant_standard = NULL,
     list_pollutant_standards(parameter_code)$pollutant_standard,
     several.ok = TRUE
   )
+  ## Verify event handle
+  event_handle <- match.arg(event_handle)
   ## Verify year format
   year <- .verify_year(year)
   ## Create grid
@@ -75,7 +79,7 @@ get_raster <- function(parameter_code, pollutant_standard = NULL,
   if (length(year) == 1) {
     out <- .get_and_process_aqs_data(
       parameter_code = parameter_code, pollutant_standard = pollutant_standard,
-      year = year, by_month = by_month, crs = crs,
+      event_handle = event_handle, year = year, by_month = by_month, crs = crs,
       aqs_email = aqs_email, aqs_key = aqs_key,
       minlat = minlat, maxlat = maxlat, minlon = minlon, maxlon = maxlon,
       us_grid = us_grid, nmax = nmax, download_chunk_size = download_chunk_size
@@ -88,7 +92,7 @@ get_raster <- function(parameter_code, pollutant_standard = NULL,
   } else {
     out <- .mget_and_process_aqs_data(
       param = parameter_code, pollutant_standard = pollutant_standard,
-      year = year, by_month = by_month, crs = crs,
+      event_handle = event_handle, year = year, by_month = by_month, crs = crs,
       aqs_email = aqs_email, aqs_key = aqs_key,
       minlat = minlat, maxlat = maxlat, minlon = minlon, maxlon = maxlon,
       us_grid = us_grid, nmax = nmax, download_chunk_size = download_chunk_size
