@@ -34,38 +34,84 @@
   invisible()
 }
 
-## Check 4-digit year input
-.verify_year <- function(x) {
-  x <- as.character(x)
-  ## First 4 characters are used to define year
-  year <- format(as.Date(x, format = "%Y"), format = "%Y")
-  ## consider year can be a vector
-  is_invalid <- nchar(x) != 4 | is.na(year)
-  if (any(is_invalid)) {
-    stop("Invalid year(s). Please use 'YYYY' format.")
-  }
-  x
-}
-
-## Generate sequence of dates to slice a time interval for AQS data download
-.gen_dl_chunk_seq <- function(year, download_chunk_size = c("month", "2-week")) {
-  download_chunk_size <- match.arg(download_chunk_size)
-  begin_date <- as.Date(paste0(year, "-01-01"))
-  begin_seq <- seq(as.Date(paste0(year, "-01-01")),
-                   length.out = 12, by = "month")
-  end_seq <- seq(as.Date(paste0(year, "-01-31")) + 1,
-                 length.out = 12, by = "month") - 1
-  if (download_chunk_size == "2-week") {
-    end_seq <- sort(c(end_seq, begin_seq + 14))
-    begin_seq <- sort(c(begin_seq, begin_seq + 15))
-  }
-  ## Re-format to YYYYMMDD
-  begin_seq <- format(begin_seq, "%Y%m%d")
-  end_seq <- format(end_seq, "%Y%m%d")
-  list(bdate = begin_seq, edate = end_seq)
-}
-
+## Year format
 .to_ymd <- function(yyyymmdd) {
   sub("(\\d{4})(\\d{2})(\\d{2})", "\\1/\\2/\\3", yyyymmdd)
 }
 
+.map_standard_to_ulim <- function(standard, scale) {
+  switch(
+    standard,
+    "co_1_hour_1971" = 50,
+    "co_8_hour_1971" = 13,
+    "so2_1_hour_2010" = 110,
+    "no2_1_hour_2010" = 140,
+    "no2_annual_1971" = 75,
+    "ozone_8_hour_2015" = 0.1,
+    "pm10_24_hour_2006" = 220,
+    "pm25_24_hour_2012" = 50,
+    "pm25_annual_2012" = 18
+  )
+}
+
+
+## Custom labelformat for leaflet legend
+.labelFormat <- function(prefix = "", suffix = "", between = " &ndash; ",
+                         digits = 3, big.mark = ",", transform = identity,
+                         trunc_val = NULL) {
+    formatNum <- function(x) {
+        format(round(transform(x), digits), trim = TRUE, scientific = FALSE,
+               big.mark = big.mark)
+    }
+    function(type, ...) {
+      switch(
+        type,
+        numeric = (function(cuts) {
+          ## paste0(prefix, formatNum(cuts), suffix)
+          cuts <- sort(cuts, decreasing = TRUE)
+          paste0(prefix, formatNum(cuts), ifelse(cuts == trunc_val, "+", ""))
+        })(...),
+        bin = (function(cuts) {
+          n <- length(cuts)
+          paste0(prefix, formatNum(cuts[-n]), between, formatNum(cuts[-1]),
+                 suffix)
+        })(...),
+        quantile = (function(cuts, p) {
+          n <- length(cuts)
+          p <- paste0(round(p * 100), "%")
+          cuts <- paste0(formatNum(cuts[-n]), between, formatNum(cuts[-1]))
+          paste0("<span title=\"", cuts, "\">", prefix, p[-n],
+                 between, p[-1], suffix, "</span>")
+        })(...),
+        factor = (function(cuts) {
+          paste0(prefix, as.character(transform(cuts)), suffix)
+        })(...))
+    }
+}
+
+.colorNumeric <- function (palette, domain, na.color = "#808080", alpha = FALSE, 
+                           reverse = FALSE)
+{
+  rng <- NULL
+  if (length(domain) > 0) {
+    rng <- range(domain, na.rm = TRUE)
+    if (!all(is.finite(rng))) {
+      stop("Wasn't able to determine range of domain")
+    }
+  }
+  pf <- safePaletteFunc(palette, na.color, alpha)
+  withColorAttr("numeric", list(na.color = na.color), function(x) {
+    if (length(x) == 0 || all(is.na(x))) {
+      return(pf(x))
+    }
+    if (is.null(rng))
+      rng <- range(x, na.rm = TRUE)
+    rescaled <- scales::rescale(x, from = rng)
+    if (any(rescaled < 0 | rescaled > 1, na.rm = TRUE))
+      warning("Some values were outside the color scale and will be treated as NA")
+    if (reverse) {
+      rescaled <- 1 - rescaled
+    }
+    pf(rescaled)
+  })
+}

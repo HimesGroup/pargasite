@@ -30,8 +30,8 @@ names(.pollutant_standards)[idx] <- "pollutant_standard"
 .criteria_pollutants <- merge(.criteria_pollutants, .pollutant_standards)
 ## Keep only current standards
 ids_to_keep <- c(
-  ## Lead 3-month 2009
-  2,
+  ## Lead 3-month 2009; too few sites for interpolation
+  ## 2,
   ## CO 1-hour 1971, CO 8-hour 1971
   3, 4,
   ## NO2 1-hour 2010, NO2 Annual 1971
@@ -83,8 +83,8 @@ conus_filter <- st_bbox(
 
 ## Temporary for package develop
 ## Eventually data will be provided by users
-mozone <- get_raster(44201, NULL, year = 2005:2007, nmax = 10, cell_size = 20000)
-mno2 <- get_raster(42602, NULL, year = 2005:2007, nmax = 10, cell_size = 20000)
+mozone <- create_pargasite_data("SO2", year = 2022, cell_size = 5000)
+mno2 <- get_raster(42602, NULL, year = 2020:2022, nmax = 10, cell_size = 20000)
 .yy <- c(mozone, mno2)
 
 pm25 <- get_raster(88101, NULL, year = 2005:2006, by_month = TRUE, cell_size = 20000)

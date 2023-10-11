@@ -35,6 +35,7 @@ Imports:
     dplyr,
     gstat,
     leaflet,
+    raqs,
     rlang,
     sf,
     shiny,

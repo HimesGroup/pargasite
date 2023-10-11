@@ -12,7 +12,14 @@ ui <- fluidPage(
       width = 3
     ),
     mainPanel(
-      withSpinner(leafletOutput("us_map", width = "100%", height = 800))
+      ## withSpinner(leafletOutput("us_map", width = "100%", height = 800)),
+      withSpinner(leafletOutput("us_map", height = "67vh")),
+      hr(),
+      radioButtons(
+        inputId = "color",
+        label = span("Color scale (useful when outliers exist)",
+                     style = "font-weight: bold"),
+        choices = list("As is", "Upper bounded"), inline = TRUE)
     )
   )
 )

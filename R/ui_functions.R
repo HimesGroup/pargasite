@@ -7,10 +7,10 @@ pollutant_ui <- function(pollutant_list, year_list, month_list = NULL,
   fluidRow(
     column(
       12,
-      h3("Map View", style = "font-weight: bold; color: #54B4D3; margin-top: 10px; margin-bottom: 20px"),
-      hr(),
-      h4("Choose a grid attribute to visualize",
-         style = "font-weight: bold; color: #DC4C64; margin-bottom: 15px"),
+      ## h3("Map View", style = "font-weight: bold; color: #54B4D3; margin-top: 10px; margin-bottom: 20px"),
+      ## hr(),
+      h3("Choose a raster attribute to visualize",
+         style = "font-weight: bold; color: #DC4C64; margin-top:10px; margin-bottom: 15px"),
       selectizeInput(
         inputId = "pollutant",
         label = NULL,
@@ -95,8 +95,4 @@ pollutant_ui <- function(pollutant_list, year_list, month_list = NULL,
   d <- merge(list(key = names(x)), d)
   d <- within(d, name <- paste0(parameter, " (", parameter_code, ")"))
   lapply(split(d$pollutant_standard, d$name), as.list)
-  ## lapply(dl, as.list)
-  ## mapply(function(x, y) as.list(x), dl, names(dl), USE.NAMES = TRUE)
-  ## lapply(split(d, d$name), function(x) x$pollutant_standard)
-  ## list(name = d$name, standard = d$pollutant_standard)
 }
