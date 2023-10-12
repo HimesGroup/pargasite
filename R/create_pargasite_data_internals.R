@@ -43,7 +43,9 @@
   wkt_filter <- .get_wkt_filter(minlon = minlon, maxlon = maxlon,
                                 minlat = minlat, maxlat = maxlat, crs = map_crs)
   if (map_source == "TIGER") {
-    us_shape <- get_tl_shape(wkt_filter = wkt_filter)
+    ## Use cartographic boundary file instead of TL due to plot loading time
+    us_shape <- get_tl_shape(url = .get_carto_url("state"),
+                             wkt_filter = wkt_filter)
   } else {
     us_shape <- get_gadm_shape(admin_level = 2, wkt_filter = wkt_filter)
     us_shape <- us_shape[us_shape$ENGTYPE_2 != "Water body", ]
@@ -202,4 +204,3 @@
   end_seq <- format(end_seq, "%Y%m%d")
   list(bdate = begin_seq, edate = end_seq)
 }
-

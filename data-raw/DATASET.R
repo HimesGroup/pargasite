@@ -101,7 +101,6 @@ geojsonio::topojson_write(st_as_sfc(.topo_county), file = "./inst/extdata/county
 geojsonio::topojson_write(st_as_sfc(.topo_cbsa), file = "./inst/extdata/cbsa.json")
 
 
-
 ## USA CONUS and Puerto Rico shape files using Natural Earth data:
 ## Downloads Admin 0 without boundary lakes:
 ## https://www.naturalearthdata.com/downloads/10m-cultural-vectors/
@@ -130,7 +129,7 @@ conus_filter <- st_bbox(
 
 ## Temporary for package develop
 ## Eventually data will be provided by users
-mozone <- create_pargasite_data("SO2", year = 2022, cell_size = 5000)
+mozone <- create_pargasite_data("SO2", year = 2022, cell_size = 10000, nmax = 10)
 mno2 <- get_raster(42602, NULL, year = 2020:2022, nmax = 10, cell_size = 20000)
 .yy <- c(mozone, mno2)
 
@@ -141,20 +140,6 @@ co <- get_raster(42101, NULL, year = 2005:2006, by_month = TRUE,
 
 ## Save internal dataset
 format(object.size(list(.criteria_pollutants, .us_conus, .us_pr)), "Mb")
-usethis::use_data(.criteria_pollutants, .us_conus, .us_pr, .yy, .mm, .monitors,
+usethis::use_data(.criteria_pollutants, .yy, .monitors,
                   internal = TRUE, overwrite = TRUE)
-
-
-
-co_monitors <- raqs::monitors_bybox(param = 42101, bdate = "19970101", edate = "19971231",
-                                    minlat = 24, maxlat = 50, minlon = -124, maxlon = -66)
-
-
-.co_monitors <- list()
-for (i in 1997:2022) {
-  bdate <- paste0(i, "0101")
-  edate <- paste0(i, "1231")
-  co_monitors[[i]] <- raqs::monitors_bybox(param = 42101, bdate = bdate, edate = edate,
-                                           minlat = 24, maxlat = 50, minlon = -124, maxlon = -66)
-}
 

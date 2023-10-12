@@ -29,6 +29,14 @@ get_tl_shape <- function(url = NULL, quiet = TRUE, force = FALSE, ...) {
   )
 }
 
+.get_carto_url <- function(x) {
+  switch(
+    x,
+    "state" = "https://www2.census.gov/geo/tiger/GENZ2022/shp/cb_2022_us_state_20m.zip",
+    "county" = "https://www2.census.gov/geo/tiger/GENZ2022/shp/cb_2022_us_county_20m.zip",
+    "cbsa" = "https://www2.census.gov/geo/tiger/GENZ2021/shp/cb_2021_us_cbsa_20m.zip"
+  )
+}
 
 ## get_tl_shape <- function(url = NULL, quiet = TRUE, ...) {
 ##   message("Processing TIGER/TL shape file...")

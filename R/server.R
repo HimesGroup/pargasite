@@ -1,13 +1,5 @@
 server <- function(input, output, session) {
 
-  ## topoData <- readLines("https://rstudio.github.io/leaflet/json/us-10m.json") |> paste(collapse = "\n")
-  ## topo_state <- readLines(system.file("extdata", "state.json", package = "pargasite")) |>
-  ##   paste(collapse = "\n")
-  ## topo_county <- readLines(system.file("extdata", "county.json", package = "pargasite")) |>
-  ##   paste(collapse = "\n")
-  ## topo_cbsa <- readLines(system.file("extdata", "cbsa.json", package = "pargasite")) |>
-  ##   paste(collapse = "\n")
-
   ## Get data from global scope and reset pargasite options
   pargasite.dat <- getOption("pargasite.dat")
   pargasite.summary_state <- getOption("pargasite.summary_state")
@@ -32,21 +24,12 @@ server <- function(input, output, session) {
   summary_list <- "None"
   if (!is.null(pargasite.summary_state)) {
     summary_list <- c(summary_list, "State")
-    topo_state <- readLines(
-      system.file("extdata", "state.json", package = "pargasite")
-    ) |> paste(collapse = "\n")
   }
   if (!is.null(pargasite.summary_county)) {
     summary_list <- c(summary_list, "County")
-    topo_county <- readLines(
-      system.file("extdata", "county.json", package = "pargasite")
-    ) |> paste(collapse = "\n")
   }
   if (!is.null(pargasite.summary_cbsa)) {
     summary_list <- c(summary_list, "CBSA")
-    topo_cbsa <- readLines(
-      system.file("extdata", "cbsa.json", package = "pargasite")
-    ) |> paste(collapse = "\n")
   }
 
   ## Render UI
@@ -113,13 +96,15 @@ server <- function(input, output, session) {
     if (!is.null(input$year)) {
       d <- dimsub(d, dim = "year", value = input$year, drop = TRUE)
     } else {
-      d <- dimsub(d, dim = "year", value = st_get_dimension_values(d, "year")[1], drop = TRUE)
+      d <- dimsub(d, dim = "year", value = st_get_dimension_values(d, "year")[1],
+                  drop = TRUE)
     }
     if ("month" %in% dimnames(d)) {
       if (!is.null(input$month)) {
         d <- dimsub(d, dim = "month", value = input$month, drop = TRUE)
       } else {
-        d <- dimsub(d, dim = "month", value = st_get_dimension_values(d, "month")[1], drop = TRUE)
+        d <- dimsub(d, dim = "month",
+                    value = st_get_dimension_values(d, "month")[1], drop = TRUE)
       }
     }
     d
@@ -150,29 +135,32 @@ server <- function(input, output, session) {
     p <- leaflet(options = leafletOptions(minZoom = 3)) |>
       addTiles() |>
       setView(lng = -98.58, lat = 39.33, zoom = 4)
-  if (is.null(input$summary) || input$summary == "None") {
-    p <- p |>
-      ## addRasterImage with project = TRUE will project data to the leaflet map CRS
-      addRasterImage(as(map_dat, "Raster"), color = pal, opacity = 0.5)
-  } else {
-    ## Avoid addPolygons due to performance issue
-    if (input$summary == "State") {
+    if (is.null(input$summary) || input$summary == "None") {
       p <- p |>
-        leaflet::addTopoJSON(topo_state, weight = 1, color = "#444444", fill = FALSE)
-    }
-    if (input$summary == "County") {
+        ## addRasterImage with project = TRUE will project data to the leaflet map CRS
+        addRasterImage(as(map_dat, "Raster"), color = pal, opacity = 0.7)
+    } else {
+      m <- switch(
+        input$summary,
+        "State" = pargasite.map_state,
+        "County" = pargasite.map_county,
+        "CBSA" = pargasite.map_cbsa
+      )
+      r <- st_join(st_as_sf(map_dat), m, join = sf::st_equals) |>
+        st_transform(4326)
+      names(r)[1] <- "value"
       p <- p |>
-        leaflet::addTopoJSON(topo_county, weight = 1, color = "#444444", fill = FALSE)
+        addPolygons(
+          data = r, fillColor = ~pal(value), weight = 1, opacity = 1,
+          color = "#444444",
+          dashArray = NULL, fillOpacity = 0.7,
+          highlightOptions = highlightOptions(
+            weight = 3, color = "#444444", dashArray = NULL,
+            fillOpacity = 0.9, bringToFront = FALSE
+          ),
+          label = paste0(r$NAME, ": ", sprintf("%.3f", r$value))
+        )
     }
-    if (input$summary == "CBSA") {
-      p <- p |>
-        leaflet::addTopoJSON(topo_cbsa, weight = 1, color = "#444444", fill = FALSE)
-    }
-    r <- st_as_sf(map_dat) |>
-      stars::st_rasterize(dx = 5000)
-    p <- p |>
-      addRasterImage(as(r, "Raster"), color = pal, opacity = 0.5)
-  }
     p <- p |>
       addLegend(position = "bottomright", pal = pal_rev, values = c(min_val, max_val),
                 labFormat = label_fmt)
@@ -180,6 +168,8 @@ server <- function(input, output, session) {
   })
 
   ## Display pollutant level based upon mouse click event
+  ## Can use mouseover events with map_shape_mouseover but would not work with
+  ## addRasterImage; (limitation can be bypassed with leafem addImageQuery/addMouseCoordinates ?)
   output$pollutant_val <- renderText({
     if (!is.null(input$us_map_click)) {
       click_pos <- st_point(c(input$us_map_click$lng, input$us_map_click$lat)) |>
@@ -216,7 +206,6 @@ server <- function(input, output, session) {
         }
       }
     } else {
-      ## "<font color='#DC4C64'><b>Click the map to retrieve a pollutant value.</b></font>"
       "<b>Click the map to retrieve a pollutant value.</b>"
     }
   })

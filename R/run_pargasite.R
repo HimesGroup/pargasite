@@ -14,7 +14,7 @@ run_pargasite <- function(x, summarize_by = c("state", "county", "cbsa")) {
   if ("state" %in% summarize_by) {
     message("[Generating state-level summary...]")
     tl_state <- st_transform(
-      get_tl_shape(.get_tl_url("state"), wkt_filter = x_wkt_filter),
+      get_tl_shape(.get_carto_url("state"), wkt_filter = x_wkt_filter),
       st_crs(x)
     )
     summary_state <- aggregate(x, by = tl_state, FUN = function(x) mean(x, na.rm = TRUE))
@@ -24,7 +24,7 @@ run_pargasite <- function(x, summarize_by = c("state", "county", "cbsa")) {
   if ("county" %in% summarize_by) {
     message("[Generating county-level summary...]")
     tl_county <- st_transform(
-      get_tl_shape(url = .get_tl_url("county"), wkt_filter = x_wkt_filter),
+      get_tl_shape(url = .get_carto_url("county"), wkt_filter = x_wkt_filter),
       st_crs(x)
     )
     summary_county <- aggregate(x, by = tl_county, FUN = function(x) mean(x, na.rm = TRUE))
@@ -34,7 +34,7 @@ run_pargasite <- function(x, summarize_by = c("state", "county", "cbsa")) {
   if ("cbsa" %in% summarize_by) {
     message("[Generating CBSA-level summary...]")
     tl_cbsa <- st_transform(
-      get_tl_shape(url = .get_tl_url("cbsa"), wkt_filter = x_wkt_filter),
+      get_tl_shape(url = .get_carto_url("cbsa"), wkt_filter = x_wkt_filter),
       st_crs(x)
     )
     summary_cbsa <- aggregate(x, by = tl_cbsa, FUN = function(x) mean(x, na.rm = TRUE))
