@@ -1,5 +1,13 @@
 server <- function(input, output, session) {
 
+  ## topoData <- readLines("https://rstudio.github.io/leaflet/json/us-10m.json") |> paste(collapse = "\n")
+  ## topo_state <- readLines(system.file("extdata", "state.json", package = "pargasite")) |>
+  ##   paste(collapse = "\n")
+  ## topo_county <- readLines(system.file("extdata", "county.json", package = "pargasite")) |>
+  ##   paste(collapse = "\n")
+  ## topo_cbsa <- readLines(system.file("extdata", "cbsa.json", package = "pargasite")) |>
+  ##   paste(collapse = "\n")
+
   ## Get data from global scope and reset pargasite options
   pargasite.dat <- getOption("pargasite.dat")
   pargasite.summary_state <- getOption("pargasite.summary_state")
@@ -22,9 +30,24 @@ server <- function(input, output, session) {
     month_list <- NULL
   }
   summary_list <- "None"
-  if (!is.null(pargasite.summary_state)) summary_list <- c(summary_list, "State")
-  if (!is.null(pargasite.summary_county)) summary_list <- c(summary_list, "County")
-  if (!is.null(pargasite.summary_cbsa)) summary_list <- c(summary_list, "CBSA")
+  if (!is.null(pargasite.summary_state)) {
+    summary_list <- c(summary_list, "State")
+    topo_state <- readLines(
+      system.file("extdata", "state.json", package = "pargasite")
+    ) |> paste(collapse = "\n")
+  }
+  if (!is.null(pargasite.summary_county)) {
+    summary_list <- c(summary_list, "County")
+    topo_county <- readLines(
+      system.file("extdata", "county.json", package = "pargasite")
+    ) |> paste(collapse = "\n")
+  }
+  if (!is.null(pargasite.summary_cbsa)) {
+    summary_list <- c(summary_list, "CBSA")
+    topo_cbsa <- readLines(
+      system.file("extdata", "cbsa.json", package = "pargasite")
+    ) |> paste(collapse = "\n")
+  }
 
   ## Render UI
   output$pollutant_ui <- renderUI(
@@ -127,17 +150,29 @@ server <- function(input, output, session) {
     p <- leaflet(options = leafletOptions(minZoom = 3)) |>
       addTiles() |>
       setView(lng = -98.58, lat = 39.33, zoom = 4)
-    if (is.null(input$summary) || input$summary == "None") {
+  if (is.null(input$summary) || input$summary == "None") {
+    p <- p |>
+      ## addRasterImage with project = TRUE will project data to the leaflet map CRS
+      addRasterImage(as(map_dat, "Raster"), color = pal, opacity = 0.5)
+  } else {
+    ## Avoid addPolygons due to performance issue
+    if (input$summary == "State") {
       p <- p |>
-        ## addRasterImage with project = TRUE will project data to the leaflet map CRS
-        addRasterImage(as(map_dat, "Raster"), color = pal, opacity = 0.5)
-    } else {
-      ## Avoid addPolygons due to performance issue
-      r <- st_as_sf(map_dat) |>
-        stars::st_rasterize(dx = 10000)
-      p <- p |>
-        addRasterImage(as(r, "Raster"), color = pal, opacity = 0.5)
+        leaflet::addTopoJSON(topo_state, weight = 1, color = "#444444", fill = FALSE)
     }
+    if (input$summary == "County") {
+      p <- p |>
+        leaflet::addTopoJSON(topo_county, weight = 1, color = "#444444", fill = FALSE)
+    }
+    if (input$summary == "CBSA") {
+      p <- p |>
+        leaflet::addTopoJSON(topo_cbsa, weight = 1, color = "#444444", fill = FALSE)
+    }
+    r <- st_as_sf(map_dat) |>
+      stars::st_rasterize(dx = 5000)
+    p <- p |>
+      addRasterImage(as(r, "Raster"), color = pal, opacity = 0.5)
+  }
     p <- p |>
       addLegend(position = "bottomright", pal = pal_rev, values = c(min_val, max_val),
                 labFormat = label_fmt)

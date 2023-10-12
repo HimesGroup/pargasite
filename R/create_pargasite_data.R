@@ -4,7 +4,7 @@ create_pargasite_data <- function(pollutant = c("CO", "SO2", "NO2", "Ozone",
                                   event_filter = c("Events Included",
                                                    "Events Excluded",
                                                    "Concurred Events Excluded"),
-                                  year, by_month = FALSE, cell_size = 10000,
+                                  year, by_month = FALSE, cell_size = 5000,
                                   nmax = Inf, aqs_email = get_aqs_email(),
                                   aqs_key = get_aqs_key(),
                                   download_chunk_size = c("2-week", "month")) {
@@ -27,7 +27,7 @@ create_raster <- function(parameter_code, pollutant_standard = NULL,
                                            "Concurred Events Excluded"),
                           year,  by_month = FALSE,
                           minlat = 24, maxlat = 50, minlon = -124, maxlon = -66,
-                          crs = 6350, cell_size = 10000,
+                          crs = 6350, cell_size = 5000,
                           aqs_email = get_aqs_email(), aqs_key = get_aqs_key(),
                           nmax = 5, download_chunk_size = c("2-week", "month")) {
   ## Check package first; it wouldn't be necessary if raqs is 'imported'.

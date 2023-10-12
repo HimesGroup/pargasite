@@ -54,6 +54,53 @@ ids_to_keep <- c(
   ]
 
 
+################################################################################
+## Monitor list
+################################################################################
+get_monitors <- function(param, year = 1997:2022) {
+  monitors <- list()
+  for (i in year) {
+    message("Processing year: ", i)
+    bdate <- paste0(i, "0101")
+    edate <- paste0(i, "1231")
+    out <- raqs::monitors_bybox(
+                   param = param, bdate = bdate, edate = edate,
+                   minlat = 24, maxlat = 50, minlon = -124, maxlon = -66
+                 )
+    out$param <- param
+    out$year <- i
+    out <- out[, c("param", "year", "longitude", "latitude", "datum")]
+    out <- .aqs_transform(out, target_crs = 4326)
+    monitors[[as.character(i)]] <- out
+  }
+  .sys_sleep_pb(5)
+  out <- do.call(rbind, monitors)
+  rownames(out) <- NULL
+  out
+}
+
+.co_monitors <- get_monitors(42101)
+.so2_monitors <- get_monitors(42401)
+.no2_monitors <- get_monitors(42602)
+.ozone_monitors <- get_monitors(44201)
+.pm10_monitors <- get_monitors(81102)
+.pm25_monitors <- get_monitors(88101)
+.monitors <- do.call(rbind, list(.co_monitors, .so2_monitors, .no2_monitors,
+                                 .ozone_monitors, .pm10_monitors, .pm25_monitors))
+################################################################################
+## Simplified cartographic
+################################################################################
+.topo_state <- get_tl_shape("https://www2.census.gov/geo/tiger/GENZ2022/shp/cb_2022_us_state_20m.zip")
+.topo_county <- get_tl_shape("https://www2.census.gov/geo/tiger/GENZ2022/shp/cb_2022_us_county_20m.zip")
+.topo_cbsa <- get_tl_shape("https://www2.census.gov/geo/tiger/GENZ2021/shp/cb_2021_us_cbsa_20m.zip")
+## .topo_state <- get_tl_shape(.get_tl_url("state"))
+## .topo_county <- get_tl_shape(.get_tl_url("county"))
+## .topo_cbsa <- get_tl_shape(.get_tl_url("cbsa"))
+geojsonio::topojson_write(st_as_sfc(.topo_state), file = "./inst/extdata/state.json")
+geojsonio::topojson_write(st_as_sfc(.topo_county), file = "./inst/extdata/county.json")
+geojsonio::topojson_write(st_as_sfc(.topo_cbsa), file = "./inst/extdata/cbsa.json")
+
+
 
 ## USA CONUS and Puerto Rico shape files using Natural Earth data:
 ## Downloads Admin 0 without boundary lakes:
@@ -94,7 +141,20 @@ co <- get_raster(42101, NULL, year = 2005:2006, by_month = TRUE,
 
 ## Save internal dataset
 format(object.size(list(.criteria_pollutants, .us_conus, .us_pr)), "Mb")
-usethis::use_data(.criteria_pollutants, .us_conus, .us_pr, .yy, .mm,
+usethis::use_data(.criteria_pollutants, .us_conus, .us_pr, .yy, .mm, .monitors,
                   internal = TRUE, overwrite = TRUE)
 
+
+
+co_monitors <- raqs::monitors_bybox(param = 42101, bdate = "19970101", edate = "19971231",
+                                    minlat = 24, maxlat = 50, minlon = -124, maxlon = -66)
+
+
+.co_monitors <- list()
+for (i in 1997:2022) {
+  bdate <- paste0(i, "0101")
+  edate <- paste0(i, "1231")
+  co_monitors[[i]] <- raqs::monitors_bybox(param = 42101, bdate = bdate, edate = edate,
+                                           minlat = 24, maxlat = 50, minlon = -124, maxlon = -66)
+}
 
