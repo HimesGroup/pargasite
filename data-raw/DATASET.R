@@ -69,7 +69,7 @@ get_monitors <- function(param, year = 1997:2022) {
                  )
     out$param <- param
     out$year <- i
-    out <- out[, c("param", "year", "longitude", "latitude", "datum")]
+    out <- out[, c("parameter_code", "year", "longitude", "latitude", "datum")]
     out <- .aqs_transform(out, target_crs = 4326)
     monitors[[as.character(i)]] <- out
   }
@@ -87,6 +87,7 @@ get_monitors <- function(param, year = 1997:2022) {
 .pm25_monitors <- get_monitors(88101)
 .monitors <- do.call(rbind, list(.co_monitors, .so2_monitors, .no2_monitors,
                                  .ozone_monitors, .pm10_monitors, .pm25_monitors))
+
 ################################################################################
 ## Simplified cartographic
 ################################################################################
@@ -129,8 +130,8 @@ conus_filter <- st_bbox(
 
 ## Temporary for package develop
 ## Eventually data will be provided by users
-mozone <- create_pargasite_data("SO2", year = 2022, cell_size = 10000, nmax = 10)
-mno2 <- get_raster(42602, NULL, year = 2020:2022, nmax = 10, cell_size = 20000)
+mozone <- create_pargasite_data("Ozone", year = 2020:2022)
+mno2 <- create_pargasite_data("NO2", year = 2020:2022)
 .yy <- c(mozone, mno2)
 
 pm25 <- get_raster(88101, NULL, year = 2005:2006, by_month = TRUE, cell_size = 20000)
@@ -139,7 +140,6 @@ co <- get_raster(42101, NULL, year = 2005:2006, by_month = TRUE,
 .mm <- c(pm25, co)
 
 ## Save internal dataset
-format(object.size(list(.criteria_pollutants, .us_conus, .us_pr)), "Mb")
 usethis::use_data(.criteria_pollutants, .yy, .monitors,
                   internal = TRUE, overwrite = TRUE)
 

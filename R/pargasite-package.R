@@ -8,6 +8,7 @@
 ##'   observeEvent renderText h2 shinyApp reactive hr span
 ##' @importFrom leaflet leafletOutput renderLeaflet leaflet leafletOptions
 ##'   colorNumeric addTiles setView addRasterImage addPolygons addLegend
-##'   labelFormat highlightOptions
+##'   labelFormat highlightOptions addMarkers addLayersControl
+##'   layersControlOptions hideGroup
 ##' @importFrom shinycssloaders withSpinner
 "_PACKAGE"

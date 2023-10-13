@@ -110,9 +110,27 @@ server <- function(input, output, session) {
     d
   })
 
+  monitor_dat <- reactive({
+    if (is.null(input$year)) {
+      year <- st_get_dimension_values(pargasite.dat, "year")[1]
+    } else {
+      year <- input$year
+    }
+    if (is.null(input$pollutant)) {
+      idx <- which(.criteria_pollutants$pollutant_standard == .recover_from_standard(pargasite.dat)[[1]][[1]])
+    } else {
+      idx <- which(.criteria_pollutants$pollutant_standard == input$pollutant)
+    }
+    parameter_code <- .criteria_pollutants$parameter_code[idx]
+    d <- .monitors[.monitors$year == year &
+                   .monitors$parameter_code == parameter_code, ]
+    as.data.frame(st_coordinates(d))
+  })
+
   ## Draw map
   observeEvent({
     pargasite_dat()
+    monitor_dat()
     input$color
   }, {
     map_dat <- pargasite_dat()
@@ -134,7 +152,12 @@ server <- function(input, output, session) {
     ## map_dat <- st_transform(st_as_sf(pargasite_dat()), 4326)
     p <- leaflet(options = leafletOptions(minZoom = 3)) |>
       addTiles() |>
-      setView(lng = -98.58, lat = 39.33, zoom = 4)
+      setView(lng = -98.58, lat = 39.33, zoom = 4) |>
+      addMarkers(lng = monitor_dat()$X, lat = monitor_dat()$Y,
+                 group = "Show Monitor Locations") |>
+      addLayersControl(overlayGroups = "Show Monitor Locations",
+                       options = layersControlOptions(collapsed = FALSE)) |>
+      hideGroup("Show Monitor Locations")
     if (is.null(input$summary) || input$summary == "None") {
       p <- p |>
         ## addRasterImage with project = TRUE will project data to the leaflet map CRS
