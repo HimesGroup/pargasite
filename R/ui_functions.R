@@ -1,4 +1,4 @@
-pollutant_ui <- function(pollutant_list, year_list, month_list = NULL,
+pollutant_ui <- function(pollutant_list, event_list, year_list, month_list = NULL,
                          summary_list) {
   ## Month full name
   if (!is.null(month_list)) {
@@ -56,6 +56,13 @@ pollutant_ui <- function(pollutant_list, year_list, month_list = NULL,
       ),
       hr(),
       selectizeInput(
+        inputId = "event",
+        label = "Exceptional event",
+        choice = event_list,
+        multiple = FALSE
+      ),
+      hr(),
+      selectizeInput(
         inputId = "year",
         label = "Year",
         choice = year_list,
@@ -92,7 +99,9 @@ pollutant_ui <- function(pollutant_list, year_list, month_list = NULL,
 
 .recover_from_standard <- function(x, y = .criteria_pollutants) {
   d <- within(y, key <- .make_names(pollutant_standard))
-  d <- merge(list(key = names(x)), d)
+  d <- merge(list(key = names(x)), d, sort = FALSE)
   d <- within(d, name <- paste0(parameter, " (", parameter_code, ")"))
+  ## Preserve order
+  d$name <- factor(d$name, levels = unique(d$name))
   lapply(split(d$pollutant_standard, d$name), as.list)
 }

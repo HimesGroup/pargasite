@@ -97,14 +97,22 @@
       ## No matched data
       return(NULL)
     }
-    d <- aggregate(
-      arithmetic_mean ~ latitude + longitude + pollutant_standard + month + datum,
-      FUN = mean, data = d
-    )
-    d <- .aqs_transform(d, target_crs = crs)
+    ## d <- aggregate(
+    ##   arithmetic_mean ~ latitude + longitude + pollutant_standard + month + datum,
+    ##   FUN = mean, data = d
+    ## )
+    ## d <- .aqs_transform(d, target_crs = crs)
     d <- by(d, d$pollutant_standard, function(x) {
       out <- by(x, x$month, function(y) {
-        .run_idw(y, us_grid, "arithmetic_mean", nmax)
+        out <- lapply(event_filter, function(z) {
+          y <- y[y$event_type %in% c(z, "No Events"), ]
+          y <- aggregate(arithmetic_mean ~ latitude + longitude + datum,
+                         FUN = mean, data = y)
+          y <- .aqs_transform(y, target_crs = crs)
+          .run_idw(y, us_grid, "arithmetic_mean", nmax)
+        })
+        names(out) <- event_filter
+        do.call(c, c(out, along = "event"))
       }, simplify = FALSE)
       do.call(c, c(out, along = "month"))
     }, simplify = FALSE)
@@ -119,10 +127,19 @@
     d <- d[d$event_type %in% c(event_filter, "No Events"), ]
     d <- by(d, d$pollutant_standard, function(x) {
       field <- .map_standard_to_field(unique(x$pollutant_standard))
-      aggr_fml <- as.formula(paste0(field, " ~ latitude + longitude + datum"))
-      x <- aggregate(aggr_fml, FUN = mean, data = x)
-      x <- .aqs_transform(x, target_crs = crs)
-      .run_idw(x, us_grid, field, nmax)
+      out <- lapply(event_filter, function(y) {
+        x <- x[x$event_type %in% c(y, "No Events"), ]
+        aggr_fml <- as.formula(paste0(field, " ~ latitude + longitude + datum"))
+        x <- aggregate(aggr_fml, FUN = mean, data = x)
+        x <- .aqs_transform(x, target_crs = crs)
+        .run_idw(x, us_grid, field, nmax)
+      })
+      names(out) <- event_filter
+      do.call(c, c(out, along = "event"))
+      ## aggr_fml <- as.formula(paste0(field, " ~ latitude + longitude + datum"))
+      ## x <- aggregate(aggr_fml, FUN = mean, data = x)
+      ## x <- .aqs_transform(x, target_crs = crs)
+      ## .run_idw(x, us_grid, field, nmax)
     }, simplify = FALSE)
     setNames(do.call(c, d), .make_names(names(d)))
   }

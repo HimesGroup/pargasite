@@ -14,8 +14,8 @@ create_pargasite_data <- function(pollutant = c("CO", "SO2", "NO2", "Ozone",
   parameter_code <- .map_pollutant_to_param(pollutant)
   ## Create raster for US CONUS in EPSG 6350 (NAD83 / Conus Albers)
   create_raster(
-    parameter_code = parameter_code, year = year, by_month = by_month,
-    cell_size = cell_size, nmax = nmax,
+    parameter_code = parameter_code, event_filter = event_filter,
+    year = year, by_month = by_month, cell_size = cell_size, nmax = nmax,
     download_chunk_size = download_chunk_size
   )
 }
@@ -55,7 +55,11 @@ create_raster <- function(parameter_code, pollutant_standard = NULL,
     several.ok = TRUE
   )
   ## Verify event handle
-  event_filter <- match.arg(event_filter)
+  event_filter <- match.arg(
+    event_filter,
+    c("Events Included", "Events Excluded", "Concurred Events Excluded"),
+    several.ok = TRUE
+  )
   ## Verify year format
   year <- .verify_year(year)
   ## Verify cell size

@@ -1,4 +1,9 @@
-run_pargasite <- function(x, summarize_by = c("state", "county", "cbsa")) {
+run_pargasite <- function(x, summarize_by = c("state", "county", "cbsa"),
+                          summary_state = NULL, summary_county = NULL,
+                          summary_cbsa = NULL) {
+  if (!inherits(x, "stars")) {
+    stop("'x' must be a stars object.")
+  }
   if ("year" %ni% dimnames(x)) {
     stop("'x' must have 'year' dimension")
   }
@@ -17,7 +22,10 @@ run_pargasite <- function(x, summarize_by = c("state", "county", "cbsa")) {
       get_tl_shape(.get_carto_url("state"), wkt_filter = x_wkt_filter),
       st_crs(x)
     )
-    summary_state <- aggregate(x, by = tl_state, FUN = function(x) mean(x, na.rm = TRUE))
+    if (is.null(summary_state)) {
+      summary_state <- aggregate(x, by = tl_state,
+                                 FUN = function(x) mean(x, na.rm = TRUE))
+    }
     options(pargasite.summary_state = summary_state,
             pargasite.map_state = tl_state)
   }
@@ -27,7 +35,10 @@ run_pargasite <- function(x, summarize_by = c("state", "county", "cbsa")) {
       get_tl_shape(url = .get_carto_url("county"), wkt_filter = x_wkt_filter),
       st_crs(x)
     )
-    summary_county <- aggregate(x, by = tl_county, FUN = function(x) mean(x, na.rm = TRUE))
+    if (is.null(summary_county)) {
+      summary_county <- aggregate(x, by = tl_county,
+                                  FUN = function(x) mean(x, na.rm = TRUE))
+    }
     options(pargasite.summary_county = summary_county,
             pargasite.map_county = tl_county)
   }
@@ -37,7 +48,10 @@ run_pargasite <- function(x, summarize_by = c("state", "county", "cbsa")) {
       get_tl_shape(url = .get_carto_url("cbsa"), wkt_filter = x_wkt_filter),
       st_crs(x)
     )
-    summary_cbsa <- aggregate(x, by = tl_cbsa, FUN = function(x) mean(x, na.rm = TRUE))
+    if (is.null(summary_cbsa)) {
+      summary_cbsa <- aggregate(x, by = tl_cbsa,
+                                FUN = function(x) mean(x, na.rm = TRUE))
+    }
     options(pargasite.summary_cbsa = summary_cbsa,
             pargasite.map_cbsa = tl_cbsa)
   }

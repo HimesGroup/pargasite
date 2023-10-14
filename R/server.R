@@ -15,6 +15,7 @@ server <- function(input, output, session) {
 
   ## Some preprocessing
   pollutant_list <- .recover_from_standard(pargasite.dat)
+  event_list <- st_get_dimension_values(pargasite.dat, "event")
   year_list <- st_get_dimension_values(pargasite.dat, "year")
   if ("month" %in% dimnames(pargasite.dat)) {
     month_list <- st_get_dimension_values(pargasite.dat, "month")
@@ -34,9 +35,8 @@ server <- function(input, output, session) {
 
   ## Render UI
   output$pollutant_ui <- renderUI(
-    tagList(
-      pollutant_ui(pollutant_list, year_list, month_list, summary_list)
-    )
+    tagList(pollutant_ui(pollutant_list, event_list, year_list,
+                         month_list, summary_list))
   )
 
   ## Pollutant information
@@ -93,6 +93,13 @@ server <- function(input, output, session) {
     } else {
       d <- d[.make_names(input$pollutant)]
     }
+    if (!is.null(input$event)) {
+      ## Drop=TRUE will drop singular dimension of year; it throw an error next year eval.
+      d <- dimsub(d, dim = "event", value = input$event, drop = FALSE)
+    } else {
+      d <- dimsub(d, dim = "event", value = st_get_dimension_values(d, "event")[1],
+                  drop = FALSE)
+    }
     if (!is.null(input$year)) {
       d <- dimsub(d, dim = "year", value = input$year, drop = TRUE)
     } else {
@@ -117,7 +124,8 @@ server <- function(input, output, session) {
       year <- input$year
     }
     if (is.null(input$pollutant)) {
-      idx <- which(.criteria_pollutants$pollutant_standard == .recover_from_standard(pargasite.dat)[[1]][[1]])
+      idx <- which(.criteria_pollutants$pollutant_standard ==
+                   .recover_from_standard(pargasite.dat)[[1]][[1]])
     } else {
       idx <- which(.criteria_pollutants$pollutant_standard == input$pollutant)
     }
