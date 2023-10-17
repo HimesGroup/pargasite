@@ -1,3 +1,21 @@
+##' Summarized PARGASITE pollutant data by geographic boundaries
+##'
+##' A function to compute areal means of grid samples falling inside the target
+##' geographic boundaries, including State, County, and Core Based Statistical
+##' Area (CBSA). The US shape files are automatically downloaded to R's
+##' temporary directory once for the current session and removed when R is
+##' closed.
+##'
+##' @param x A stars object created by [create_pargasite_data].
+##' @param level A string specifying a geographic boundary.
+##'
+##' @return A stars object containing pollutant levels summarized by geographic
+##'   boundaries.
+##'
+##' @examples
+##'
+##' ## State-level summary
+##' summarize_by_boundaries(ozone20km, "state")
 summarize_by_boundaries <- function(x , level = c("state", "county", "cbsa")) {
   if (!inherits(x, "stars")) {
     stop("'x' must be a stars object.")

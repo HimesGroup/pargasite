@@ -134,23 +134,20 @@ conus_filter <- st_bbox(
 
 ## Temporary for package develop
 ## Eventually data will be provided by users
-mozone <- create_pargasite_data("Ozone", year = 2020:2022)
-mno2 <- create_pargasite_data("NO2", year = 2020:2022)
-mso2 <- create_pargasite_data("SO2", year = 2020:2022)
-.yy <- c(mozone, mno2, mso2)
+ozone20km <- create_pargasite_data("Ozone", year = 2021:2022, cell_size = 20000)
 
 
-mozone <- create_pargasite_data("Ozone", year = 2020:2021, event_filter = c("Events Included"))
-mozone <- create_pargasite_data("Ozone", year = 2020:2022, event_filter = "x")
-mozone <- create_pargasite_data("Ozone", year = 2020:2021, event_filter = c("Events Included", "x"))
-mozone <- create_pargasite_data("Ozone", year = 2020:2021, event_filter = c("y", "x"))
-mozone <- create_pargasite_data("Ozone", year = 2020:2021, event_filter = c("Events Included", "Events Excluded"))
+## mozone <- create_pargasite_data("Ozone", year = 2020:2021, event_filter = c("Events Included"))
+## mozone <- create_pargasite_data("Ozone", year = 2020:2022, event_filter = "x")
+## mozone <- create_pargasite_data("Ozone", year = 2020:2021, event_filter = c("Events Included", "x"))
+## mozone <- create_pargasite_data("Ozone", year = 2020:2021, event_filter = c("y", "x"))
+## mozone <- create_pargasite_data("Ozone", year = 2020:2021, event_filter = c("Events Included", "Events Excluded"))
 ## pm25 <- get_raster(88101, NULL, year = 2005:2006, by_month = TRUE, cell_size = 20000)
 ## co <- get_raster(42101, NULL, year = 2005:2006, by_month = TRUE,
 ##                  download_chunk_size = "2-week", cell_size = 20000)
 ## .mm <- c(pm25, co)
 
 ## Save internal dataset
-usethis::use_data(.criteria_pollutants, .map_state, .map_county, .map_cbsa,
-                  .monitors, .yy, internal = TRUE, overwrite = TRUE)
+usethis::use_data(ozone20km, overwrite = TRUE)
+usethis::use_data(.criteria_pollutants, .monitors, internal = TRUE, overwrite = TRUE)
 

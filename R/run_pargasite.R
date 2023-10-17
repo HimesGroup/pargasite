@@ -1,3 +1,29 @@
+##' Run PARGASITE application
+##'
+##' Launch a Shiny application to visualize pollutant levels of the conterminous
+##' US. The system's default web browser will be launched automatically after
+##' the app is started.
+##'
+##' @param x A stars object created by [create_pargasite_data].
+##' @param summarize_by A vector of strings specifying geographic boundaries to
+##'   compute areal means.
+##' @param summary_state A stars object created by [summarize_by_boundaries].
+##'   Ignored if 'state' is not specified in `summarize_by`. While the function
+##'   computes areal summary if the argument is `NULL`, it may be useful if the
+##'   app is to be called multiple times to save processing time.
+##' @param summary_county A stars object created by [summarize_by_boundaries].
+##'   Ignored if 'county' is not specified in `summarize_by`.
+##' @param summary_cbsa A stars object created by [summarize_by_boundaries].
+##'   Ignored if 'cbsa' is not specified in `summarize_by`.
+##'
+##' @return This function normally does not return; interrupt R to stop the
+##'   application (usually by pressing Ctrl + C or ESC).
+##'
+##' @examples
+##'
+##' if (interactive()) {
+##'   run_pargasite(ozone20km)
+##' }
 run_pargasite <- function(x, summarize_by = c("state", "county", "cbsa"),
                           summary_state = NULL, summary_county = NULL,
                           summary_cbsa = NULL) {

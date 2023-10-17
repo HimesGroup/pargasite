@@ -1,3 +1,80 @@
+##' Create a data cube for air pollutant levels covering the conterminous US
+##'
+##' A function to create a raster-based pollutant concentration input for
+##' PARGASITE's shiny application. It downloads pollutant data via the
+##' Environmental Protection Agency's (EPA) Air Quality System (AQS) API
+##' service, filters the data by exceptional event (e.g., wildfire) status, and
+##' performs the inverse distance weighted (IDW) interpolation to estimate
+##' pollutant concentrations covering the conterminous United States (CONUS) at
+##' user-defined time ranges.
+##'
+##' By default, it returns yearly-summarized concentrations using AQS's annual
+##' data but can also provide monthly-summarized concentrations by aggregating
+##' AQS's daily data. Note that the function chooses an appropriate data field
+##' for each pollutant to check the air quality status based on the National
+##' Ambient Air Quality Standard (NAAQS) for yearly-summarized outputs as
+##' follows
+##'
+##' - CO 1-hour: `second_max_value` field
+##' - CO 8-hour: `second_max_nonoverlap` field
+##' - SO2 1-hour: `ninety_ninth_percentile` field
+##' - NO2 1-hour: `nineth_eighth_percentile` field
+##' - NO2 Annual: `arithmetic mean` field
+##' - Ozone 8-hour: `fourth_max_value` field
+##' - PM10 24-hour: `primary_exceedance_count` field
+##' - PM25 24-hour: `ninety_eighth_percentile` field
+##' - PM25 Annual: `arithmetic_mean` field
+##'
+##' For monthly-summarized outputs, it uses the `arithmetic_mean` field of daily
+##' data. Please check AQS API `metaData/fieldsByService` (see
+##' [raqs::metadata_fieldsbyservice]) and
+##' \href{https://aqs.epa.gov/aqsweb/documents/AQS_Data_Dictionary.html}{AQS
+##' data dictionary} for the details of field descriptions.
+##'
+##' For spatial interpolation, the AQS data is projected to EPSG:6350 (NAD83
+##' CONUS Albers), and thus, `cell_size` value is represented in meters (5,000
+##' creates 5km x 5km grid). The smaller `cell_size`, the more processing time
+##' is required.
+##'
+##' @param pollutant A string specifying an air pollutant to create a raster
+##'   data cube. Must be one of CO2, SO2, NO2, Ozone, PM2.5 and PM10.
+##' @param event_filter A vector of strings indicating whether data measured
+##'   during exceptional events are included in the summary. 'Events Included'
+##'   means events occurred and the data from theme is included in the summary.
+##'   'Events Excluded' means that events occurred but data from them is
+##'   excluded from the summary. 'Concurred Events Excluded' means that events
+##'   occurred but only EPA concurred exclusions are removed from the summary.
+##'   If multiple values are specified, pollutant levels for each filter are
+##'   stored in `event` dimension in the resulting output.
+##' @param year A vector of 4-digit numeric values specifying years to retrieve
+##'   pollutant levels.
+##' @param by_month A logical value indicating whether data summarized at
+##'   monthly level instead of yearly level.
+##' @param cell_size A numeric value specifying a cell size of grid cells in
+##'   meters.
+##' @param nmax An integer value specifying the number of nearest observations
+##'   that should be used for spatial interpolation.
+##' @param aqs_email A string specifying the registered email for AQS API
+##'   service.
+##' @param aqs_key A string specifying the registered key for AQS API service.
+##' @param download_chunk_size A string specifying a chunk size for AQS API
+##'   daily data download to prevent an unexpected server timeout error. Ignored
+##'   when `by_month` is `FALSE`.
+##'
+##' @return A stars object containing the interpolated pollutant levels.
+##'
+##' @examples
+##'\dontrun{
+##'
+##' ## Set your AQS API key first using [raqs::set_aqs_user] to run the example.
+##'
+##' ## SO2 and CO concentrations through 2020 to 2022
+##' so2 <- create_pargasite_data("SO2", "Events Included", year = 2020:2022)
+##' co <- create_pargasite_data("CO", "Events Included", year = 2020:2022)
+##'
+##' ## Combine them; can combine other pollutant grids in the same way
+##' pargasite_input <- c(so2, co)
+##' }
 ##' @export
 create_pargasite_data <- function(pollutant = c("CO", "SO2", "NO2", "Ozone",
                                                 "PM2.5", "PM10"),

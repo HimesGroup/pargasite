@@ -6,7 +6,7 @@
 \alias{pargasite-package}
 \title{pargasite: Pollution-Associated Risk Geospatial Analysis}
 \description{
-This package provides raster layers from which pollution estimates can be extracted for latitude longitude coordinates within the contiguous United States at a 10km x 10km resolution. The recent modified version of the package also allows the user to download the pollutant data at the county, CBSA, census tract and zipcode level. Data is based on publicly available, pre-generated files from the United States Environmental Protection Agency (EPA) for years 1997 to 2021.
+Pollution-Associated Risk Geospatial Analysis STIE (PARGASITE) offers tools to estimate and visualize major pollutant levels (CO, NO2, SO2, Ozone, PM2.5 and PM10) covering the conterminous United States at user-defined time ranges. It help users to automatically retrieves pollutant data via the Environmental Protection Agency’s (EPA) Air Quality System (AQS) API service, filters the data by exceptional event (e.g., wildfire) status, performs spatial interpolations, and summarizes pollutant concentrations by geographic boundaries including State, County, and Core-Based Statistical Area (CBSA). It also offers a Shiny application to interactively visualize pollutant levels and to easily check the air quality status of a given location over time relative to the level of the National Ambient Air Quality Standards (NAAQS).
 }
 \author{
 \strong{Maintainer}: Jaehyun Joo \email{jaehyun.joo@outlook.com}
