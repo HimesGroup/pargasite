@@ -1,22 +1,31 @@
-# PARGASITE
+---
+title: "Getting Started"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
 
-Pollution-Associated Risk Geospatial Analysis STIE (PARGASITE) is an R package
-to estimate and visualize major pollutant levels (CO, NO2, SO2, Ozone, PM2.5 and
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+Pollution-Associated Risk Geospatial Analysis STIE (PARGASITE) offers tools to
+estimate and visualize major pollutant levels (CO, NO2, SO2, Ozone, PM2.5 and
 PM10) covering the conterminous United States at user-defined time ranges. It
-provides a function that automatically retrieves pollutant data via the
-Environmental Protection Agency’s (EPA) Air Quality System (AQS) API service,
-filters the data by exceptional event (e.g., wildfire) status, performs spatial
-interpolations, and summarizes pollutant concentrations by geographic boundaries
-including State, County, and Core-Based Statistical Area (CBSA). It also offers
-a Shiny application to interactively visualize pollutant levels and to easily
-check the air quality status of a given location over time relative to the level
-of the National Ambient Air Quality Standards (NAAQS).
-
-The PARGASITE package has been re-designed due to the deprecation of the rgdal
-package, and thus, it is not compatible with the previous version. Please check
-the v1 branch if you want to use the old interface.
-
-# Getting Started
+help users to automatically retrieves pollutant data via the Environmental
+Protection Agency’s (EPA) Air Quality System (AQS) API service, filters the data
+by exceptional event (e.g., wildfire) status, performs spatial interpolations,
+and summarizes pollutant concentrations by geographic boundaries including
+State, County, and Core-Based Statis- tical Area (CBSA). It also offers a Shiny
+application to interactively visualize pollutant levels and to easily check the
+air quality status of a given location over time relative to the level of the
+National Ambient Air Quality Standards (NAAQS).
 
 ## Installation
 
@@ -104,17 +113,16 @@ year to visualize. Relevant pollutant standard information will be provided. A
 pollutant value will be printed at bottom left in response to a mouse click
 event for a specific location.
 
-![](vignettes/pargasite1.png){width=100%}
+![](pargasite1.png){width=100%}
 
 We are often interested in pollutant levels by geographic boundaries. A user can
 display summarized values using the "summarize_by" app menu, which provides
 areal mean either by State, County, or Core Based Statistical Area (CBSA).
 
-![](vignettes/pargasite2.png){width=100%}
+![](pargasite2.png){width=100%}
 
 In addition, clicking "Show Monitor Locations" will returns all monitors operated
 in a given year.
 
-![](vignettes/pargasite3.png){width=100%}
-
+![](pargasite3.png){width=100%}
 

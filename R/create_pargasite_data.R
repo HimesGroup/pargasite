@@ -75,6 +75,7 @@
 ##' ## Combine them; can combine other pollutant grids in the same way
 ##' pargasite_input <- c(so2, co)
 ##' }
+##'
 ##' @export
 create_pargasite_data <- function(pollutant = c("CO", "SO2", "NO2", "Ozone",
                                                 "PM2.5", "PM10"),

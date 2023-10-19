@@ -24,6 +24,8 @@
 ##' if (interactive()) {
 ##'   run_pargasite(ozone20km)
 ##' }
+##'
+##' @export
 run_pargasite <- function(x, summarize_by = c("state", "county", "cbsa"),
                           summary_state = NULL, summary_county = NULL,
                           summary_cbsa = NULL) {

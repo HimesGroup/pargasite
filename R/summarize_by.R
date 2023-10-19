@@ -16,6 +16,8 @@
 ##'
 ##' ## State-level summary
 ##' summarize_by_boundaries(ozone20km, "state")
+##'
+##' @export
 summarize_by_boundaries <- function(x , level = c("state", "county", "cbsa")) {
   if (!inherits(x, "stars")) {
     stop("'x' must be a stars object.")

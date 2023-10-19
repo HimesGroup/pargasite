@@ -3,6 +3,8 @@
 S3method(c,pargasite.grid)
 S3method(print,pargasite.grid)
 export(create_pargasite_data)
+export(run_pargasite)
+export(summarize_by_boundaries)
 importFrom(gstat,idw)
 importFrom(leaflet,addLayersControl)
 importFrom(leaflet,addLegend)

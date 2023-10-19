@@ -26,4 +26,5 @@ closed.
 
 ## State-level summary
 summarize_by_boundaries(ozone20km, "state")
+
 }

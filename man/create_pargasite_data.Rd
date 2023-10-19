@@ -104,4 +104,5 @@ co <- create_pargasite_data("CO", "Events Included", year = 2020:2022)
 ## Combine them; can combine other pollutant grids in the same way
 pargasite_input <- c(so2, co)
 }
+
 }
