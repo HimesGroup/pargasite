@@ -13,9 +13,5 @@
   )
   toset <- names(op.pargasite) %ni% names(op)
   if (any(toset)) options(op.pargasite[toset])
-  shiny::addResourcePath(
-           prefix = "www", # custom prefix that will be used to reference your directory
-           directoryPath = system.file("www", package = "pargasite")
-         )# path to resource in your package
   invisible()
 }
