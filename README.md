@@ -104,17 +104,16 @@ year to visualize. Relevant pollutant standard information will be provided. A
 pollutant value will be printed at bottom left in response to a mouse click
 event for a specific location.
 
-![](vignettes/pargasite1.png){width=100%}
+![](vignettes/pargasite1.png)
 
 We are often interested in pollutant levels by geographic boundaries. A user can
 display summarized values using the "summarize_by" app menu, which provides
 areal mean either by State, County, or Core Based Statistical Area (CBSA).
 
-![](vignettes/pargasite2.png){width=100%}
+![](vignettes/pargasite2.png)
 
 In addition, clicking "Show Monitor Locations" will returns all monitors operated
 in a given year.
 
-![](vignettes/pargasite3.png){width=100%}
-
+![](vignettes/pargasite3.png)
 
