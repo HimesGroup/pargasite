@@ -22,7 +22,7 @@ the v1 branch if you want to use the old interface.
 
 In R session, please type
 
-```{r setup}
+``` r
 ## Install from CRAN
 install.packages("pargasite")
 
@@ -41,7 +41,7 @@ API](https://aqs.epa.gov/aqsweb/documents/data_api.html), users need to register
 API service first. Please check the raqs package to create an account and set up
 email and key for the current R session.
 
-```{r api service}
+``` r
 library(raqs)
 
 ## Please use your eamil address to create an account
@@ -58,7 +58,7 @@ based on pollutant standards, creates regular grid covering the conterminous US,
 and performs spatial interpolation on the grid. For spatial interpolation, the
 AQS data is projected to EPSG:6350 (NAD83 CONUS Albers).
 
-```{r create pargasite data}
+``` r
 ## Ozone concentrations based on 20km x 20km grid over the conterminous US
 ozone20km <- create_pargasite_data(
   pollutant = "Ozone", event_filter = "Events Included", year = 2021:2022,
@@ -77,7 +77,7 @@ for the details.
 
 You could also create other pollutant data cubes and combine them.
 
-```{r combine data cubes}
+``` r
 ## CO concentrations
 co20km <- create_pargasite_data(
   pollutant = "CO", event_filter = "Events Included", year = 2021:2022,
@@ -92,7 +92,7 @@ combined <- c(ozone20km, co20km)
 
 To visualize a pollutant data cube, launch the shiny app with
 
-```{r, launch shiny app}
+``` r
 run_pargasite(combined, summarize_by = c("state", "county", "cbsa"))
 ```
 
