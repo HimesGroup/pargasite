@@ -110,8 +110,12 @@ started.
 
 On the left panel, a user can choose a pollutant attribute, event filter, and
 year to visualize. Relevant pollutant standard information will be provided. A
-pollutant value will be printed at bottom left in response to a mouse click
-event for a specific location.
+pollutant value will be printed at the bottom left in response to a mouse click
+event for a specific location. For the color scale menu, “As is” selects colors
+based on the currently selected data, whereas “Consistent” picks ones that have
+the same range across different times and event filters for easy comparisons.
+The “Upper bounded” checkbox can be useful when color distortion is expected due
+to extreme outliers.
 
 ![](pargasite1.png){width=100%}
 

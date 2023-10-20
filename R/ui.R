@@ -15,9 +15,17 @@ ui <- fluidPage(
       hr(),
       radioButtons(
         inputId = "color",
-        label = span("Color scale (useful when outliers exist)",
+        label = span("Color scale",
                      style = "font-weight: bold"),
-        choices = list("As is", "Upper bounded"), inline = TRUE)
+        choices = list("As is", "Consistent"), inline = TRUE
+      ),
+      tags$div(checkboxInput(
+        inputId = "color_bounded",
+        label = "Upper bounded (useful when extreme outliers exist)",
+        value = FALSE,
+        width = "100%"
+      ), style = "margin-top: -0.7em"),
+      width = 9
     )
   )
 )

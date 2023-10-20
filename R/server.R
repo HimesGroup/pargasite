@@ -77,6 +77,9 @@ server <- function(input, output, session) {
     )
   })
 
+  ## Consistent color scale across different times and event filters
+  v <- reactiveValues(min_val = NULL, max_val = NULL)
+
   ## Choose data by user's selections
   ## To do: uniform legend scale for the same pollutant
   pargasite_dat <- reactive({
@@ -97,6 +100,9 @@ server <- function(input, output, session) {
     } else {
       d <- d[.make_names(input$pollutant)]
     }
+    ## For color scale
+    v$max_val <- max(d[[i = TRUE]], na.rm = TRUE)
+    v$min_val <- min(d[[i = TRUE]], na.rm = TRUE)
     if (!is.null(input$event)) {
       ## Drop=TRUE will drop singular dimension of year; it throw an error next year eval.
       d <- dimsub(d, dim = "event", value = input$event, drop = FALSE)
@@ -144,18 +150,27 @@ server <- function(input, output, session) {
     pargasite_dat()
     monitor_dat()
     input$color
+    input$color_bounded
   }, {
     map_dat <- pargasite_dat()
     label_fmt <- labelFormat(transform = function(x) sort(x, decreasing = TRUE))
     ## prevent color distortion due to too high values
-    if (input$color != "As is") {
+    if (input$color == "As is") {
+      min_val <- min(map_dat[[1]], na.rm = TRUE) * 0.99
+      max_val <- max(map_dat[[1]], na.rm = TRUE) * 1.01 # small offset due to boundary
+    } else {
+      min_val <- v$min_val * 0.99 # small offset due to boundary
+      max_val <- v$max_val * 1.01
+    }
+    if (input$color_bounded) {
       ulim_val <- .map_standard_to_ulim(names(pargasite_dat()))
       map_dat[[1]] <- pmin(map_dat[[1]], ulim_val)
+      max_val <- min(max_val, ulim_val * 1.01)
       label_fmt <- labelFormat(transform = function(x) sort(x, decreasing = TRUE),
                                suffix = "+")
     }
-    min_val <- min(map_dat[[1]], na.rm = TRUE) * 0.99
-    max_val <- max(map_dat[[1]], na.rm = TRUE) * 1.01 # small offset due to boundary
+    ## min_val <- min(map_dat[[1]], na.rm = TRUE) * 0.99
+    ## max_val <- max(map_dat[[1]], na.rm = TRUE) * 1.01 # small offset due to boundary
     pal <- colorNumeric("Spectral", domain = c(min_val, max_val),
                         na.color = "transparent", reverse = TRUE)
     ## For sorting add legend; clunky
