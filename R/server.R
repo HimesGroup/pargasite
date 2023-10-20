@@ -49,7 +49,11 @@ server <- function(input, output, session) {
       }
     )
     output$dat_field <- renderText(
-      .map_standard_to_field(input$pollutant)
+      if ("month" %ni% dimnames(pargasite.dat)) {
+        .map_standard_to_field(input$pollutant)
+      } else {
+        "arithmetic_mean"
+      }
     )
     ## List a selected pollutant information
     pollutant_idx <- which(
