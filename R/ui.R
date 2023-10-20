@@ -1,7 +1,5 @@
 ui <- fluidPage(
   title = "PARGASITE",
-  theme = shinythemes::shinytheme("darkly"),
-  ## theme = "www/minty.css",
   titlePanel(h2(
     "Pollution-Associated Risk Geospatial Analysis Site (PARGASITE)",
     style = "font-weight: bold; margin-bottom: 20px")

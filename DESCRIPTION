@@ -45,12 +45,11 @@ Imports:
     sf,
     shiny,
     shinycssloaders,
-    shinythemes,
     stars (>= 0.6-5)
 Depends:
     R (>= 4.0.0)
 LazyData: true
-Suggests: 
+Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
