@@ -1,6 +1,6 @@
 server <- function(input, output, session) {
 
-  ## Get data from global scope
+  ## Get data from global scope and reset pargasite options
   pargasite.dat <- getOption("pargasite.dat")
   pargasite.summary_state <- getOption("pargasite.summary_state")
   pargasite.summary_county <- getOption("pargasite.summary_county")
@@ -8,12 +8,10 @@ server <- function(input, output, session) {
   pargasite.map_state <- getOption("pargasite.map_state")
   pargasite.map_county <- getOption("pargasite.map_county")
   pargasite.map_cbsa <- getOption("pargasite.map_cbsa")
-  ## Reset pargasite options
-  ## Whenever the web page is refreshed it throws an error as data are set to NULL
-  ## options(pargasite.dat = NULL, pargasite.summary_state = NULL,
-  ##         pargasite.summary_county = NULL, pargasite.summary_cbsa = NULL,
-  ##         pargasite.map_state = NULL, pargasite.map_county = NULL,
-  ##         pargasite.map_cbsa = NULL)
+  options(pargasite.dat = NULL, pargasite.summary_state = NULL,
+          pargasite.summary_county = NULL, pargasite.summary_cbsa = NULL,
+          pargasite.map_state = NULL, pargasite.map_county = NULL,
+          pargasite.map_cbsa = NULL)
 
   ## Some preprocessing
   pollutant_list <- .recover_from_standard(pargasite.dat)

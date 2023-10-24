@@ -29,6 +29,12 @@
 run_pargasite <- function(x, summarize_by = c("state", "county", "cbsa"),
                           summary_state = NULL, summary_county = NULL,
                           summary_cbsa = NULL) {
+  ## Reset pargasite options first
+  options(pargasite.dat = NULL, pargasite.summary_state = NULL,
+          pargasite.summary_county = NULL, pargasite.summary_cbsa = NULL,
+          pargasite.map_state = NULL, pargasite.map_county = NULL,
+          pargasite.map_cbsa = NULL)
+  ## Verify inputs
   if (!inherits(x, "stars")) {
     stop("'x' must be a stars object.")
   }
