@@ -1,5 +1,6 @@
 ## This script is simply to run app on POSIT cloud
 library(shiny)
+library(raqs)
 library(pargasite)
 library(sf)
 library(shinycssloaders)
@@ -8,34 +9,41 @@ library(leaflet)
 library(stars)
 source("functions.R")
 
+## file source DIR as working DIR
 .criteria_pollutants <- pargasite:::.criteria_pollutants
 .monitors <- pargasite:::.monitors
 
-x <- ozone20km
-x_bbox <- st_bbox(st_transform(ozone20km, 4269))
+options(pargasite.dat = readRDS("pollutant_annual_10km_no_concurred_filter.RDS"))
+x_bbox <- st_bbox(st_transform(getOption("pargasite.dat"), 4269))
 x_wkt_filter <- st_as_text(st_as_sfc(x_bbox))
-tl_state <- st_transform(
-  get_tl_shape(.get_carto_url("state"), wkt_filter = x_wkt_filter),
-  st_crs(x)
-)
-tl_county <- st_transform(
-  get_tl_shape(url = .get_carto_url("county"), wkt_filter = x_wkt_filter),
-  st_crs(x)
-)
-tl_cbsa <- st_transform(
-  get_tl_shape(url = .get_carto_url("cbsa"), wkt_filter = x_wkt_filter),
-  st_crs(x)
+x_crs <- st_crs(getOption("pargasite.dat"))
+
+options(
+  pargasite.map_state = st_read(
+    "./shape/cb_2022_us_state_20m/cb_2022_us_state_20m.shp",
+    wkt_filter = x_wkt_filter, quiet = TRUE) |>
+    st_transform(x_crs),
+  pargasite.map_county = st_read(
+    "./shape/cb_2022_us_county_20m/cb_2022_us_county_20m.shp",
+    wkt_filter = x_wkt_filter, quiet = TRUE) |>
+    st_transform(x_crs),
+  pargasite.map_cbsa = st_read(
+    "./shape/cb_2021_us_cbsa_20m/cb_2021_us_cbsa_20m.shp",
+    wkt_filter = x_wkt_filter, quiet = TRUE) |>
+    st_transform(x_crs)
 )
 
-summary_state <- summarize_by_boundaries(x, "state")
-summary_county <- summarize_by_boundaries(x, "county")
-summary_cbsa <- summarize_by_boundaries(x, "cbsa")
-
-options(pargasite.dat = ozone20km,
-        pargasite.summary_state = summary_state,
-        pargasite.summary_county = summary_county,
-        pargasite.summary_cbsa = summary_cbsa,
-        pargasite.map_state = tl_state,
-        pargasite.map_county = tl_county,
-        pargasite.map_cbsa = tl_cbsa)
-
+options(
+  pargasite.summary_state = aggregate(
+    getOption("pargasite.dat"), by = getOption("pargasite.map_state"),
+    FUN = function(x) mean(x, na.rm = TRUE)
+  ),
+  pargasite.summary_county = aggregate(
+    getOption("pargasite.dat"), by = getOption("pargasite.map_county"),
+    FUN = function(x) mean(x, na.rm = TRUE)
+  ),
+  pargasite.summary_cbsa = aggregate(
+    getOption("pargasite.dat"), by = getOption("pargasite.map_cbsa"),
+    FUN = function(x) mean(x, na.rm = TRUE)
+  )
+)
