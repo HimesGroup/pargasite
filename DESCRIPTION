@@ -19,7 +19,7 @@ Authors@R: c(
            family = "Himes",
            role = c("aut"))
            )
-Description: Pollution-Associated Risk Geospatial Analysis STIE (PARGASITE)
+Description: Pollution-Associated Risk Geospatial Analysis SITE (PARGASITE)
              offers tools to estimate and visualize major pollutant levels (CO,
              NO2, SO2, Ozone, PM2.5 and PM10) covering the conterminous United
              States at user-defined time ranges. It help users to automatically
