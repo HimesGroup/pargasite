@@ -1,18 +1,5 @@
 server <- function(input, output, session) {
 
-  ## Get data from global scope and reset pargasite options
-  pargasite.dat <- getOption("pargasite.dat")
-  pargasite.summary_state <- getOption("pargasite.summary_state")
-  pargasite.summary_county <- getOption("pargasite.summary_county")
-  pargasite.summary_cbsa <- getOption("pargasite.summary_cbsa")
-  pargasite.map_state <- getOption("pargasite.map_state")
-  pargasite.map_county <- getOption("pargasite.map_county")
-  pargasite.map_cbsa <- getOption("pargasite.map_cbsa")
-  options(pargasite.dat = NULL, pargasite.summary_state = NULL,
-          pargasite.summary_county = NULL, pargasite.summary_cbsa = NULL,
-          pargasite.map_state = NULL, pargasite.map_county = NULL,
-          pargasite.map_cbsa = NULL)
-
   ## Some preprocessing
   pollutant_list <- .recover_from_standard(pargasite.dat)
   event_list <- st_get_dimension_values(pargasite.dat, "event")

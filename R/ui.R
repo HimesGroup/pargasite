@@ -17,14 +17,19 @@ ui <- fluidPage(
         inputId = "color",
         label = span("Color scale",
                      style = "font-weight: bold"),
-        choices = list("As is", "Consistent"), inline = TRUE
+        choices = list("Free", "Fixed"), inline = TRUE
       ),
       tags$div(checkboxInput(
-        inputId = "color_bounded",
-        label = "Upper bounded (useful when extreme outliers exist)",
-        value = FALSE,
-        width = "100%"
-      ), style = "margin-top: -0.7em"),
+             inputId = "color_bounded",
+             label = "Upper bounded (useful when extreme outliers exist)",
+             value = FALSE,
+             width = "100%"
+           ), style = "margin-top: -0.7em"),
+      tags$div(tags$p(
+             "- Free: each data has its own scale for the selected year",
+             tags$br(),
+             "- Fixed: all data share the same scale across the years"
+           ), style = "color: #900C3F"),
       width = 9
     )
   )

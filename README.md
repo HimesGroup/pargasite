@@ -1,6 +1,6 @@
 # PARGASITE
 
-Pollution-Associated Risk Geospatial Analysis STIE (PARGASITE) is an R package
+Pollution-Associated Risk Geospatial Analysis SITE (PARGASITE) is an R package
 to estimate and visualize major pollutant levels (CO, NO2, SO2, Ozone, PM2.5 and
 PM10) covering the conterminous United States at user-defined time ranges. It
 provides a function that automatically retrieves pollutant data via the

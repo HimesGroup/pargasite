@@ -19,14 +19,21 @@ ui <- fluidPage(
             inputId = "color",
             label = span("Color scale",
                          style = "font-weight: bold"),
-            choices = list("As is", "Consistent"), inline = TRUE
+            choices = list("Free", "Fixed"), inline = TRUE
           ),
           tags$div(checkboxInput(
                  inputId = "color_bounded",
                  label = "Upper bounded (useful when extreme outliers exist)",
                  value = FALSE,
                  width = "100%"
-               ), style = "margin-top: -0.7em")
+               ), style = "margin-top: -0.7em"),
+          tags$div(p(
+                 "- Free: each data has its own scale for the selected year",
+                 tags$br(),
+                "- Fixed: all data share the same scale across the years"
+               ), style = "color: #900C3F"),
+          tags$br(),
+          tags$div(p("Last updated: Dec 1, 2023"), style = "font-weight: bold")
         ),
         tabPanel(
           "About",
@@ -42,6 +49,10 @@ ui <- fluidPage(
             "status, performs spatial interpolations, and summarizes pollutant",
             "concentrations by geographic boundaries including State, County, ",
             "and Core-Based Statistical Area (CBSA)."),
+          p("We have no affiliation with the EPA."),
+          br(),
+          h4("Contributors", style = "font-weight: bold"),
+          p("Jaehyun Joo, Nisha Narayanan, Avantika Diwadkar, Rebecca Greenblatt, and Blanca Himes"),
           br(),
           h4("References", style = "font-weight: bold"),
           p("Greenblatt RE, Himes BE. Facilitating Inclusion of Geocoded Pollution",
