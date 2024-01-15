@@ -23,8 +23,8 @@ the v1 branch if you want to use the old interface.
 In R session, please type
 
 ``` r
-## Install from CRAN
-install.packages("pargasite")
+## Install from Github
+remotes::install_github("HimesGroup/pargasite")
 
 ## Load pargasite pacakge
 library(pargasite)
