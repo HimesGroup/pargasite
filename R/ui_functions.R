@@ -22,15 +22,6 @@ pollutant_ui <- function(pollutant_list, field_list, event_list, year_list,
       h4("Data Info", style = "font-weight: bold; color: #332D2D"),
       p(span("Source: ", style = "font-weight: bold; color: orange"),
         textOutput("dat_src", inline = TRUE)),
-      ## p(span("Field used: ", style = "font-weight: bold; color: orange"),
-      ##   textOutput("dat_field", inline = TRUE)),
-      ## p(span("Field used: ", style = "font-weight: bold; color: orange"),
-      ##   selectizeInput(
-      ##     inputId = "dat_field",
-      ##     label = "",
-      ##     choice = field_list,
-      ##     multiple = FALSE
-      ##   )),
       p("Field used:",
         style = "font-weight: bold; color: orange; margin-bottom: -15px"),
       selectizeInput(
@@ -105,7 +96,6 @@ pollutant_ui <- function(pollutant_list, field_list, event_list, year_list,
       },
       hr(),
       h4("Pollutant value", style = "font-weight: bold; color: #9CCC65"),
-      ## h5(textOutput("pollutant_val"))
       h5(htmlOutput("pollutant_val"))
     )
   )

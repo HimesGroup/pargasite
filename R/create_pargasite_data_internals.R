@@ -98,11 +98,6 @@
       ## No matched data
       return(NULL)
     }
-    ## d <- aggregate(
-    ##   arithmetic_mean ~ latitude + longitude + pollutant_standard + month + datum,
-    ##   FUN = mean, data = d
-    ## )
-    ## d <- .aqs_transform(d, target_crs = crs)
     d <- by(d, d$pollutant_standard, function(x) {
       out <- by(x, x$month, function(y) {
         out <- lapply(event_filter, function(z) {
@@ -128,22 +123,13 @@
     d <- d[d$pollutant_standard %in% pollutant_standard, ]
     d <- d[d$event_type %in% c(event_filter, "No Events"), ]
     d <- by(d, d$pollutant_standard, function(x) {
-      ## if (data_field == "NAAQS") {
-      ##   field <- .map_standard_to_field(unique(x$pollutant_standard))
-      ## } else {
-      ##   field <- "arithmetic_mean"
-      ## }
-      ## if ("NAAQS_statistic" %in% data_field) {
-      ##   naaqs <- match("NAAQS_statistic", data_field)
-      ##   data_field[naaqs] <- .map_standard_to_field(unique(x$pollutant_standard))
-      ## }
-      ## browser()
+      ## Create grid iterating over different data fields and event types
       out <- lapply(data_field, function(y) {
         out_sub <- lapply(event_filter, function(z) {
           x <- x[x$event_type %in% c(z, "No Events"), ]
-          ## aggr_fml <- as.formula(paste0(field, " ~ latitude + longitude + datum"))
           if (y == "NAAQS_statistic") {
-              y <- .map_standard_to_field(unique(x$pollutant_standard))
+            ## Map an appropriate field to the given pollution standard
+            y <- .map_standard_to_field(unique(x$pollutant_standard))
           }
           aggr_fml <- as.formula(paste0(y, " ~ latitude + longitude + datum"))
           x <- aggregate(aggr_fml, FUN = mean, data = x)
@@ -155,19 +141,6 @@
       })
       names(out) <- data_field
       do.call(c, c(out, along = "data_field"))
-      ## out <- lapply(event_filter, function(y) {
-      ##   x <- x[x$event_type %in% c(y, "No Events"), ]
-      ##   aggr_fml <- as.formula(paste0(field, " ~ latitude + longitude + datum"))
-      ##   x <- aggregate(aggr_fml, FUN = mean, data = x)
-      ##   x <- .aqs_transform(x, target_crs = crs)
-      ##   .run_idw(x, us_grid, field, nmax)
-      ## })
-      ## names(out) <- event_filter
-      ## do.call(c, c(out, along = "event"))
-      ## aggr_fml <- as.formula(paste0(field, " ~ latitude + longitude + datum"))
-      ## x <- aggregate(aggr_fml, FUN = mean, data = x)
-      ## x <- .aqs_transform(x, target_crs = crs)
-      ## .run_idw(x, us_grid, field, nmax)
     }, simplify = FALSE)
     setNames(do.call(c, d), .make_names(names(d)))
   }

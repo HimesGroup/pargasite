@@ -153,17 +153,6 @@ create_raster <- function(parameter_code, pollutant_standard = NULL, data_field,
     list_pollutant_standards(parameter_code)$pollutant_standard,
     several.ok = TRUE
   )
-  ## Verify event handler
-  ## event_filter <- match.arg(
-  ##   event_filter,
-  ##   c("Events Included", "Events Excluded", "Concurred Events Excluded"),
-  ##   several.ok = TRUE
-  ## )
-  ## Verify year format
-  ## year <- .verify_year(year)
-  ## Verify cell size
-  ## .is_nonnegative_number(cell_size)
-  ## Create grid
   us_grid <- .create_grid(
     minlat = minlat, maxlat = maxlat, minlon = minlon, maxlon = maxlon,
     crs = crs, cell_size = cell_size

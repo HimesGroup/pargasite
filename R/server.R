@@ -51,13 +51,8 @@ server <- function(input, output, session) {
         "EPA's AQS API dailyData service"
       }
     )
-    ## output$data_field <- renderText(
-    ##   if ("month" %ni% dimnames(pargasite.dat)) {
-    ##     .map_standard_to_field(input$pollutant)
-    ##   } else {
-    ##     "arithmetic_mean"
-    ##   }
-    ## )
+    ## Select an appropriate field when NAAQS_statistic is given and update the
+    ## dropdown menu
     if ("NAAQS_statistic" %in% st_get_dimension_values(pargasite.dat, "data_field")) {
       idx <- match("NAAQS_statistic", field_list)
       field_list[idx] <- .map_standard_to_field(input$pollutant)
@@ -116,6 +111,7 @@ server <- function(input, output, session) {
           drop = FALSE
         )
       } else{
+        ## Need to handle the case: NAAQS_statistic = arithmetic_mean
         if ("arithmetic_mean" %in% st_get_dimension_values(d, "data_field")) {
           d <- dimsub(d, dim = "data_field", value = "arithmetic_mean", drop = FALSE)
         } else{
@@ -174,6 +170,7 @@ server <- function(input, output, session) {
     as.data.frame(st_coordinates(d))
   })
 
+  ## Set a boundary threshold for color-scale
   observeEvent({
     input$pollutant
   }, {
@@ -207,9 +204,9 @@ server <- function(input, output, session) {
     }
     if (input$color_bounded) {
       ## ulim_val <- .map_standard_to_ulim(names(pargasite_dat()))
-      ulim_val <- v$ulim_val
-      map_dat[[1]] <- pmin(map_dat[[1]], ulim_val)
-      max_val <- min(max_val, ulim_val * 1.01)
+      ## ulim_val <- v$ulim_val
+      map_dat[[1]] <- pmin(map_dat[[1]], v$ulim_val)
+      max_val <- min(max_val, v$ulim_val * 1.01)
       label_fmt <- labelFormat(transform = function(x) sort(x, decreasing = TRUE),
                                suffix = "+")
     }
