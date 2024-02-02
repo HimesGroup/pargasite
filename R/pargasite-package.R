@@ -7,7 +7,7 @@
 ##'   fluidRow uiOutput selectizeInput updateSelectizeInput renderUI
 ##'   radioButtons wellPanel observeEvent renderText h2 shinyApp reactive
 ##'   reactiveValues hr span checkboxInput tags HTML textOutput htmlOutput
-##'   numericInput updateNumericInput
+##'   numericInput updateNumericInput tabsetPanel tabPanel
 ##' @importFrom leaflet leafletOutput renderLeaflet leaflet leafletOptions
 ##'   colorNumeric addTiles setView addRasterImage addPolygons addLegend
 ##'   labelFormat highlightOptions addMarkers addLayersControl

@@ -116,7 +116,12 @@ server <- function(input, output, session) {
           drop = FALSE
         )
       } else{
-        d <- dimsub(d, dim = "data_field", value = input$dat_field, drop = FALSE)
+        if ("arithmetic_mean" %in% st_get_dimension_values(d, "data_field")) {
+          d <- dimsub(d, dim = "data_field", value = "arithmetic_mean", drop = FALSE)
+        } else{
+          d <- dimsub(d, dim = "data_field", value = "NAAQS_statistic", drop = FALSE)
+        }
+        ## d <- dimsub(d, dim = "data_field", value = input$dat_field, drop = FALSE)
       }
     } else {
       d <- dimsub(d, dim = "data_field",
