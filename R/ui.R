@@ -19,7 +19,7 @@ ui <- fluidPage(
             inputId = "color",
             label = span("Color scale",
                          style = "font-weight: bold"),
-            choices = list("Free", "Fixed"), inline = TRUE
+            choices = list("Fixed", "Free"), inline = TRUE
           ),
           tags$div(checkboxInput(
                  inputId = "color_bounded",
@@ -38,9 +38,9 @@ ui <- fluidPage(
                ), class = "not_bold",
                style = "margin-top: -2.0em; display: inline-block"),
           tags$div(tags$p(
-                          "- Free: each data has its own color-scale for the selected year",
+                          "- Fixed: all data share the same color-scale across the years",
                           tags$br(),
-                          "- Fixed: all data share the same color-scale across the years"
+                          "- Free: each data has its own color-scale for the selected year"
                         ), style = "color: #900C3F")
         ),
         tabPanel(

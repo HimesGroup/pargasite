@@ -195,23 +195,20 @@ server <- function(input, output, session) {
     map_dat <- pargasite_dat()
     label_fmt <- labelFormat(transform = function(x) sort(x, decreasing = TRUE))
     ## prevent color distortion due to too high values
-    if (input$color == "Free") {
-      min_val <- min(map_dat[[1]], na.rm = TRUE) * 0.99
-      max_val <- max(map_dat[[1]], na.rm = TRUE) * 1.01 # small offset due to boundary
-    } else {
+    if (input$color == "Fixed") {
       min_val <- v$min_val * 0.99 # small offset due to boundary
       max_val <- v$max_val * 1.01
+    } else {
+      min_val <- min(map_dat[[1]], na.rm = TRUE) * 0.99
+      max_val <- max(map_dat[[1]], na.rm = TRUE) * 1.01 # small offset due to boundary
     }
     if (input$color_bounded) {
       ## ulim_val <- .map_standard_to_ulim(names(pargasite_dat()))
-      ## ulim_val <- v$ulim_val
       map_dat[[1]] <- pmin(map_dat[[1]], v$ulim_val)
       max_val <- min(max_val, v$ulim_val * 1.01)
       label_fmt <- labelFormat(transform = function(x) sort(x, decreasing = TRUE),
                                suffix = "+")
     }
-    ## min_val <- min(map_dat[[1]], na.rm = TRUE) * 0.99
-    ## max_val <- max(map_dat[[1]], na.rm = TRUE) * 1.01 # small offset due to boundary
     pal <- colorNumeric("Spectral", domain = c(min_val, max_val),
                         na.color = "transparent", reverse = TRUE)
     ## For sorting add legend; clunky
