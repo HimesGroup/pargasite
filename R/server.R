@@ -15,8 +15,9 @@ server <- function(input, output, session) {
   ##         pargasite.map_state = NULL, pargasite.map_county = NULL,
   ##         pargasite.map_cbsa = NULL)
 
-  ## Some preprocessing
+  ## Some pre-processing
   pollutant_list <- .recover_from_standard(pargasite.dat)
+  field_list <- st_get_dimension_values(pargasite.dat, "data_field")
   event_list <- st_get_dimension_values(pargasite.dat, "event")
   year_list <- st_get_dimension_values(pargasite.dat, "year")
   if ("month" %in% dimnames(pargasite.dat)) {
@@ -37,7 +38,7 @@ server <- function(input, output, session) {
 
   ## Render UI
   output$pollutant_ui <- renderUI(
-    tagList(pollutant_ui(pollutant_list, event_list, year_list,
+    tagList(pollutant_ui(pollutant_list, field_list, event_list, year_list,
                          month_list, summary_list))
   )
 
@@ -50,13 +51,18 @@ server <- function(input, output, session) {
         "EPA's AQS API dailyData service"
       }
     )
-    output$dat_field <- renderText(
-      if ("month" %ni% dimnames(pargasite.dat)) {
-        .map_standard_to_field(input$pollutant)
-      } else {
-        "arithmetic_mean"
-      }
-    )
+    ## output$data_field <- renderText(
+    ##   if ("month" %ni% dimnames(pargasite.dat)) {
+    ##     .map_standard_to_field(input$pollutant)
+    ##   } else {
+    ##     "arithmetic_mean"
+    ##   }
+    ## )
+    if ("NAAQS_statistic" %in% st_get_dimension_values(pargasite.dat, "data_field")) {
+      idx <- match("NAAQS_statistic", field_list)
+      field_list[idx] <- .map_standard_to_field(input$pollutant)
+    }
+    updateSelectizeInput(session, inputId = "dat_field", choices = field_list)
     ## List a selected pollutant information
     pollutant_idx <- which(
       .criteria_pollutants$pollutant_standard == input$pollutant
@@ -80,7 +86,7 @@ server <- function(input, output, session) {
   })
 
   ## Consistent color scale across different times and event filters
-  v <- reactiveValues(min_val = NULL, max_val = NULL)
+  v <- reactiveValues(min_val = NULL, max_val = NULL, ulim_val = NULL)
 
   ## Choose data by user's selections
   ## To do: uniform legend scale for the same pollutant
@@ -102,7 +108,23 @@ server <- function(input, output, session) {
     } else {
       d <- d[.make_names(input$pollutant)]
     }
-    ## For color scale
+    if (!is.null(input$dat_field)) {
+      if (input$dat_field != "arithmetic_mean") {
+        d <- dimsub(
+          d, dim = "data_field",
+          value = setdiff(st_get_dimension_values(d, "data_field"), "arithmetic_mean"),
+          drop = FALSE
+        )
+      } else{
+        d <- dimsub(d, dim = "data_field", value = input$dat_field, drop = FALSE)
+      }
+    } else {
+      d <- dimsub(d, dim = "data_field",
+                  value = st_get_dimension_values(d, "data_field")[1],
+                  drop = FALSE)
+    }
+    ## For color scale; still allow different scale between data fields as they
+    ## are a lot different
     v$max_val <- max(d[[i = TRUE]], na.rm = TRUE)
     v$min_val <- min(d[[i = TRUE]], na.rm = TRUE)
     if (!is.null(input$event)) {
@@ -147,17 +169,31 @@ server <- function(input, output, session) {
     as.data.frame(st_coordinates(d))
   })
 
+  observeEvent({
+    input$pollutant
+  }, {
+    v$ulim_val <- .map_standard_to_ulim(.make_names(input$pollutant))
+    updateNumericInput(inputId = "outlier_cutoff", value = v$ulim_val)
+  })
+
+  observeEvent({
+    input$outlier_cutoff
+  }, {
+    v$ulim_val <- input$outlier_cutoff
+  })
+
   ## Draw map
   observeEvent({
     pargasite_dat()
     monitor_dat()
     input$color
     input$color_bounded
+    v$ulim_val
   }, {
     map_dat <- pargasite_dat()
     label_fmt <- labelFormat(transform = function(x) sort(x, decreasing = TRUE))
     ## prevent color distortion due to too high values
-    if (input$color == "As is") {
+    if (input$color == "Free") {
       min_val <- min(map_dat[[1]], na.rm = TRUE) * 0.99
       max_val <- max(map_dat[[1]], na.rm = TRUE) * 1.01 # small offset due to boundary
     } else {
@@ -165,7 +201,8 @@ server <- function(input, output, session) {
       max_val <- v$max_val * 1.01
     }
     if (input$color_bounded) {
-      ulim_val <- .map_standard_to_ulim(names(pargasite_dat()))
+      ## ulim_val <- .map_standard_to_ulim(names(pargasite_dat()))
+      ulim_val <- v$ulim_val
       map_dat[[1]] <- pmin(map_dat[[1]], ulim_val)
       max_val <- min(max_val, ulim_val * 1.01)
       label_fmt <- labelFormat(transform = function(x) sort(x, decreasing = TRUE),

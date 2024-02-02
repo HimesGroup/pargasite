@@ -6,6 +6,7 @@
 \usage{
 create_pargasite_data(
   pollutant = c("CO", "SO2", "NO2", "Ozone", "PM2.5", "PM10"),
+  data_field = c("NAAQS_statistic", "arithmetic_mean"),
   event_filter = c("Events Included", "Events Excluded", "Concurred Events Excluded"),
   year,
   by_month = FALSE,
@@ -20,14 +21,22 @@ create_pargasite_data(
 \item{pollutant}{A string specifying an air pollutant to create a raster
 data cube. Must be one of CO2, SO2, NO2, Ozone, PM2.5 and PM10.}
 
+\item{data_field}{A vector of strings specifying whether which data fields
+are used to summarize the data. Must be either 'NAAQS statistic',
+'arithmetic_mean', or both. 'NAAQS_statistic' try to chooses an
+appropriate field based on National Ambient Air Quality Standards (NAAQS)
+in the AQS yearly data (e.g, for CO 1-hour average, 'second_max_value'
+would be chosen). 'arithmetic_mean' represents the measure of central
+tendency in the yearly data. Ignored when \code{by_month = TRUE}.}
+
 \item{event_filter}{A vector of strings indicating whether data measured
 during exceptional events are included in the summary. 'Events Included'
-means events occurred and the data from theme is included in the summary.
-'Events Excluded' means that events occurred but data from them is
-excluded from the summary. 'Concurred Events Excluded' means that events
-occurred but only EPA concurred exclusions are removed from the summary.
-If multiple values are specified, pollutant levels for each filter are
-stored in \code{event} dimension in the resulting output.}
+means that events occurred and the data from theme is included in the
+summary. 'Events Excluded' means that events occurred but data from them
+is excluded from the summary. 'Concurred Events Excluded' means that
+events occurred but only EPA concurred exclusions are removed from the
+summary. If multiple values are specified, pollutant levels for each
+filter are stored in \code{event} dimension in the resulting output.}
 
 \item{year}{A vector of 4-digit numeric values specifying years to retrieve
 pollutant levels.}
@@ -48,7 +57,7 @@ service.}
 
 \item{download_chunk_size}{A string specifying a chunk size for AQS API
 daily data download to prevent an unexpected server timeout error. Ignored
-when \code{by_month} is \code{FALSE}.}
+when \code{by_month = FALSE}.}
 }
 \value{
 A stars object containing the interpolated pollutant levels.

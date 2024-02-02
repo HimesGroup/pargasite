@@ -38,14 +38,21 @@
 ##'
 ##' @param pollutant A string specifying an air pollutant to create a raster
 ##'   data cube. Must be one of CO2, SO2, NO2, Ozone, PM2.5 and PM10.
+##' @param data_field A vector of strings specifying whether which data fields
+##'   are used to summarize the data. Must be either 'NAAQS statistic',
+##'   'arithmetic_mean', or both. 'NAAQS_statistic' try to chooses an
+##'   appropriate field based on National Ambient Air Quality Standards (NAAQS)
+##'   in the AQS yearly data (e.g, for CO 1-hour average, 'second_max_value'
+##'   would be chosen). 'arithmetic_mean' represents the measure of central
+##'   tendency in the yearly data. Ignored when `by_month = TRUE`.
 ##' @param event_filter A vector of strings indicating whether data measured
 ##'   during exceptional events are included in the summary. 'Events Included'
-##'   means events occurred and the data from theme is included in the summary.
-##'   'Events Excluded' means that events occurred but data from them is
-##'   excluded from the summary. 'Concurred Events Excluded' means that events
-##'   occurred but only EPA concurred exclusions are removed from the summary.
-##'   If multiple values are specified, pollutant levels for each filter are
-##'   stored in `event` dimension in the resulting output.
+##'   means that events occurred and the data from theme is included in the
+##'   summary. 'Events Excluded' means that events occurred but data from them
+##'   is excluded from the summary. 'Concurred Events Excluded' means that
+##'   events occurred but only EPA concurred exclusions are removed from the
+##'   summary. If multiple values are specified, pollutant levels for each
+##'   filter are stored in `event` dimension in the resulting output.
 ##' @param year A vector of 4-digit numeric values specifying years to retrieve
 ##'   pollutant levels.
 ##' @param by_month A logical value indicating whether data summarized at
@@ -59,7 +66,7 @@
 ##' @param aqs_key A string specifying the registered key for AQS API service.
 ##' @param download_chunk_size A string specifying a chunk size for AQS API
 ##'   daily data download to prevent an unexpected server timeout error. Ignored
-##'   when `by_month` is `FALSE`.
+##'   when `by_month = FALSE`.
 ##'
 ##' @return A stars object containing the interpolated pollutant levels.
 ##'
@@ -79,6 +86,8 @@
 ##' @export
 create_pargasite_data <- function(pollutant = c("CO", "SO2", "NO2", "Ozone",
                                                 "PM2.5", "PM10"),
+                                  data_field = c("NAAQS_statistic",
+                                                 "arithmetic_mean"),
                                   event_filter = c("Events Included",
                                                    "Events Excluded",
                                                    "Concurred Events Excluded"),
@@ -88,22 +97,34 @@ create_pargasite_data <- function(pollutant = c("CO", "SO2", "NO2", "Ozone",
                                   download_chunk_size = c("2-week", "month")) {
   ## Verify pollutant input
   pollutant <- match.arg(pollutant)
+  ## Verify data field to use
+  data_field <- match.arg(
+    data_field, c("NAAQS_statistic", "arithmetic_mean"), several.ok = TRUE
+  )
+  ## Verify event handler
+  event_filter <- match.arg(
+    event_filter,
+    c("Events Included", "Events Excluded", "Concurred Events Excluded"),
+    several.ok = TRUE
+  )
+  ## Verify year format
+  year <- .verify_year(year)
+  ## Verify cell size
+  .is_nonnegative_number(cell_size)
   ## Convert string to param code
   parameter_code <- .map_pollutant_to_param(pollutant)
   ## Create raster for US CONUS in EPSG 6350 (NAD83 / Conus Albers)
   create_raster(
-    parameter_code = parameter_code, event_filter = event_filter,
-    year = year, by_month = by_month, cell_size = cell_size, nmax = nmax,
-    download_chunk_size = download_chunk_size
+    parameter_code = parameter_code, data_field = data_field,
+    event_filter = event_filter, year = year, by_month = by_month,
+    cell_size = cell_size, nmax = nmax, download_chunk_size = download_chunk_size
   )
 }
 
 ## This is a more general version of raster creation function with a
 ## user-specified bounding box.
-create_raster <- function(parameter_code, pollutant_standard = NULL,
-                          event_filter = c("Events Included", "Events Excluded",
-                                           "Concurred Events Excluded"),
-                          year,  by_month = FALSE,
+create_raster <- function(parameter_code, pollutant_standard = NULL, data_field,
+                          event_filter, year,  by_month = FALSE,
                           minlat = 24, maxlat = 50, minlon = -124, maxlon = -66,
                           crs = 6350, cell_size = 5000,
                           aqs_email = get_aqs_email(), aqs_key = get_aqs_key(),
@@ -132,16 +153,16 @@ create_raster <- function(parameter_code, pollutant_standard = NULL,
     list_pollutant_standards(parameter_code)$pollutant_standard,
     several.ok = TRUE
   )
-  ## Verify event handle
-  event_filter <- match.arg(
-    event_filter,
-    c("Events Included", "Events Excluded", "Concurred Events Excluded"),
-    several.ok = TRUE
-  )
+  ## Verify event handler
+  ## event_filter <- match.arg(
+  ##   event_filter,
+  ##   c("Events Included", "Events Excluded", "Concurred Events Excluded"),
+  ##   several.ok = TRUE
+  ## )
   ## Verify year format
-  year <- .verify_year(year)
+  ## year <- .verify_year(year)
   ## Verify cell size
-  .is_nonnegative_number(cell_size)
+  ## .is_nonnegative_number(cell_size)
   ## Create grid
   us_grid <- .create_grid(
     minlat = minlat, maxlat = maxlat, minlon = minlon, maxlon = maxlon,
@@ -156,8 +177,8 @@ create_raster <- function(parameter_code, pollutant_standard = NULL,
   if (length(year) == 1) {
     out <- .get_and_process_aqs_data(
       parameter_code = parameter_code, pollutant_standard = pollutant_standard,
-      event_filter = event_filter, year = year, by_month = by_month, crs = crs,
-      aqs_email = aqs_email, aqs_key = aqs_key,
+      data_field = data_field, event_filter = event_filter, year = year,
+      by_month = by_month, crs = crs, aqs_email = aqs_email, aqs_key = aqs_key,
       minlat = minlat, maxlat = maxlat, minlon = minlon, maxlon = maxlon,
       us_grid = us_grid, nmax = nmax, download_chunk_size = download_chunk_size
     )
@@ -169,8 +190,8 @@ create_raster <- function(parameter_code, pollutant_standard = NULL,
   } else {
     out <- .mget_and_process_aqs_data(
       param = parameter_code, pollutant_standard = pollutant_standard,
-      event_filter = event_filter, year = year, by_month = by_month, crs = crs,
-      aqs_email = aqs_email, aqs_key = aqs_key,
+      data_field = data_field, event_filter = event_filter, year = year,
+      by_month = by_month, crs = crs, aqs_email = aqs_email, aqs_key = aqs_key,
       minlat = minlat, maxlat = maxlat, minlon = minlon, maxlon = maxlon,
       us_grid = us_grid, nmax = nmax, download_chunk_size = download_chunk_size
     )

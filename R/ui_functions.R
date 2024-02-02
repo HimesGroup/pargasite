@@ -1,5 +1,5 @@
-pollutant_ui <- function(pollutant_list, event_list, year_list, month_list = NULL,
-                         summary_list) {
+pollutant_ui <- function(pollutant_list, field_list, event_list, year_list,
+                         month_list = NULL, summary_list) {
   ## Month full name
   if (!is.null(month_list)) {
     names(month_list) <- month.name[as.integer(month_list)]
@@ -22,8 +22,23 @@ pollutant_ui <- function(pollutant_list, event_list, year_list, month_list = NUL
       h4("Data Info", style = "font-weight: bold; color: #332D2D"),
       p(span("Source: ", style = "font-weight: bold; color: orange"),
         textOutput("dat_src", inline = TRUE)),
-      p(span("Field used: ", style = "font-weight: bold; color: orange"),
-        textOutput("dat_field", inline = TRUE)),
+      ## p(span("Field used: ", style = "font-weight: bold; color: orange"),
+      ##   textOutput("dat_field", inline = TRUE)),
+      ## p(span("Field used: ", style = "font-weight: bold; color: orange"),
+      ##   selectizeInput(
+      ##     inputId = "dat_field",
+      ##     label = "",
+      ##     choice = field_list,
+      ##     multiple = FALSE
+      ##   )),
+      p("Field used:",
+        style = "font-weight: bold; color: orange; margin-bottom: -15px"),
+      selectizeInput(
+        inputId = "dat_field",
+        label = "",
+        choice = field_list,
+        multiple = FALSE
+      ),
       helpText(
         icon("circle-info"),
         "Please check",
@@ -43,7 +58,7 @@ pollutant_ui <- function(pollutant_list, event_list, year_list, month_list = NUL
       p(span("Description: ", style = "font-weight: bold; color: orange"),
         textOutput("pollutant_desc", inline = TRUE)),
       p(span("NAAQS Basis: ", style = "font-weight: bold; color: orange"),
-        shiny::textOutput("naaqs_basis", inline = TRUE)),
+        textOutput("naaqs_basis", inline = TRUE)),
       p(span("NAAQS Statistic: ", style = "font-weight: bold; color: orange"),
         textOutput("naaqs_stat", inline = TRUE)),
       helpText(
@@ -91,7 +106,7 @@ pollutant_ui <- function(pollutant_list, event_list, year_list, month_list = NUL
       hr(),
       h4("Pollutant value", style = "font-weight: bold; color: #9CCC65"),
       ## h5(textOutput("pollutant_val"))
-      h5(shiny::htmlOutput("pollutant_val"))
+      h5(htmlOutput("pollutant_val"))
     )
   )
 }

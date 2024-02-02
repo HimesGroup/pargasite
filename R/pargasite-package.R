@@ -4,9 +4,10 @@
 ##' @importFrom stars st_as_stars st_get_dimension_values st_extract
 ##' @importFrom gstat idw
 ##' @importFrom shiny fluidPage titlePanel sidebarLayout sidebarPanel mainPanel
-##'   fluidRow uiOutput selectizeInput renderUI radioButtons wellPanel
-##'   observeEvent renderText h2 shinyApp reactive reactiveValues hr span
-##'   checkboxInput tags
+##'   fluidRow uiOutput selectizeInput updateSelectizeInput renderUI
+##'   radioButtons wellPanel observeEvent renderText h2 shinyApp reactive
+##'   reactiveValues hr span checkboxInput tags HTML textOutput htmlOutput
+##'   numericInput updateNumericInput
 ##' @importFrom leaflet leafletOutput renderLeaflet leaflet leafletOptions
 ##'   colorNumeric addTiles setView addRasterImage addPolygons addLegend
 ##'   labelFormat highlightOptions addMarkers addLayersControl

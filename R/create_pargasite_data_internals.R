@@ -50,7 +50,7 @@
     us_shape <- get_gadm_shape(admin_level = 2, wkt_filter = wkt_filter)
     us_shape <- us_shape[us_shape$ENGTYPE_2 != "Water body", ]
   }
-  ## Use projected coordinate for grid creation and interpolation Be aware that
+  ## Use projected coordinate for grid creation and interpolation. Be aware that
   ## IDW depends on distance as a way of establishing relationships; distance in
   ## geographic coordinate can vary as we move along latitude.
   us_shape <- st_as_sfc(st_transform(us_shape, crs))
@@ -59,7 +59,8 @@
 }
 
 .get_and_process_aqs_data <- function(parameter_code, pollutant_standard,
-                                      event_filter, year, by_month, crs,
+                                      data_field, event_filter,
+                                      year, by_month, crs,
                                       aqs_email, aqs_key, minlat, maxlat,
                                       minlon, maxlon, us_grid, nmax,
                                       download_chunk_size) {
@@ -112,7 +113,8 @@
           .run_idw(y, us_grid, "arithmetic_mean", nmax)
         })
         names(out) <- event_filter
-        do.call(c, c(out, along = "event"))
+        out <- do.call(c, c(out, along = "event"))
+        c(out, along = list(data_field = "arithmetic_mean"))
       }, simplify = FALSE)
       do.call(c, c(out, along = "month"))
     }, simplify = FALSE)
@@ -126,16 +128,42 @@
     d <- d[d$pollutant_standard %in% pollutant_standard, ]
     d <- d[d$event_type %in% c(event_filter, "No Events"), ]
     d <- by(d, d$pollutant_standard, function(x) {
-      field <- .map_standard_to_field(unique(x$pollutant_standard))
-      out <- lapply(event_filter, function(y) {
-        x <- x[x$event_type %in% c(y, "No Events"), ]
-        aggr_fml <- as.formula(paste0(field, " ~ latitude + longitude + datum"))
-        x <- aggregate(aggr_fml, FUN = mean, data = x)
-        x <- .aqs_transform(x, target_crs = crs)
-        .run_idw(x, us_grid, field, nmax)
+      ## if (data_field == "NAAQS") {
+      ##   field <- .map_standard_to_field(unique(x$pollutant_standard))
+      ## } else {
+      ##   field <- "arithmetic_mean"
+      ## }
+      ## if ("NAAQS_statistic" %in% data_field) {
+      ##   naaqs <- match("NAAQS_statistic", data_field)
+      ##   data_field[naaqs] <- .map_standard_to_field(unique(x$pollutant_standard))
+      ## }
+      ## browser()
+      out <- lapply(data_field, function(y) {
+        out_sub <- lapply(event_filter, function(z) {
+          x <- x[x$event_type %in% c(z, "No Events"), ]
+          ## aggr_fml <- as.formula(paste0(field, " ~ latitude + longitude + datum"))
+          if (y == "NAAQS_statistic") {
+              y <- .map_standard_to_field(unique(x$pollutant_standard))
+          }
+          aggr_fml <- as.formula(paste0(y, " ~ latitude + longitude + datum"))
+          x <- aggregate(aggr_fml, FUN = mean, data = x)
+          x <- .aqs_transform(x, target_crs = crs)
+          .run_idw(x, us_grid, y, nmax)
+        })
+        names(out_sub) <- event_filter
+        do.call(c, c(out_sub, along = "event"))
       })
-      names(out) <- event_filter
-      do.call(c, c(out, along = "event"))
+      names(out) <- data_field
+      do.call(c, c(out, along = "data_field"))
+      ## out <- lapply(event_filter, function(y) {
+      ##   x <- x[x$event_type %in% c(y, "No Events"), ]
+      ##   aggr_fml <- as.formula(paste0(field, " ~ latitude + longitude + datum"))
+      ##   x <- aggregate(aggr_fml, FUN = mean, data = x)
+      ##   x <- .aqs_transform(x, target_crs = crs)
+      ##   .run_idw(x, us_grid, field, nmax)
+      ## })
+      ## names(out) <- event_filter
+      ## do.call(c, c(out, along = "event"))
       ## aggr_fml <- as.formula(paste0(field, " ~ latitude + longitude + datum"))
       ## x <- aggregate(aggr_fml, FUN = mean, data = x)
       ## x <- .aqs_transform(x, target_crs = crs)
@@ -147,14 +175,15 @@
 
 
 .mget_and_process_aqs_data <- function(parameter_code, pollutant_standard,
-                                       event_filter, year, by_month, crs,
-                                       aqs_email, aqs_key, minlat, maxlat,
+                                       data_field, event_filter, year, by_month,
+                                       crs, aqs_email, aqs_key, minlat, maxlat,
                                        minlon, maxlon, us_grid, nmax,
                                        download_chunk_size) {
   Map(function(x, y) {
     aqs_data <- .get_and_process_aqs_data(
       parameter_code = parameter_code, pollutant_standard = pollutant_standard,
-      event_filter = event_filter, year = x, by_month = by_month, crs = crs,
+      data_field = data_field, event_filter = event_filter,
+      year = x, by_month = by_month, crs = crs,
       aqs_email = aqs_email, aqs_key = aqs_key,
       minlat = minlat, maxlat = maxlat, minlon = minlon, maxlon = maxlon,
       us_grid = us_grid, nmax = nmax, download_chunk_size = download_chunk_size
