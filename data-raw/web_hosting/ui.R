@@ -12,32 +12,40 @@ ui <- fluidPage(
     mainPanel(
       tabsetPanel(
         tabPanel(
-          "Map View",
+          "Pollutant Map",
           withSpinner(leafletOutput("us_map", height = "67vh")),
           hr(),
           radioButtons(
             inputId = "color",
             label = span("Color scale",
                          style = "font-weight: bold"),
-            choices = list("Free", "Fixed"), inline = TRUE
+            choices = list("Fixed", "Free"), inline = TRUE
           ),
           tags$div(checkboxInput(
                  inputId = "color_bounded",
                  label = "Upper bounded (useful when extreme outliers exist)",
                  value = FALSE,
                  width = "100%"
-               ), style = "margin-top: -0.7em"),
-          tags$div(p(
-                 "- Free: each data has its own scale for the selected year",
-                 tags$br(),
-                "- Fixed: all data share the same scale across the years"
-               ), style = "color: #900C3F"),
-          tags$br(),
-          tags$div(p("Last updated: Dec 1, 2023"), style = "font-weight: bold")
+               ),
+               style = "margin-top: -0.7em; margin-right: 0.5em; display: inline-block"
+               ),
+          tags$head(tags$style(HTML(".not_bold label {font-weight:normal; color: #37474F}"))),
+          tags$div(numericInput(
+                 inputId = "outlier_cutoff",
+                 label = HTML("threshold"),
+                 value = 0,
+                 width = "100%"
+               ), class = "not_bold",
+               style = "margin-top: -2.0em; display: inline-block"),
+          tags$div(tags$p(
+                          "- Fixed: all data share the same color-scale across the years",
+                          tags$br(),
+                          "- Free: each data has its own color-scale for the selected year"
+                        ), style = "color: #900C3F")
         ),
         tabPanel(
           "About",
-          br(),
+          tags$br(),
           h3("PARGASITE", style = "font-weight: bold"),
           p("Pollution-Associated Risk Geospatial Analysis SITE (PARGASITE) is",
             "an R package to offer tools and Shiny application to estimate and",
@@ -50,15 +58,15 @@ ui <- fluidPage(
             "concentrations by geographic boundaries including State, County, ",
             "and Core-Based Statistical Area (CBSA)."),
           p("We have no affiliation with the EPA."),
-          br(),
+          tags$br(),
           h4("Contributors", style = "font-weight: bold"),
           p("Jaehyun Joo, Nisha Narayanan, Avantika Diwadkar, Rebecca Greenblatt, and Blanca Himes"),
-          br(),
+          tags$br(),
           h4("References", style = "font-weight: bold"),
           p("Greenblatt RE, Himes BE. Facilitating Inclusion of Geocoded Pollution",
             "Data into Health Studies. AMIA Jt Summits Transl Sci Proc.",
             "2019;2019:553–561. PMID:",
-            a("31259010",href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6568125/",
+            tags$a("31259010",href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6568125/",
               target="_blank"),
             ".")
         )

@@ -45,7 +45,7 @@ ui <- fluidPage(
         ),
         tabPanel(
           "About",
-          br(),
+          tags$br(),
           h3("PARGASITE", style = "font-weight: bold"),
           p("Pollution-Associated Risk Geospatial Analysis SITE (PARGASITE) is",
             "an R package to offer tools and Shiny application to estimate and",
@@ -58,15 +58,15 @@ ui <- fluidPage(
             "concentrations by geographic boundaries including State, County, ",
             "and Core-Based Statistical Area (CBSA)."),
           p("We have no affiliation with the EPA."),
-          br(),
+          tags$br(),
           h4("Contributors", style = "font-weight: bold"),
           p("Jaehyun Joo, Nisha Narayanan, Avantika Diwadkar, Rebecca Greenblatt, and Blanca Himes"),
-          br(),
+          tags$br(),
           h4("References", style = "font-weight: bold"),
           p("Greenblatt RE, Himes BE. Facilitating Inclusion of Geocoded Pollution",
             "Data into Health Studies. AMIA Jt Summits Transl Sci Proc.",
             "2019;2019:553–561. PMID:",
-            a("31259010",href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6568125/",
+            tags$a("31259010",href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6568125/",
               target="_blank"),
             ".")
         )

@@ -1,4 +1,4 @@
-## Last update: 10.15.23
+## Last update: 02.01.24
 
 ################################################################################
 ## Pollutant info
@@ -119,17 +119,17 @@ get_monitors <- function(param, year = 1997:2022) {
 ## https://gadm.org/license.html
 library(sf)
 library(stars)
-ne <- st_read("~/Downloads/ne_10m_admin_0_countries_lakes/ne_10m_admin_0_countries_lakes.shp")
-ne_us <- ne[grep("United States of America", ne$ADMIN), ]
-conus_filter <- st_bbox(
-  c(xmin = -125, xmax = -65, ymin = 20, ymax = 50),
-  crs = 4326
-)
-.us_conus <- st_as_sfc(ne_us) |>
-  st_cast("POLYGON")|> # split for cropping
-  st_crop(conus_filter)
-.us_pr <- ne[ne$ADMIN == "Puerto Rico", ] |>
-  st_as_sfc()
+## ne <- st_read("~/Downloads/ne_10m_admin_0_countries_lakes/ne_10m_admin_0_countries_lakes.shp")
+## ne_us <- ne[grep("United States of America", ne$ADMIN), ]
+## conus_filter <- st_bbox(
+##   c(xmin = -125, xmax = -65, ymin = 20, ymax = 50),
+##   crs = 4326
+## )
+## .us_conus <- st_as_sfc(ne_us) |>
+##   st_cast("POLYGON")|> # split for cropping
+##   st_crop(conus_filter)
+## .us_pr <- ne[ne$ADMIN == "Puerto Rico", ] |>
+##   st_as_sfc()
 
 ## Temporary for package develop
 ## Eventually data will be provided by users

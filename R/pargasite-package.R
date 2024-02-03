@@ -5,9 +5,9 @@
 ##' @importFrom gstat idw
 ##' @importFrom shiny fluidPage titlePanel sidebarLayout sidebarPanel mainPanel
 ##'   fluidRow uiOutput selectizeInput updateSelectizeInput renderUI
-##'   radioButtons wellPanel observeEvent renderText h2 shinyApp reactive
-##'   reactiveValues hr span checkboxInput tags HTML textOutput htmlOutput
-##'   numericInput updateNumericInput tabsetPanel tabPanel
+##'   radioButtons wellPanel observeEvent renderText p h2 h3 h4 shinyApp
+##'   reactive reactiveValues hr span checkboxInput tags HTML textOutput
+##'   htmlOutput numericInput updateNumericInput tabsetPanel tabPanel
 ##' @importFrom leaflet leafletOutput renderLeaflet leaflet leafletOptions
 ##'   colorNumeric addTiles setView addRasterImage addPolygons addLegend
 ##'   labelFormat highlightOptions addMarkers addLayersControl
