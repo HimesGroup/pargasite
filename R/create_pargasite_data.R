@@ -123,8 +123,67 @@ create_pargasite_data <- function(pollutant = c("CO", "SO2", "NO2", "Ozone",
 
 ## This is a more general version of raster creation function with a
 ## user-specified bounding box.
-create_raster <- function(parameter_code, pollutant_standard = NULL, data_field,
-                          event_filter, year,  by_month = FALSE,
+##' Raster creation function
+##'
+##' This function is used internally by [create_pargasite_data]. It is exported
+##' for package development and not for directly user calls.
+##'
+##' @param parameter_code A numeric value specifying a AQS parameter code.
+##' @param pollutant_standard A vector of strings specifying unique pollutant
+##'   standards in AQS (e.g., PM25 Annual 2012).
+##' @param data_field A vector of strings specifying whether which data fields
+##'   are used to summarize the data. Must be either 'NAAQS statistic',
+##'   'arithmetic_mean', or both. 'NAAQS_statistic' try to chooses an
+##'   appropriate field based on National Ambient Air Quality Standards (NAAQS)
+##'   in the AQS yearly data (e.g, for CO 1-hour average, 'second_max_value'
+##'   would be chosen). 'arithmetic_mean' represents the measure of central
+##'   tendency in the yearly data. Ignored when `by_month = TRUE`.
+##' @param event_filter A vector of strings indicating whether data measured
+##'   during exceptional events are included in the summary. 'Events Included'
+##'   means that events occurred and the data from theme is included in the
+##'   summary. 'Events Excluded' means that events occurred but data from them
+##'   is excluded from the summary. 'Concurred Events Excluded' means that
+##'   events occurred but only EPA concurred exclusions are removed from the
+##'   summary. If multiple values are specified, pollutant levels for each
+##'   filter are stored in `event` dimension in the resulting output.
+##' @param year A vector of 4-digit numeric values specifying years to retrieve
+##'   pollutant levels.
+##' @param by_month A logical value indicating whether data summarized at
+##'   monthly level instead of yearly level.
+##' @param minlat,maxlat,minlon,maxlon A numeric value specifying a bounding box
+##'   defined by two latitudes and two longitudes.
+##' @param crs A target coordinate reference system.
+##' @param cell_size A numeric value specifying a cell size of grid cells in
+##'   meters.
+##' @param nmax An integer value specifying the number of nearest observations
+##'   that should be used for spatial interpolation.
+##' @param aqs_email A string specifying the registered email for AQS API
+##'   service.
+##' @param aqs_key A string specifying the registered key for AQS API service.
+##' @param download_chunk_size A string specifying a chunk size for AQS API
+##'   daily data download to prevent an unexpected server timeout error. Ignored
+##'   when `by_month = FALSE`.
+##'
+##' @examples
+##'\dontrun{
+##'
+##' ## Set your AQS API key first using [raqs::set_aqs_user] to run the example.
+##'
+##' ## SO2 through 2021 to 2022
+##' so2 <- create_raster(42401, event_filter = "Events Included",
+##'                      year = 2021:2022)
+##' }
+##'
+##' @return A stars object containing the interpolated pollutant levels.
+##'
+##' @export
+create_raster <- function(parameter_code, pollutant_standard = NULL,
+                          data_field = c("NAAQS_statistic",
+                                         "arithmetic_mean"),
+                          event_filter = c("Events Included",
+                                           "Events Excluded",
+                                           "Concurred Events Excluded"),
+                          year,  by_month = FALSE,
                           minlat = 24, maxlat = 50, minlon = -124, maxlon = -66,
                           crs = 6350, cell_size = 5000,
                           aqs_email = get_aqs_email(), aqs_key = get_aqs_key(),
