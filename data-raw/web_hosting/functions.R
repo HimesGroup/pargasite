@@ -13,7 +13,7 @@
   )
 }
 
-.map_standard_to_ulim <- function(standard, scale = 1.2) {
+.map_standard_to_ulim <- function(standard, scale = 1) {
   switch(
     standard,
     ## "co_1_hour_1971" = 50,
@@ -33,7 +33,7 @@
     "ozone_8_hour_2015" = 0.07 * scale,
     "pm10_24_hour_2006" = 150 * scale,
     "pm25_24_hour_2012" = 35 * scale,
-    "pm25_annual_2012" = 15 * scale
+    "pm25_annual_2012" = 9 * scale
   )
 }
 

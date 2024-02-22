@@ -298,4 +298,81 @@ server <- function(input, output, session) {
     }
   })
 
+  ## AQI data
+  aqi_dat <- reactive({
+    d <- switch(
+      input$aqi_summary,
+      "County" = pargasite.aqi_county,
+      "CBSA" = pargasite.aqi_cbsa
+    )
+    d <- d[d$year == input$aqi_year, ]
+    if (input$aqi_stat == "Median") {
+      ind <- match("median_aqi", names(d))
+      names(d)[ind] <- "value"
+    }
+    if (input$aqi_stat == "Max") {
+      ind <- match("max_aqi", names(d))
+      names(d)[ind] <- "value"
+    }
+    if (input$aqi_stat == "90th Percentile") {
+      ind <- match("x90th_percentile_aqi", names(d))
+      names(d)[ind] <- "value"
+    }
+    d$fill_cols <- aqi_colors(d$value)
+    d
+  })
+
+  ## AQI map
+  observeEvent({
+    aqi_dat()
+  }, {
+    r <- st_transform(aqi_dat(), 4326)
+    p <- leaflet(options = leafletOptions(minZoom = 3)) |>
+      addTiles() |>
+      setView(lng = -98.58, lat = 39.33, zoom = 4) |>
+      addPolygons(
+        data = r,
+        fillColor = r$fill_cols, weight = 1, opacity = 1,
+        color = "#444444", dashArray = NULL, fillOpacity = 0.7,
+        highlightOptions = highlightOptions(
+          weight = 3, color = "#444444", dashArray = NULL,
+          fillOpacity = 0.9, bringToFront = FALSE
+        ),
+        label = paste0(r$name, ": ", sprintf("%.1f", r$value))
+      ) |>
+      addLegend(position = "bottomright",
+                color = c("#7e0023", "#8f3f97", "#ff0000", "#ff7e00", "#ffff00", "#00e400"),
+                labels = c("Hazardous", "Very Unhealthy", "Unhealthy",
+                           "Unhealthy for Sensitive Groups",
+                           "Moderate", "Good"))
+    output$aqi_map <- renderLeaflet(p)
+  })
+
+  ## AQI value
+  output$aqi_val <- renderText({
+    if (!is.null(input$aqi_map_click)) {
+      click_pos <- st_point(c(input$aqi_map_click$lng, input$aqi_map_click$lat)) |>
+        st_sfc(crs = 4326) |>
+        st_transform(st_crs(aqi_dat())) # EPSG6350
+      m <- switch(
+        input$aqi_summary,
+        "County" = pargasite.map_county,
+        "CBSA" = pargasite.map_cbsa
+      )
+      val_idx <- sf::st_within(click_pos, aqi_dat())[[1]]
+      aqi_val <- aqi_dat()$value[val_idx]
+      name_idx <- sf::st_within(click_pos, m)[[1]]
+      if (length(aqi_val) == 0) {
+        paste0("(", round(input$aqi_map_click$lng,2), ", ",
+               round(input$aqi_map_click$lat, 2), "):  ",
+               "out of bounds")
+      } else {
+        paste0(m$NAMELSAD[name_idx], ":  ", aqi_val)
+      }
+    } else {
+      "<b>Click the map to retrieve a AQI value.</b>"
+    }
+
+  })
+
 }
