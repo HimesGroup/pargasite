@@ -1,20 +1,20 @@
 # PARGASITE
 
-Pollution-Associated Risk Geospatial Analysis SITE (PARGASITE) is an R package
-to estimate and visualize major pollutant levels (CO, NO2, SO2, Ozone, PM2.5 and
-PM10) covering the conterminous United States at user-defined time ranges. It
-provides a function that automatically retrieves pollutant data via the
-Environmental Protection Agency’s (EPA) Air Quality System (AQS) API service,
+Pollution-Associated Risk Geospatial Analysis Site (PARGASITE) offers tools to
+estimate and visualize levels of major pollutants (CO, NO2, SO2, Ozone, PM2.5
+and PM10) across the conterminous United States for user-defined time ranges. It
+helps users to automatically retrieves pollutant data from the Environmental
+Protection Agency’s (EPA) Air Quality System (AQS) API service. PARGASITE
 filters the data by exceptional event (e.g., wildfire) status, performs spatial
 interpolations, and summarizes pollutant concentrations by geographic boundaries
-including State, County, and Core-Based Statistical Area (CBSA). It also offers
-a Shiny application to interactively visualize pollutant levels and to easily
-check the air quality status of a given location over time relative to the level
-of the National Ambient Air Quality Standards (NAAQS).
+including state, county, and Core-Based Statistical Area (CBSA). It also offers
+a Shiny application for interactively visualization of pollutant levels and
+easily checking of air quality status for a given location over time relative to
+the National Ambient Air Quality Standards (NAAQS).
 
-The PARGASITE package has been re-designed due to the deprecation of the rgdal
-package, and thus, it is not compatible with the previous version. Please check
-the v1 branch if you want to use the old interface.
+The PARGASITE package has been redesigned due to the deprecation of the rgdal
+package. As a result, it is not compatible with the previous version. If you
+want to use the old interface, please check out the v1 branch.
 
 # Getting Started
 
@@ -22,9 +22,9 @@ the v1 branch if you want to use the old interface.
 
 In R session, please type
 
-``` r
-## Install from Github
-remotes::install_github("HimesGroup/pargasite")
+```{r setup}
+## Install from CRAN
+install.packages("pargasite")
 
 ## Load pargasite pacakge
 library(pargasite)
@@ -41,7 +41,10 @@ API](https://aqs.epa.gov/aqsweb/documents/data_api.html), users need to register
 API service first. Please check the raqs package to create an account and set up
 email and key for the current R session.
 
-``` r
+```{r api service}
+if (!requireNamespace("raqs", quietly = TRUE)) {
+  install.packages("raqs")
+}
 library(raqs)
 
 ## Please use your eamil address to create an account
@@ -58,7 +61,7 @@ based on pollutant standards, creates regular grid covering the conterminous US,
 and performs spatial interpolation on the grid. For spatial interpolation, the
 AQS data is projected to EPSG:6350 (NAD83 CONUS Albers).
 
-``` r
+```{r create pargasite data}
 ## Ozone concentrations based on 20km x 20km grid over the conterminous US
 ozone20km <- create_pargasite_data(
   pollutant = "Ozone", event_filter = "Events Included", year = 2021:2022,
@@ -77,7 +80,7 @@ for the details.
 
 You could also create other pollutant data cubes and combine them.
 
-``` r
+```{r combine data cubes}
 ## CO concentrations
 co20km <- create_pargasite_data(
   pollutant = "CO", event_filter = "Events Included", year = 2021:2022,
@@ -92,32 +95,31 @@ combined <- c(ozone20km, co20km)
 
 To visualize a pollutant data cube, launch the shiny app with
 
-``` r
-run_pargasite(combined, summarize_by = c("state", "county", "cbsa"))
+```{r, launch shiny app}
+run_pargasite(combined)
 ```
-
 The system's default web browser will be launched automatically after the app is
 started.
 
-On the left panel, a user can choose a pollutant attribute, event filter, and
-year to visualize. Relevant pollutant standard information will be provided. A
-pollutant value will be printed at the bottom left in response to a mouse click
-event for a specific location. For the color scale menu, “As is” selects colors
-based on the currently selected data, whereas “Consistent” picks ones that have
-the same range across different times and event filters for easy comparisons.
-The “Upper bounded” checkbox can be useful when color distortion is expected due
-to extreme outliers.
+The left panel allows users to select a pollutant attribute, filter events, and
+choose years for visualization. Relevant pollutant standard information will
+also be provided.
 
-![](vignettes/pargasite1.png)
+![](vignettes/pargasite1.png){width=100%}
 
-We are often interested in pollutant levels by geographic boundaries. A user can
-display summarized values using the "summarize_by" app menu, which provides
-areal mean either by State, County, or Core Based Statistical Area (CBSA).
+<br/>
 
-![](vignettes/pargasite2.png)
+Users can summarize data by geographical area using the "Summarized By" menu in
+the app. This menu allows selection of areal means for states, counties, or Core
+Based Statistical Areas (CBSAs).
 
-In addition, clicking "Show Monitor Locations" will returns all monitors operated
-in a given year.
+![](vignettes/pargasite2.png){width=100%}
 
-![](vignettes/pargasite3.png)
+<br/>
 
+To view historical pollutant level trends, select multiple years from the app
+menu.
+
+<br/>
+
+![](vignettes/pargasite3.png){width=100%}

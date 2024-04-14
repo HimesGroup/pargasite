@@ -4,9 +4,11 @@ server <- function(input, output, session) {
   pollutant_list <- .recover_from_standard(getOption("pargasite.dat"))
   field_list <- st_get_dimension_values(getOption("pargasite.dat"), "data_field")
   event_list <- st_get_dimension_values(getOption("pargasite.dat"), "event")
-  year_list <- sort(st_get_dimension_values(getOption("pargasite.dat"), "year"), decreasing = TRUE)
+  year_list <- sort(st_get_dimension_values(getOption("pargasite.dat"), "year"),
+                    decreasing = TRUE)
   if ("month" %in% dimnames(getOption("pargasite.dat"))) {
-    month_list <- sort(st_get_dimension_values(getOption("pargasite.dat"), "month"), decreasing = TRUE)
+    month_list <- sort(st_get_dimension_values(getOption("pargasite.dat"), "month"),
+                       decreasing = TRUE)
   } else {
     month_list <- NULL
   }
