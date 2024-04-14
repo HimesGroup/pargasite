@@ -4,30 +4,10 @@
 \alias{run_pargasite}
 \title{Run PARGASITE application}
 \usage{
-run_pargasite(
-  x,
-  summarize_by = c("state", "county", "cbsa"),
-  summary_state = NULL,
-  summary_county = NULL,
-  summary_cbsa = NULL
-)
+run_pargasite(x)
 }
 \arguments{
-\item{x}{A stars object created by \link{create_pargasite_data}.}
-
-\item{summarize_by}{A vector of strings specifying geographic boundaries to
-compute areal means.}
-
-\item{summary_state}{A stars object created by \link{summarize_by_boundaries}.
-Ignored if 'state' is not specified in \code{summarize_by}. While the function
-computes areal summary if the argument is \code{NULL}, it may be useful if the
-app is to be called multiple times to save processing time.}
-
-\item{summary_county}{A stars object created by \link{summarize_by_boundaries}.
-Ignored if 'county' is not specified in \code{summarize_by}.}
-
-\item{summary_cbsa}{A stars object created by \link{summarize_by_boundaries}.
-Ignored if 'cbsa' is not specified in \code{summarize_by}.}
+\item{x}{A stars object returned by \link{create_pargasite_data}.}
 }
 \value{
 This function normally does not return; interrupt R to stop the

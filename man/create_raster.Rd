@@ -16,10 +16,10 @@ create_raster(
   minlon = -124,
   maxlon = -66,
   crs = 6350,
-  cell_size = 5000,
+  cell_size = 10000,
   aqs_email = get_aqs_email(),
   aqs_key = get_aqs_key(),
-  nmax = 5,
+  nmax = Inf,
   download_chunk_size = c("2-week", "month")
 )
 }
@@ -73,11 +73,13 @@ daily data download to prevent an unexpected server timeout error. Ignored
 when \code{by_month = FALSE}.}
 }
 \value{
-A stars object containing the interpolated pollutant levels.
+A stars object containing the interpolated pollutant levels covering
+the user-specified bounding box.
 }
 \description{
-This function is used internally by \link{create_pargasite_data}. It is exported
-for package development and not for directly user calls.
+This function is used internally by \link{create_pargasite_data}, allowing users
+to specify a longitude/latitude bounding box. It is exported for package
+development, not for direct user calls.
 }
 \examples{
 \dontrun{

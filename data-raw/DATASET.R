@@ -94,59 +94,13 @@ get_monitors <- function(param, year = 1997:2022) {
 )
 
 ################################################################################
-## Map information
+## Example data
 ################################################################################
-.map_state <- get_tl_shape(
-  "https://www2.census.gov/geo/tiger/GENZ2022/shp/cb_2022_us_state_20m.zip"
+ozone20km <- create_pargasite_data(
+  "Ozone", year = 2021:2022,
+  event_filter = c("Events Included", "Events Excluded"), cell_size = 20000
 )
-.map_county <- get_tl_shape(
-  "https://www2.census.gov/geo/tiger/GENZ2022/shp/cb_2022_us_county_20m.zip"
-)
-.map_cbsa <- get_tl_shape(
-  "https://www2.census.gov/geo/tiger/GENZ2021/shp/cb_2021_us_cbsa_20m.zip"
-)
-.map_state <- .map_state[, c("NAME", "geometry")]
-.map_county <- .map_county[, c("NAME", "NAMELSAD", "geometry")]
-.map_cbsa <- .map_county[, c("NAME", "NAMELSAD", "geometry")]
-
-## USA CONUS and Puerto Rico shape files using Natural Earth data:
-## Downloads Admin 0 without boundary lakes:
-## https://www.naturalearthdata.com/downloads/10m-cultural-vectors/
-## Natural Earth is license-free in any manner.
-## https://www.naturalearthdata.com/about/terms-of-use/
-## Alternatively, GADM (level2 and ENGTYPE_2 != "Water body" filters Great
-## Lakes). Non-commercial use is free, but redistribution is not allowed.
-## https://gadm.org/license.html
-library(sf)
-library(stars)
-## ne <- st_read("~/Downloads/ne_10m_admin_0_countries_lakes/ne_10m_admin_0_countries_lakes.shp")
-## ne_us <- ne[grep("United States of America", ne$ADMIN), ]
-## conus_filter <- st_bbox(
-##   c(xmin = -125, xmax = -65, ymin = 20, ymax = 50),
-##   crs = 4326
-## )
-## .us_conus <- st_as_sfc(ne_us) |>
-##   st_cast("POLYGON")|> # split for cropping
-##   st_crop(conus_filter)
-## .us_pr <- ne[ne$ADMIN == "Puerto Rico", ] |>
-##   st_as_sfc()
-
-## Temporary for package develop
-## Eventually data will be provided by users
-ozone20km <- create_pargasite_data("Ozone", year = 2021:2022, cell_size = 20000)
-
-
-## mozone <- create_pargasite_data("Ozone", year = 2020:2021, event_filter = c("Events Included"))
-## mozone <- create_pargasite_data("Ozone", year = 2020:2022, event_filter = "x")
-## mozone <- create_pargasite_data("Ozone", year = 2020:2021, event_filter = c("Events Included", "x"))
-## mozone <- create_pargasite_data("Ozone", year = 2020:2021, event_filter = c("y", "x"))
-## mozone <- create_pargasite_data("Ozone", year = 2020:2021, event_filter = c("Events Included", "Events Excluded"))
-## pm25 <- get_raster(88101, NULL, year = 2005:2006, by_month = TRUE, cell_size = 20000)
-## co <- get_raster(42101, NULL, year = 2005:2006, by_month = TRUE,
-##                  download_chunk_size = "2-week", cell_size = 20000)
-## .mm <- c(pm25, co)
 
 ## Save internal dataset
 usethis::use_data(ozone20km, overwrite = TRUE)
 usethis::use_data(.criteria_pollutants, .monitors, internal = TRUE, overwrite = TRUE)
-

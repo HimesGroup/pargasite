@@ -1,8 +1,8 @@
 pollutant_ui <- function(pollutant_list, field_list, event_list, year_list,
-                         month_list = NULL, summary_list) {
+                         month_list = NULL) {
   ## Month full name
   if (!is.null(month_list)) {
-    names(month_list) <- month.name[as.integer(month_list)]
+    names(month_list) <- month.abb[as.integer(month_list)]
   }
   fluidRow(
     column(
@@ -25,7 +25,7 @@ pollutant_ui <- function(pollutant_list, field_list, event_list, year_list,
       p("Field used:",
         style = "font-weight: bold; color: orange; margin-bottom: -15px"),
       selectizeInput(
-        inputId = "dat_field",
+        inputId = "data_field",
         label = "",
         choice = field_list,
         multiple = FALSE
@@ -67,45 +67,52 @@ pollutant_ui <- function(pollutant_list, field_list, event_list, year_list,
         multiple = FALSE
       ),
       hr(),
-      selectizeInput(
-        inputId = "year",
-        label = "Year",
-        choice = year_list,
-        multiple = FALSE
-      ),
-      if (!is.null(month_list)) {
+      if (is.null(month_list)) {
         selectizeInput(
-          inputId = "month",
-          label = "Month",
-          ## choice = month.name[as.integer(month_list)],
-          choice = month_list,
+          inputId = "year",
+          label = "Year",
+          choice = year_list,
+          ## selected = if (length(year_list) > 1) year_list[1:2] else year_list[1],
+          selected = year_list[1],
+          multiple = TRUE
+        )
+      } else {
+        selectizeInput(
+          inputId = "year",
+          label = "Year",
+          choice = year_list,
           multiple = FALSE
         )
       },
-      if (length(summary_list) > 1) {
-        hr()
-      },
-      if (length(summary_list) > 1) {
-        radioButtons(
-          inputId = "summary",
-          label = "Summarize by",
-          ## choices = c("None", "State", "County", "CBSA"),
-          choices = summary_list,
-          inline = TRUE
+      if (!is.null(month_list)) {
+        ## had to put on separate if else block; cannot accommodate multiple
+        ## selectizeInput
+        selectizeInput(
+          inputId = "month",
+          label = "Month",
+          choice = month_list,
+          selected = month_list[1],
+          multiple = TRUE
         )
       },
       hr(),
-      h4("Pollutant value", style = "font-weight: bold; color: #9CCC65"),
-      h5(htmlOutput("pollutant_val"))
+      radioButtons(
+        inputId = "summary",
+        label = "Summarized by",
+        choices = c("Grid", "State", "County", "CBSA"),
+        inline = TRUE
+      )
+      ## h4("Pollutant value", style = "font-weight: bold; color: #9CCC65"),
+      ## h5(htmlOutput("pollutant_val"))
     )
   )
 }
 
 .recover_from_standard <- function(x, y = .criteria_pollutants) {
-  d <- within(y, key <- .make_names(pollutant_standard))
-  d <- merge(list(key = names(x)), d, sort = FALSE)
-  d <- within(d, name <- paste0(parameter, " (", parameter_code, ")"))
+  y$key <- .make_names(y$pollutant_standard)
+  y <- merge(list(key = names(x)), y, sort = FALSE)
+  y$name <- paste0(y$parameter, " (", y$parameter_code, ")")
   ## Preserve order
-  d$name <- factor(d$name, levels = unique(d$name))
-  lapply(split(d$pollutant_standard, d$name), as.list)
+  y$name <- factor(y$name, levels = unique(y$name))
+  lapply(split(y$pollutant_standard, y$name), as.list)
 }

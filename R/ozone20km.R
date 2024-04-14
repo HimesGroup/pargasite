@@ -1,7 +1,7 @@
 ##' Ozone concentration data
 ##'
-##' A stars object that contains ozone concentrations covering the conterminous
-##' US from 2021 to 2022 based on 20km x 20km grids.
+##' A stars object containing ozone concentrations covering the conterminous
+##' United States for years 2021-2022 on a 20km x 20km grid.
 ##'
 ##' @format
 ##' A stars object with 4 dimensions and 1 attribute

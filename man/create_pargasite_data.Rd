@@ -2,7 +2,8 @@
 % Please edit documentation in R/create_pargasite_data.R
 \name{create_pargasite_data}
 \alias{create_pargasite_data}
-\title{Create a data cube for air pollutant levels covering the conterminous US}
+\title{Create a data cube for air pollutant levels covering the conterminous United
+States}
 \usage{
 create_pargasite_data(
   pollutant = c("CO", "SO2", "NO2", "Ozone", "PM2.5", "PM10"),
@@ -10,7 +11,7 @@ create_pargasite_data(
   event_filter = c("Events Included", "Events Excluded", "Concurred Events Excluded"),
   year,
   by_month = FALSE,
-  cell_size = 5000,
+  cell_size = 10000,
   nmax = Inf,
   aqs_email = get_aqs_email(),
   aqs_key = get_aqs_key(),
@@ -60,7 +61,8 @@ daily data download to prevent an unexpected server timeout error. Ignored
 when \code{by_month = FALSE}.}
 }
 \value{
-A stars object containing the interpolated pollutant levels.
+A stars object containing the interpolated pollutant levels over
+CONUS.
 }
 \description{
 A function to create a raster-based pollutant concentration input for

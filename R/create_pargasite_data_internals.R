@@ -1,14 +1,11 @@
+## Map pollutant string to AQS pollutant parameter code
 .map_pollutant_to_param <- function(pollutant) {
   switch(pollutant,
          "CO" = "42101", "SO2" = "42401", "NO2" = "42602",
          "Ozone" = "44201", "PM10" = "81102", "PM2.5" = "88101")
 }
 
-.map_param_to_standard <- function(param) {
-  idx <- .criteria_pollutants$parameter == param
-  .criteria_pollutants$pollutant_standard[idx]
-}
-
+## Map pollutant standard to NAAQS statistic
 ## CO 1-hour: annual second maximum nonoverlapping 1-hour average; second_max_value
 ## CO 8-hour: annual second maximum nonoverlapping 8-hour average; second_max_nonoverlap_value
 ## SO2 1-hour: annual 99th percentile of the daily maximum 1-hour concentration; ninety_ninth_percentile
@@ -18,7 +15,7 @@
 ## PM10 24-hour 2006: annual estimated number of exceedances; primary_exceedance_count
 ## PM25 24-hour 2012: annual 98th percentile concentration; ninety_eighth_percentile
 ## PM25 Annual 2012: annual mean concentration; arithmetic_mean
-## Lead 3-Month 2009: too few site; exclude
+## Lead 3-Month 2009: too few monitoring sites; excluded
 .map_standard_to_field <- function(standard) {
   switch(
     standard,
@@ -34,6 +31,7 @@
   )
 }
 
+## Create a target grid to perform spatial interpolation
 .create_grid <- function(map_source = c("TIGER", "GADM"),
                          minlat = 24, maxlat = 50, minlon = -124, maxlon = -66,
                          crs = 6350, # CONUS Albers 6350; Puerto Rico 6566
@@ -44,10 +42,9 @@
                                 minlat = minlat, maxlat = maxlat, crs = map_crs)
   if (map_source == "TIGER") {
     ## Use cartographic boundary file instead of TL due to plot loading time
-    us_shape <- get_tl_shape(url = .get_carto_url("state"),
-                             wkt_filter = wkt_filter)
+    us_shape <- .get_tiger_shape("state", wkt_filter = wkt_filter)
   } else {
-    us_shape <- get_gadm_shape(admin_level = 2, wkt_filter = wkt_filter)
+    us_shape <- .get_gadm_shape(admin_level = 2, wkt_filter = wkt_filter)
     us_shape <- us_shape[us_shape$ENGTYPE_2 != "Water body", ]
   }
   ## Use projected coordinate for grid creation and interpolation. Be aware that
@@ -58,6 +55,7 @@
     st_crop(us_shape)
 }
 
+## Download AQS data via API and estimate pollutant values
 .get_and_process_aqs_data <- function(parameter_code, pollutant_standard,
                                       data_field, event_filter,
                                       year, by_month, crs,
@@ -78,7 +76,7 @@
       aqs_variables <- replace(aqs_variables, c("bdate", "edate"), c(x, y))
       current_chunk <- paste0(.to_ymd(x), "-", .to_ymd(y))
       message("- requesting: ", current_chunk)
-      aqs_data <- raqs::aqs_dailydata("byBox", aqs_variables, header = FALSE)
+      aqs_data <- aqs_dailydata("byBox", aqs_variables, header = FALSE)
       if (is.null(aqs_data)) {
         ## No matched data
         return(NULL)
@@ -115,7 +113,7 @@
     }, simplify = FALSE)
     setNames(do.call(c, d), .make_names(names(d)))
   } else {
-    d <- raqs::aqs_annualdata("byBox", aqs_variables, header = FALSE)
+    d <- aqs_annualdata("byBox", aqs_variables, header = FALSE)
     if (is.null(d)) {
       ## No matched data
       return(NULL)
@@ -146,7 +144,7 @@
   }
 }
 
-
+## AQS data processing function if length(year) > 1
 .mget_and_process_aqs_data <- function(parameter_code, pollutant_standard,
                                        data_field, event_filter, year, by_month,
                                        crs, aqs_email, aqs_key, minlat, maxlat,
@@ -161,6 +159,7 @@
       minlat = minlat, maxlat = maxlat, minlon = minlon, maxlon = maxlon,
       us_grid = us_grid, nmax = nmax, download_chunk_size = download_chunk_size
     )
+    ## Delaying process to respect AQS API rate limit
     if (getOption("raqs.delay_between_req") > 0 && y != length(year)) {
       .sys_sleep_pb(getOption("raqs.delay_between_req"))
     }
@@ -169,6 +168,7 @@
 }
 
 
+## Create WKT representation of spatial filter for st_read fun
 .get_wkt_filter <- function(minlat, maxlat, minlon, maxlon, crs) {
   ## crs argument may not be necessary
   bounding_box <- st_bbox(c(xmin = minlon, xmax = maxlon,
@@ -177,6 +177,7 @@
   st_as_text(st_as_sfc(bounding_box))
 }
 
+## Transform the AQS data coordinate
 .aqs_transform <- function(x, target_crs = 6350) {
   x <- by(x, x$datum, function(y) {
     source_crs <- st_crs(.datum_to_epsg(unique(y$datum)))
@@ -188,10 +189,10 @@
   x[, names(x) %ni% "datum"]
 }
 
+## Map AQS datum value to EPSG reference
 .datum_to_epsg <- function(x) {
   switch(x, "NAD83" = 4269, "NAD27" = 4267, "WGS84" = 4326)
 }
-
 
 ## Check 4-digit year input
 .verify_year <- function(x) {
@@ -206,7 +207,9 @@
   x
 }
 
-## Generate sequence of dates to slice a time interval for AQS data download
+## Generate sequence of dates to slice a time interval for AQS data download;
+## Download AQS daily data in small chunks, as AQS API connection can be
+## sometimes unstable
 .gen_dl_chunk_seq <- function(year, download_chunk_size = c("2-week", "month")) {
   download_chunk_size <- match.arg(download_chunk_size)
   begin_date <- as.Date(paste0(year, "-01-01"))

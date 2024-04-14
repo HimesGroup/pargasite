@@ -1,9 +1,24 @@
-list_criteria_pollutants <- function() {
-  unique(.criteria_pollutants[, c("parameter_code", "parameter")])
-}
-
-list_pollutant_standards <- function(parameter_code = NULL, full_info = FALSE) {
-  if (full_info) {
+##' Look up National Ambient Air Quality Standards (NAAQS)
+##'
+##' A function to show pollutant standard information on criteria air
+##' pollutants.
+##'
+##' @param parameter_code An AQS parameter code to retrieve specific standard
+##'   information. If `NULL` (default), display all pollutant standards.
+##' @param detail A logical value indicating whether detailed information is
+##'   retrieved.
+##'
+##' @return A data.frame containing the pollutant standard information
+##'
+##' @examples
+##' list_pollutant_standards()
+##'
+##' @references Data source:
+##'   \url{https://aqs.epa.gov/aqsweb/documents/codetables/pollutant_standards.html}
+##'
+##' @export
+list_pollutant_standards <- function(parameter_code = NULL, detail = FALSE) {
+  if (detail) {
     cols_to_show <- names(.criteria_pollutants)
   } else {
     cols_to_show <- c("parameter_code", "parameter", "pollutant_standard")

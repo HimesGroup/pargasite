@@ -1,4 +1,5 @@
-##' Create a data cube for air pollutant levels covering the conterminous US
+##' Create a data cube for air pollutant levels covering the conterminous United
+##' States
 ##'
 ##' A function to create a raster-based pollutant concentration input for
 ##' PARGASITE's shiny application. It downloads pollutant data via the
@@ -68,7 +69,8 @@
 ##'   daily data download to prevent an unexpected server timeout error. Ignored
 ##'   when `by_month = FALSE`.
 ##'
-##' @return A stars object containing the interpolated pollutant levels.
+##' @return A stars object containing the interpolated pollutant levels over
+##'   CONUS.
 ##'
 ##' @examples
 ##'\dontrun{
@@ -91,26 +93,12 @@ create_pargasite_data <- function(pollutant = c("CO", "SO2", "NO2", "Ozone",
                                   event_filter = c("Events Included",
                                                    "Events Excluded",
                                                    "Concurred Events Excluded"),
-                                  year, by_month = FALSE, cell_size = 5000,
+                                  year, by_month = FALSE, cell_size = 10000,
                                   nmax = Inf, aqs_email = get_aqs_email(),
                                   aqs_key = get_aqs_key(),
                                   download_chunk_size = c("2-week", "month")) {
   ## Verify pollutant input
   pollutant <- match.arg(pollutant)
-  ## Verify data field to use
-  data_field <- match.arg(
-    data_field, c("NAAQS_statistic", "arithmetic_mean"), several.ok = TRUE
-  )
-  ## Verify event handler
-  event_filter <- match.arg(
-    event_filter,
-    c("Events Included", "Events Excluded", "Concurred Events Excluded"),
-    several.ok = TRUE
-  )
-  ## Verify year format
-  year <- .verify_year(year)
-  ## Verify cell size
-  .is_nonnegative_number(cell_size)
   ## Convert string to param code
   parameter_code <- .map_pollutant_to_param(pollutant)
   ## Create raster for US CONUS in EPSG 6350 (NAD83 / Conus Albers)
@@ -121,12 +109,12 @@ create_pargasite_data <- function(pollutant = c("CO", "SO2", "NO2", "Ozone",
   )
 }
 
-## This is a more general version of raster creation function with a
-## user-specified bounding box.
+
 ##' Raster creation function
 ##'
-##' This function is used internally by [create_pargasite_data]. It is exported
-##' for package development and not for directly user calls.
+##' This function is used internally by [create_pargasite_data], allowing users
+##' to specify a longitude/latitude bounding box. It is exported for package
+##' development, not for direct user calls.
 ##'
 ##' @param parameter_code A numeric value specifying a AQS parameter code.
 ##' @param pollutant_standard A vector of strings specifying unique pollutant
@@ -174,7 +162,8 @@ create_pargasite_data <- function(pollutant = c("CO", "SO2", "NO2", "Ozone",
 ##'                      year = 2021:2022)
 ##' }
 ##'
-##' @return A stars object containing the interpolated pollutant levels.
+##' @return A stars object containing the interpolated pollutant levels covering
+##'   the user-specified bounding box.
 ##'
 ##' @export
 create_raster <- function(parameter_code, pollutant_standard = NULL,
@@ -185,13 +174,9 @@ create_raster <- function(parameter_code, pollutant_standard = NULL,
                                            "Concurred Events Excluded"),
                           year,  by_month = FALSE,
                           minlat = 24, maxlat = 50, minlon = -124, maxlon = -66,
-                          crs = 6350, cell_size = 5000,
+                          crs = 6350, cell_size = 10000,
                           aqs_email = get_aqs_email(), aqs_key = get_aqs_key(),
-                          nmax = 5, download_chunk_size = c("2-week", "month")) {
-  ## Check package first; it wouldn't be necessary if raqs is 'imported'.
-  ## if (!requireNamespace("raqs", quietly = TRUE)) {
-  ##   stop("Package 'raqs' is not available. Please install and try again.")
-  ## }
+                          nmax = Inf, download_chunk_size = c("2-week", "month")) {
   ## Validate parameter code
   parameter_code <- as.character(parameter_code)
   if (length(parameter_code) != 1) {
@@ -212,6 +197,21 @@ create_raster <- function(parameter_code, pollutant_standard = NULL,
     list_pollutant_standards(parameter_code)$pollutant_standard,
     several.ok = TRUE
   )
+  ## Verify data field to use
+  data_field <- match.arg(
+    data_field, c("NAAQS_statistic", "arithmetic_mean"), several.ok = TRUE
+  )
+  ## Verify event handler
+  event_filter <- match.arg(
+    event_filter,
+    c("Events Included", "Events Excluded", "Concurred Events Excluded"),
+    several.ok = TRUE
+  )
+  ## Verify year format
+  year <- .verify_year(year)
+  ## Verify cell size
+  .is_nonnegative_number(cell_size)
+  ## Create grid
   us_grid <- .create_grid(
     minlat = minlat, maxlat = maxlat, minlon = minlon, maxlon = maxlon,
     crs = crs, cell_size = cell_size
@@ -237,7 +237,7 @@ create_raster <- function(parameter_code, pollutant_standard = NULL,
     }
   } else {
     out <- .mget_and_process_aqs_data(
-      param = parameter_code, pollutant_standard = pollutant_standard,
+      parameter_code = parameter_code, pollutant_standard = pollutant_standard,
       data_field = data_field, event_filter = event_filter, year = year,
       by_month = by_month, crs = crs, aqs_email = aqs_email, aqs_key = aqs_key,
       minlat = minlat, maxlat = maxlat, minlon = minlon, maxlon = maxlon,

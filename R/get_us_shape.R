@@ -1,23 +1,37 @@
-## Download TIGER/Line or GADM shape files to temporary folder. All files are
-## deleted after function exits.
-get_tl_shape <- function(url = NULL, quiet = TRUE, force = FALSE, ...) {
-  if (is.null(url)) {
-    url <- "https://www2.census.gov/geo/tiger/TIGER2022/STATE/tl_2022_us_state.zip"
-  }
-  ## tmp <- tempdir()
-  ## file_dir <- file.path(
-  ##   tmp, "pargasite_tl_shape"
-  ## )
+## Download Cartographic boundary shape files to temporary folder.
+## All files are deleted after function exits.
+.get_pargasite_map <- function(x, boundary = c("state", "county", "cbsa")) {
+  x_bbox <- st_bbox(st_transform(x, 4269))
+  x_wkt_filter <- st_as_text(st_as_sfc(x_bbox))
+  st_transform(
+    .get_tiger_shape(boundary, wkt_filter = x_wkt_filter),
+    st_crs(x)
+  )
+}
+
+.get_tiger_shape <- function(boundary = c("state", "county", "cbsa"),
+                          quiet = TRUE, force = FALSE, ...) {
+  boundary <- match.arg(boundary)
+  url <- .get_map_url(boundary)
   file_dir <- getOption("pargasite.shape_dir")
   dir.create(file_dir, showWarnings = FALSE)
   file_path <- file.path(file_dir, basename(url))
   if (!file.exists(file_path) || force) {
-    message("Processing TIGER/TL shape file...")
+    message("Processing US shape file...")
     download.file(url, file_path, mode = "wb", quiet = FALSE)
     unzip(file_path, exdir = file_dir, overwrite = TRUE)
   }
   shape_file <- sub("\\.zip$", "", basename(url))
   sf::st_read(dsn = file_dir, layer = shape_file, quiet = quiet, ...)
+}
+
+.get_map_url <- function(x = c("state", "county", "cbsa"),
+                         simplified = TRUE) {
+  if (simplified) {
+    .get_carto_url(x)
+  } else {
+    .get_tl_url(x)
+  }
 }
 
 .get_tl_url <- function(x) {
@@ -38,33 +52,11 @@ get_tl_shape <- function(url = NULL, quiet = TRUE, force = FALSE, ...) {
   )
 }
 
-## get_tl_shape <- function(url = NULL, quiet = TRUE, ...) {
-##   message("Processing TIGER/TL shape file...")
-##   if (is.null(url)) {
-##     url <- "https://www2.census.gov/geo/tiger/TIGER2022/STATE/tl_2022_us_state.zip"
-##   }
-##   tmp <- tempdir()
-##   file_dir <- file.path(
-##     tmp, paste(sample(letters, 15, replace = TRUE), collapse = "")
-##   )
-##   dir.create(file_dir, showWarnings = FALSE)
-##   on.exit(unlink(file_dir, recursive = TRUE))
-##   file_path <- file.path(file_dir, basename(url))
-##   download.file(url, file_path, mode = "wb", quiet = FALSE)
-##   unzip(file_path, exdir = file_dir)
-##   shape_file <- sub("\\.zip$", "", basename(url))
-##   sf::st_read(dsn = file_dir, layer = shape_file, quiet = quiet, ...)
-## }
-
-get_gadm_shape <- function(url = NULL, admin_level = 1, quiet = TRUE,
-                           force = FALSE, ...) {
+.get_gadm_shape <- function(url = NULL, admin_level = 1, quiet = TRUE,
+                            force = FALSE, ...) {
   if (is.null(url)) {
     url <- "https://geodata.ucdavis.edu/gadm/gadm4.1/shp/gadm41_USA_shp.zip"
   }
-  ## tmp <- tempdir()
-  ## file_dir <- file.path(
-  ##   tmp, "pargasite_gadm_shape"
-  ## )
   file_dir <- getOption("pargasite.shape_dir")
   dir.create(file_dir, showWarnings = FALSE)
   file_path <- file.path(file_dir, basename(url))
@@ -76,21 +68,3 @@ get_gadm_shape <- function(url = NULL, admin_level = 1, quiet = TRUE,
   shape_file <- sub("shp.zip$", paste0(admin_level, ".shp"), basename(url))
   sf::st_read(dsn = file.path(file_dir, shape_file), quiet = quiet, ...)
 }
-
-## get_gadm_shape <- function(url = NULL, admin_level = 1, quiet = TRUE, ...) {
-##   message("Processing GADM shape file...")
-##   if (is.null(url)) {
-##     url <- "https://geodata.ucdavis.edu/gadm/gadm4.1/shp/gadm41_USA_shp.zip"
-##   }
-##   tmp <- tempdir()
-##   file_dir <- file.path(
-##     tmp, paste(sample(letters, 15, replace = TRUE), collapse = "")
-##   )
-##   dir.create(file_dir, showWarnings = FALSE)
-##   on.exit(unlink(file_dir, recursive = TRUE))
-##   file_path <- file.path(file_dir, basename(url))
-##   download.file(url, file_path, mode = "wb", quiet = FALSE)
-##   unzip(file_path, exdir = file_dir)
-##   shape_file <- sub("shp.zip$", paste0(admin_level, ".shp"), basename(url))
-##   sf::st_read(dsn = file.path(file_dir, shape_file), quiet = quiet, ...)
-## }

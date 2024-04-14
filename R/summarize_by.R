@@ -1,33 +1,45 @@
-##' Summarized PARGASITE pollutant data by geographic boundaries
-##'
-##' A function to compute areal means of grid samples falling inside the target
-##' geographic boundaries, including State, County, and Core Based Statistical
-##' Area (CBSA). The US shape files are automatically downloaded to R's
-##' temporary directory once for the current session and removed when R is
-##' closed.
-##'
-##' @param x A stars object created by [create_pargasite_data].
-##' @param level A string specifying a geographic boundary.
-##'
-##' @return A stars object containing pollutant levels summarized by geographic
-##'   boundaries.
-##'
-##' @examples
-##'
-##' ## State-level summary
-##' summarize_by_boundaries(ozone20km, "state")
-##'
-##' @export
-summarize_by_boundaries <- function(x , level = c("state", "county", "cbsa")) {
+## Compute areal means of grid samples falling inside the target geographic
+## boundaries.
+.summarize_by_boundaries <- function(x, us_map) {
   if (!inherits(x, "stars")) {
     stop("'x' must be a stars object.")
   }
-  level <- match.arg(level)
-  x_bbox <- st_bbox(st_transform(x, 4269))
-  x_wkt_filter <- st_as_text(st_as_sfc(x_bbox))
-  us_map <- st_transform(
-    get_tl_shape(.get_carto_url(level), wkt_filter = x_wkt_filter),
-    st_crs(x)
-  )
-  aggregate(x, by = us_map, FUN = function(x) mean(x, na.rm = TRUE))
+  ## stars would return NA for some boundaries.
+  ## sf doesn't have this issue
+  ## see https://github.com/r-spatial/stars/issues/317
+  x <- setNames(x, "value")
+  x <- aggregate(st_as_sf(x)["value"], by = us_map, FUN = function(x) mean(x, na.rm = TRUE))
+  st_transform(st_join(us_map, x, join = st_equals), 4326) # WGS84
+}
+
+.summarize_pargasite_data <- function(x, us_map, year, month) {
+  if (is.null(month)) {
+    if (length(year) > 1) {
+      x <- lapply(year, function(k) {
+        y <- .dimsub(x, dim = "year", value = k, drop = TRUE)
+        y <- .summarize_by_boundaries(y, us_map)
+        y$year <- k
+        y
+      })
+      x  <- do.call(rbind, x)
+    } else {
+      x <- .summarize_by_boundaries(x, us_map)
+      x$year <- year
+    }
+  } else {
+    if (length(month) > 1) {
+      x <- lapply(month, function(k) {
+        y <- .dimsub(x, dim = "month", value = k, drop = TRUE)
+        y <- .summarize_by_boundaries(y, us_map)
+        y$month <- k
+        y
+      })
+      x <- do.call(rbind, x)
+    } else {
+      x <- .summarize_by_boundaries(x, us_map)
+      x$month <- month
+    }
+    x$year <- year
+  }
+  x
 }
