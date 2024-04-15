@@ -1,6 +1,3 @@
-## Recenter map
-button.js <- paste0("function(btn, map){ map.setView([39.33, -98.58], 4); }")
-
 ## Get color palette
 .get_pal <- function(min_val, max_val, reverse = TRUE) {
   colorNumeric("Spectral", domain = c(min_val, max_val),
@@ -82,9 +79,10 @@ button.js <- paste0("function(btn, map){ map.setView([39.33, -98.58], 4); }")
       options = layersControlOptions(collapsed = FALSE)
     ) |>
     hideGroup("Monitor Locations") |>
+    ## Recenter
     addEasyButton(easyButton(
       icon = "fa-crosshairs", title = "Recenter",
-      onClick = JS(button.js)
+      onClick = JS("function(btn, map){map.setView([39.33, -98.58], 4);}")
     )) |>
     ## Useful?
     addMeasure(

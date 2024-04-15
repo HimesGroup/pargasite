@@ -18,9 +18,9 @@ ui <- fluidPage(
                    " || ",
                    "(typeof input.month !== 'undefined' && input.month.length == 1)"),
             withSpinner(leafletOutput("smap", height = "67vh")),
-            hr(),
             conditionalPanel(
               "input.summary === 'Grid'",
+              hr(),
               uiOutput("grid_val_ui")
             )
           ),
@@ -29,7 +29,8 @@ ui <- fluidPage(
                    " || ",
                    "(typeof input.month !== 'undefined' && input.month.length > 1)"),
             withSpinner(uiOutput("mmap"))
-          )
+          ),
+          width = 9
         )
       )
     ),

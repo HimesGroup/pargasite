@@ -1,51 +1,28 @@
 server <- function(input, output, session) {
 
-  ## Get data from global scope
-  ## pargasite.dat <- getOption("pargasite.dat")
-  ## pargasite.summary_state <- getOption("pargasite.summary_state")
-  ## pargasite.summary_county <- getOption("pargasite.summary_county")
-  ## pargasite.summary_cbsa <- getOption("pargasite.summary_cbsa")
-  ## pargasite.map_state <- getOption("pargasite.map_state")
-  ## pargasite.map_county <- getOption("pargasite.map_county")
-  ## pargasite.map_cbsa <- getOption("pargasite.map_cbsa")
-  ## Reset pargasite options
-  ## Whenever the web page is refreshed it throws an error as data are set to NULL
-  ## options(pargasite.dat = NULL, pargasite.summary_state = NULL,
-  ##         pargasite.summary_county = NULL, pargasite.summary_cbsa = NULL,
-  ##         pargasite.map_state = NULL, pargasite.map_county = NULL,
-  ##         pargasite.map_cbsa = NULL)
-
   ## Some pre-processing
-  pollutant_list <- .recover_from_standard(pargasite.dat)
-  field_list <- st_get_dimension_values(pargasite.dat, "data_field")
-  event_list <- st_get_dimension_values(pargasite.dat, "event")
-  year_list <- st_get_dimension_values(pargasite.dat, "year")
-  if ("month" %in% dimnames(pargasite.dat)) {
-    month_list <- st_get_dimension_values(pargasite.dat, "month")
+  pollutant_list <- .recover_from_standard(getOption("pargasite.dat"))
+  field_list <- st_get_dimension_values(getOption("pargasite.dat"), "data_field")
+  event_list <- st_get_dimension_values(getOption("pargasite.dat"), "event")
+  year_list <- sort(st_get_dimension_values(getOption("pargasite.dat"), "year"),
+                    decreasing = TRUE)
+  if ("month" %in% dimnames(getOption("pargasite.dat"))) {
+    month_list <- sort(st_get_dimension_values(getOption("pargasite.dat"), "month"),
+                       decreasing = TRUE)
   } else {
     month_list <- NULL
-  }
-  summary_list <- "None"
-  if (!is.null(pargasite.summary_state)) {
-    summary_list <- c(summary_list, "State")
-  }
-  if (!is.null(pargasite.summary_county)) {
-    summary_list <- c(summary_list, "County")
-  }
-  if (!is.null(pargasite.summary_cbsa)) {
-    summary_list <- c(summary_list, "CBSA")
   }
 
   ## Render UI
   output$pollutant_ui <- renderUI(
     tagList(pollutant_ui(pollutant_list, field_list, event_list, year_list,
-                         month_list, summary_list))
+                         month_list))
   )
 
   ## Pollutant information
   observeEvent(input$pollutant, {
     output$dat_src <- renderText(
-      if ("month" %ni% dimnames(pargasite.dat)) {
+      if ("month" %ni% dimnames(getOption("pargasite.dat"))) {
         "EPA's AQS API annualData service"
       } else {
         "EPA's AQS API dailyData service"
@@ -53,11 +30,13 @@ server <- function(input, output, session) {
     )
     ## Select an appropriate field when NAAQS_statistic is given and update the
     ## dropdown menu
-    if ("NAAQS_statistic" %in% st_get_dimension_values(pargasite.dat, "data_field")) {
+    if ("NAAQS_statistic" %in% field_list) {
       idx <- match("NAAQS_statistic", field_list)
       field_list[idx] <- .map_standard_to_field(input$pollutant)
+      ## If NAAQS statistic = arithmetic mean, drop duplicate
+      field_list <- unique(field_list)
     }
-    updateSelectizeInput(session, inputId = "dat_field", choices = field_list)
+    updateSelectizeInput(session, inputId = "data_field", choices = field_list)
     ## List a selected pollutant information
     pollutant_idx <- which(
       .criteria_pollutants$pollutant_standard == input$pollutant
@@ -80,299 +59,88 @@ server <- function(input, output, session) {
     )
   })
 
-  ## Consistent color scale across different times and event filters
-  v <- reactiveValues(min_val = NULL, max_val = NULL, ulim_val = NULL)
+  r <- reactiveValues(dat_grid = NULL, dat_geo = NULL)
 
-  ## Choose data by user's selections
-  ## To do: uniform legend scale for the same pollutant
-  pargasite_dat <- reactive({
-    if (is.null(input$summary)) {
-      d <- pargasite.dat
+  observeEvent({
+    ## Ensure that it is triggered when non-NULL values are given.
+    req(input$summary)
+    req(input$pollutant)
+    req(input$data_field)
+    req(input$event)
+    req(input$year)
+    input$month # exception; it can be NULL
+  }, {
+    ## Get monitor location data
+    monitor_dat <- .subset_monitor_data(input$pollutant, input$year)
+    ## Subset pargasite data
+    r$dat_grid <- .subset_pargasite_data(
+      getOption("pargasite.dat"), input$pollutant, input$data_field,
+      input$event, input$year, input$month
+    )
+    if (input$summary == "Grid") {
+      p <- .draw_grid(r$dat_grid, monitor_dat, input$year, input$month)
     } else {
-      d <- switch(
-        input$summary,
-        "None" = pargasite.dat,
-        "State" = pargasite.summary_state,
-        "County" = pargasite.summary_county,
-        "CBSA" = pargasite.summary_cbsa
+      r$dat_geo <- .summarize_pargasite_data(
+        r$dat_grid, us_map = getOption("pargasite.map")[[tolower(input$summary)]],
+        input$year, input$month
+      )
+      p <- .draw_geoshape(r$dat_geo, monitor_dat, input$year, input$month)
+    }
+    if ((is.null(input$month) && length(input$year) == 1) ||
+        (!is.null(input$month) && length(input$month) == 1)) {
+      ## May do this on UI side using conditionalPanel
+      ## output$us_map <- renderUI(leafletOutput("mymap", height = "67vh"))
+      output$smap <- renderLeaflet(p)
+    } else {
+      output$mmap <- renderUI(p)
+    }
+  },
+  ignoreNULL = FALSE # set FALSE as input$month can be NULL
+  )
+
+  ## Display pollutant value for a single-panel grid map
+  observeEvent(input$smap_click, {
+    if (!is.null(input$smap_click)) {
+      if (input$summary == "Grid") {
+        output$grid_val_ui <- renderUI(shiny::tableOutput("grid_val"))
+        click_pos <- .get_click_pos(input$smap_click$lng, input$smap_click$lat)
+        tbl <- .extract_grid_value(r$dat_grid, click_pos)
+        output$grid_val <- shiny::renderTable(tbl)
+      }
+      ## is it necessary to display values for other summary types?
+    } else {
+      output$grid_val_ui <- renderUI(shiny::htmlOutput("grid_val_na"))
+      output$grid_val_na <- renderText(
+        "<h5 style='color:#E74C3C'><b>Click the map to retrieve a pollutant value.</b></h5>"
       )
     }
-    if (is.null(input$pollutant)) {
-      ## Clumsy; need a better way to set a default value
-      d <- d[.make_names(.recover_from_standard(d)[[1]][[1]])]
-    } else {
-      d <- d[.make_names(input$pollutant)]
-    }
-    if (!is.null(input$dat_field)) {
-      if (input$dat_field != "arithmetic_mean") {
-        d <- dimsub(
-          d, dim = "data_field",
-          value = setdiff(st_get_dimension_values(d, "data_field"), "arithmetic_mean"),
-          drop = FALSE
-        )
-      } else{
-        ## Need to handle the case: NAAQS_statistic = arithmetic_mean
-        if ("arithmetic_mean" %in% st_get_dimension_values(d, "data_field")) {
-          d <- dimsub(d, dim = "data_field", value = "arithmetic_mean", drop = FALSE)
-        } else{
-          d <- dimsub(d, dim = "data_field", value = "NAAQS_statistic", drop = FALSE)
-        }
-        ## d <- dimsub(d, dim = "data_field", value = input$dat_field, drop = FALSE)
-      }
-    } else {
-      d <- dimsub(d, dim = "data_field",
-                  value = st_get_dimension_values(d, "data_field")[1],
-                  drop = FALSE)
-    }
-    ## For color scale; still allow different scale between data fields as they
-    ## are a lot different
-    v$max_val <- max(d[[i = TRUE]], na.rm = TRUE)
-    v$min_val <- min(d[[i = TRUE]], na.rm = TRUE)
-    if (!is.null(input$event)) {
-      ## Drop=TRUE will drop singular dimension of year; it throw an error next year eval.
-      d <- dimsub(d, dim = "event", value = input$event, drop = FALSE)
-    } else {
-      d <- dimsub(d, dim = "event", value = st_get_dimension_values(d, "event")[1],
-                  drop = FALSE)
-    }
-    if (!is.null(input$year)) {
-      d <- dimsub(d, dim = "year", value = input$year, drop = TRUE)
-    } else {
-      d <- dimsub(d, dim = "year", value = st_get_dimension_values(d, "year")[1],
-                  drop = TRUE)
-    }
-    if ("month" %in% dimnames(d)) {
-      if (!is.null(input$month)) {
-        d <- dimsub(d, dim = "month", value = input$month, drop = TRUE)
-      } else {
-        d <- dimsub(d, dim = "month",
-                    value = st_get_dimension_values(d, "month")[1], drop = TRUE)
-      }
-    }
-    d
-  })
+  }, ignoreNULL = FALSE)
 
-  monitor_dat <- reactive({
-    if (is.null(input$year)) {
-      year <- st_get_dimension_values(pargasite.dat, "year")[1]
-    } else {
-      year <- input$year
-    }
-    if (is.null(input$pollutant)) {
-      idx <- which(.criteria_pollutants$pollutant_standard ==
-                   .recover_from_standard(pargasite.dat)[[1]][[1]])
-    } else {
-      idx <- which(.criteria_pollutants$pollutant_standard == input$pollutant)
-    }
-    parameter_code <- .criteria_pollutants$parameter_code[idx]
-    d <- .monitors[.monitors$year == year &
-                   .monitors$parameter_code == parameter_code, ]
-    as.data.frame(st_coordinates(d))
-  })
+  ## don't know synced map can observe click event; check later
+  ## observeEvent(input$mmap_click, {
+  ##   if (!is.null(input$mmap_click)) {
+  ##   } else {
+  ##   }
+  ## })
 
-  ## Set a boundary threshold for color-scale
+  output$aqi_ui <- renderUI(aqi_ui())
   observeEvent({
-    input$pollutant
+    req(input$aqi_stat)
+    req(input$aqi_year)
+    req(input$aqi_summary)
   }, {
-    v$ulim_val <- .map_standard_to_ulim(.make_names(input$pollutant))
-    updateNumericInput(inputId = "outlier_cutoff", value = v$ulim_val)
-  })
-
-  observeEvent({
-    input$outlier_cutoff
-  }, {
-    v$ulim_val <- input$outlier_cutoff
-  })
-
-  ## Draw map
-  observeEvent({
-    pargasite_dat()
-    monitor_dat()
-    input$color
-    input$color_bounded
-    v$ulim_val
-  }, {
-    map_dat <- pargasite_dat()
-    label_fmt <- labelFormat(transform = function(x) sort(x, decreasing = TRUE))
-    ## prevent color distortion due to too high values
-    if (input$color == "Fixed") {
-      min_val <- v$min_val * 0.99 # small offset due to boundary
-      max_val <- v$max_val * 1.01
-    } else {
-      min_val <- min(map_dat[[1]], na.rm = TRUE) * 0.99
-      max_val <- max(map_dat[[1]], na.rm = TRUE) * 1.01 # small offset due to boundary
-    }
-    if (input$color_bounded) {
-      ## ulim_val <- .map_standard_to_ulim(names(pargasite_dat()))
-      map_dat[[1]] <- pmin(map_dat[[1]], v$ulim_val)
-      max_val <- min(max_val, v$ulim_val * 1.01)
-      label_fmt <- labelFormat(transform = function(x) sort(x, decreasing = TRUE),
-                               suffix = "+")
-    }
-    pal <- colorNumeric("Spectral", domain = c(min_val, max_val),
-                        na.color = "transparent", reverse = TRUE)
-    ## For sorting add legend; clunky
-    pal_rev <- colorNumeric("Spectral", domain = c(min_val, max_val),
-                            na.color = "transparent", reverse = FALSE)
-    ## map_dat <- st_transform(st_as_sf(pargasite_dat()), 4326)
-    p <- leaflet(options = leafletOptions(minZoom = 3)) |>
-      addTiles() |>
-      setView(lng = -98.58, lat = 39.33, zoom = 4) |>
-      addMarkers(lng = monitor_dat()$X, lat = monitor_dat()$Y,
-                 group = "Show Monitor Locations") |>
-      addLayersControl(overlayGroups = "Show Monitor Locations",
-                       options = layersControlOptions(collapsed = FALSE)) |>
-      hideGroup("Show Monitor Locations")
-    if (is.null(input$summary) || input$summary == "None") {
-      p <- p |>
-        ## addRasterImage with project = TRUE will project data to the leaflet map CRS
-        addRasterImage(as(map_dat, "Raster"), color = pal, opacity = 0.7)
-    } else {
-      m <- switch(
-        input$summary,
-        "State" = pargasite.map_state,
-        "County" = pargasite.map_county,
-        "CBSA" = pargasite.map_cbsa
-      )
-      r <- st_join(st_as_sf(map_dat), m, join = sf::st_equals) |>
-        st_transform(4326)
-      names(r)[1] <- "value"
-      p <- p |>
-        addPolygons(
-          data = r, fillColor = ~pal(value), weight = 1, opacity = 1,
-          color = "#444444",
-          dashArray = NULL, fillOpacity = 0.7,
-          highlightOptions = highlightOptions(
-            weight = 3, color = "#444444", dashArray = NULL,
-            fillOpacity = 0.9, bringToFront = FALSE
-          ),
-          label = paste0(r$NAME, ": ", sprintf("%.3f", r$value))
-        )
-    }
-    p <- p |>
-      addLegend(position = "bottomright", pal = pal_rev, values = c(min_val, max_val),
-                labFormat = label_fmt)
-    output$us_map <- renderLeaflet(p)
-  })
-
-  ## Display pollutant level based upon mouse click event
-  ## Can use mouseover events with map_shape_mouseover but would not work with
-  ## addRasterImage; (limitation can be bypassed with leafem addImageQuery/addMouseCoordinates ?)
-  output$pollutant_val <- renderText({
-    if (!is.null(input$us_map_click)) {
-      click_pos <- st_point(c(input$us_map_click$lng, input$us_map_click$lat)) |>
-        st_sfc(crs = 4326) |>
-        st_transform(st_crs(pargasite_dat()))
-      if (is.null(input$summary) || input$summary == "None") {
-        pollutant_val <- round(st_extract(pargasite_dat(), st_coordinates(click_pos)), 3)
-        if (is.na(pollutant_val)) pollutant_val <- "out of bounds"
-        paste0("(", round(input$us_map_click$lng,2), ", ",
-               round(input$us_map_click$lat, 2), "):  ",
-               pollutant_val)
-      } else {
-        m <- switch(
-          input$summary,
-          "State" = pargasite.map_state,
-          "County" = pargasite.map_county,
-          "CBSA" = pargasite.map_cbsa
-        )
-        ## st_extract not work? perhaps data is multipolygon?
-        ## pollutant_val <- round(st_extract(pargasite_dat(), sf::st_coordinates(click_pos)), 2)
-        val_idx <- sf::st_within(click_pos, st_as_sf(pargasite_dat()))[[1]]
-        pollutant_val <- round(st_as_sf(pargasite_dat())[[1]][val_idx], 3)
-        name_idx <- sf::st_within(click_pos, m)[[1]]
-        if (length(pollutant_val) == 0) {
-          paste0("(", round(input$us_map_click$lng,2), ", ",
-                 round(input$us_map_click$lat, 2), "):  ",
-                 "out of bounds")
-        } else {
-          if (input$summary == "State") {
-            paste0(m$NAME[name_idx], ":  ", pollutant_val)
-          } else {
-            paste0(m$NAMELSAD[name_idx], ":  ", pollutant_val)
-          }
-        }
-      }
-    } else {
-      "<b>Click the map to retrieve a pollutant value.</b>"
-    }
-  })
-
-  ## AQI data
-  aqi_dat <- reactive({
     d <- switch(
       input$aqi_summary,
       "County" = pargasite.aqi_county,
       "CBSA" = pargasite.aqi_cbsa
     )
-    d <- d[d$year == input$aqi_year, ]
-    if (input$aqi_stat == "Median") {
-      ind <- match("median_aqi", names(d))
-      names(d)[ind] <- "value"
-    }
-    if (input$aqi_stat == "Max") {
-      ind <- match("max_aqi", names(d))
-      names(d)[ind] <- "value"
-    }
-    if (input$aqi_stat == "90th Percentile") {
-      ind <- match("x90th_percentile_aqi", names(d))
-      names(d)[ind] <- "value"
-    }
-    d$fill_cols <- aqi_colors(d$value)
-    d
-  })
-
-  ## AQI map
-  observeEvent({
-    aqi_dat()
-  }, {
-    r <- st_transform(aqi_dat(), 4326)
-    p <- leaflet(options = leafletOptions(minZoom = 3)) |>
-      addTiles() |>
-      setView(lng = -98.58, lat = 39.33, zoom = 4) |>
-      addPolygons(
-        data = r,
-        fillColor = r$fill_cols, weight = 1, opacity = 1,
-        color = "#444444", dashArray = NULL, fillOpacity = 0.7,
-        highlightOptions = highlightOptions(
-          weight = 3, color = "#444444", dashArray = NULL,
-          fillOpacity = 0.9, bringToFront = FALSE
-        ),
-        label = paste0(r$name, ": ", sprintf("%.1f", r$value))
-      ) |>
-      addLegend(position = "bottomright",
-                color = c("#7e0023", "#8f3f97", "#ff0000", "#ff7e00", "#ffff00", "#00e400"),
-                labels = c("Hazardous", "Very Unhealthy", "Unhealthy",
-                           "Unhealthy for Sensitive Groups",
-                           "Moderate", "Good"))
-    output$aqi_map <- renderLeaflet(p)
-  })
-
-  ## AQI value
-  output$aqi_val <- renderText({
-    if (!is.null(input$aqi_map_click)) {
-      click_pos <- st_point(c(input$aqi_map_click$lng, input$aqi_map_click$lat)) |>
-        st_sfc(crs = 4326) |>
-        st_transform(st_crs(aqi_dat())) # EPSG6350
-      m <- switch(
-        input$aqi_summary,
-        "County" = pargasite.map_county,
-        "CBSA" = pargasite.map_cbsa
-      )
-      val_idx <- sf::st_within(click_pos, aqi_dat())[[1]]
-      aqi_val <- aqi_dat()$value[val_idx]
-      name_idx <- sf::st_within(click_pos, m)[[1]]
-      if (length(aqi_val) == 0) {
-        paste0("(", round(input$aqi_map_click$lng,2), ", ",
-               round(input$aqi_map_click$lat, 2), "):  ",
-               "out of bounds")
-      } else {
-        paste0(m$NAMELSAD[name_idx], ":  ", aqi_val)
-      }
+    if (length(input$aqi_year) == 1) {
+      p <- aqi_draw(d, input$aqi_stat, input$aqi_year)
+      output$aqi_smap <- renderLeaflet(p)
     } else {
-      "<b>Click the map to retrieve a AQI value.</b>"
+      p <- aqi_draw_multi(d, input$aqi_stat, input$aqi_year)
+      output$aqi_mmap <- renderUI(p)
     }
-
   })
 
 }
