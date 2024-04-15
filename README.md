@@ -1,5 +1,9 @@
 # PARGASITE
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/HimesGroup/pargasite/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/HimesGroup/pargasite/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 Pollution-Associated Risk Geospatial Analysis Site (PARGASITE) offers tools to
 estimate and visualize levels of major pollutants (CO, NO2, SO2, Ozone, PM2.5
 and PM10) across the conterminous United States for user-defined time ranges. It
