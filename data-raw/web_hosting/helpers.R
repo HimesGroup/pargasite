@@ -1,3 +1,18 @@
+.map_standard_to_field <- function(standard) {
+  switch(
+    standard,
+    "CO 1-hour 1971" = "second_max_value",
+    "CO 8-hour 1971" = "second_max_nonoverlap_value",
+    "SO2 1-hour 2010" = "ninety_ninth_percentile",
+    "NO2 1-hour 2010" = "ninety_eighth_percentile",
+    "NO2 Annual 1971" = "arithmetic_mean",
+    "Ozone 8-hour 2015" = "fourth_max_value",
+    "PM10 24-hour 2006" = "primary_exceedance_count",
+    "PM25 24-hour 2012" = "ninety_eighth_percentile",
+    "PM25 Annual 2012" = "arithmetic_mean"
+  )
+}
+
 aqi_colors <- function(x) {
   ifelse(x >= 0 & x <= 50, "#00e400",
   ifelse(x > 50 & x <= 100, "#ffff00",
