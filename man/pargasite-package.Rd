@@ -6,10 +6,10 @@
 \alias{pargasite-package}
 \title{pargasite: Pollution-Associated Risk Geospatial Analysis}
 \description{
-Pollution-Associated Risk Geospatial Analysis Site (PARGASITE) offers tools to estimate and visualize levels of major pollutants (CO, NO2, SO2, Ozone, PM2.5 and PM10) across the conterminous United States for user-defined time ranges. It helps users to automatically retrieves pollutant data from the Environmental Protection Agency’s (EPA) Air Quality System (AQS) API service. PARGASITE filters the data by exceptional event (e.g., wildfire) status, performs spatial interpolations, and summarizes pollutant concentrations by geographic boundaries including state, county, and Core-Based Statistical Area (CBSA). It also offers a Shiny application for interactively visualization of pollutant levels and easily checking of air quality status for a given location over time relative to the National Ambient Air Quality Standards (NAAQS).
+'PARGASITE' (Pollution-Associated Risk Geospatial Analysis Site) offers tools to estimate and visualize levels of major pollutants (CO, NO2, SO2, Ozone, PM2.5 and PM10) across the conterminous United States for user-defined time ranges. It helps users to automatically retrieves pollutant data from the Environmental Protection Agency’s (EPA) Air Quality System (AQS) API service. 'PARGASITE' filters the data by exceptional event (e.g., wildfire) status, performs spatial interpolations, and summarizes pollutant concentrations by geographic boundaries including state, county, and Core-Based Statistical Area (CBSA). It also offers a 'Shiny' application for interactively visualization of pollutant levels and easily checking of air quality status for a given location over time relative to the National Ambient Air Quality Standards (NAAQS).
 }
 \author{
-\strong{Maintainer}: Jaehyun Joo \email{jaehyun.joo@outlook.com}
+\strong{Maintainer}: Jaehyun Joo \email{jaehyunjoo@outlook.com}
 
 Authors:
 \itemize{
