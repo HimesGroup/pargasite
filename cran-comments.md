@@ -9,7 +9,9 @@ New submission
   - Windows-latest: release, devel
   - Mac-latest: release
 * Win-builder
-  - orl-release, release, devel
+  - old-release, release, devel
+* Mac-builder
+  - release
 
 ## R CMD check results
 
