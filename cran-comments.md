@@ -1,4 +1,12 @@
-New submission
+## Reviewer's comments:
+
+The Description field should not start with the package name, 'This package' or
+similar.
+
+Note that your package is called pargasite, not PARGASITE
+
+- We updated the description field based on reviewer's comment
+
 
 ## Test environments
 

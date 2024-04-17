@@ -4,19 +4,15 @@
 [![R-CMD-check](https://github.com/HimesGroup/pargasite/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/HimesGroup/pargasite/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-Pollution-Associated Risk Geospatial Analysis Site (PARGASITE) offers tools to
-estimate and visualize levels of major pollutants (CO, NO2, SO2, Ozone, PM2.5
-and PM10) across the conterminous United States for user-defined time ranges. It
-helps users to automatically retrieves pollutant data from the Environmental
-Protection Agency’s (EPA) Air Quality System (AQS) API service. PARGASITE
-filters the data by exceptional event (e.g., wildfire) status, performs spatial
-interpolations, and summarizes pollutant concentrations by geographic boundaries
-including state, county, and Core-Based Statistical Area (CBSA). It also offers
-a Shiny application for interactively visualization of pollutant levels and
-easily checking of air quality status for a given location over time relative to
-the National Ambient Air Quality Standards (NAAQS).
+The pargasite package offers tools to estimate and visualize levels of major
+pollutants (CO, NO2, SO2, Ozone, PM2.5, and PM10) across the conterminous United
+States for user-defined time ranges. It provides functions to retrieve pollutant
+data from the Environmental Protection Agency’s (EPA) Air Quality System (AQS)
+API service for interactive visualization through a Shiny application, allowing
+users to explore pollutant levels for a given location over time relative to the
+National Ambient Air Quality Standards (NAAQS).
 
-The PARGASITE package has been redesigned due to the deprecation of the rgdal
+The package has been redesigned due to the deprecation of the rgdal
 package. As a result, it is not compatible with the previous version. If you
 want to use the old interface, please check out the v1 branch.
 
