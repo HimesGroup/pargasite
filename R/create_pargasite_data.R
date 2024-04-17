@@ -2,7 +2,7 @@
 ##' States
 ##'
 ##' A function to create a raster-based pollutant concentration input for
-##' PARGASITE's shiny application. It downloads pollutant data via the
+##' pargasite's shiny application. It downloads pollutant data via the
 ##' Environmental Protection Agency's (EPA) Air Quality System (AQS) API
 ##' service, filters the data by exceptional event (e.g., wildfire) status, and
 ##' performs the inverse distance weighted (IDW) interpolation to estimate

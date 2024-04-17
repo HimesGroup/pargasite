@@ -1,4 +1,4 @@
-##' Run PARGASITE application
+##' Run pargasite application
 ##'
 ##' Launch a Shiny application to visualize pollutant levels of the conterminous
 ##' US. The system's default web browser will be launched automatically after

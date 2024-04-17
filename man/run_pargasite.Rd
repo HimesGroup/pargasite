@@ -2,7 +2,7 @@
 % Please edit documentation in R/run_pargasite.R
 \name{run_pargasite}
 \alias{run_pargasite}
-\title{Run PARGASITE application}
+\title{Run pargasite application}
 \usage{
 run_pargasite(x)
 }
