@@ -6,7 +6,7 @@
 \alias{pargasite-package}
 \title{pargasite: Pollution-Associated Risk Geospatial Analysis Site}
 \description{
-This package offers tools to estimate and visualize levels of major pollutants (CO, NO2, SO2, Ozone, PM2.5 and PM10) across the conterminous United States for user-defined time ranges. It provides functions to retrieve pollutant data from the Environmental Protection Agency’s (EPA) Air Quality System (AQS) API service for interactive visualization through a 'Shiny' application, allowing users to explore pollutant levels for a given location over time relative to the National Ambient Air Quality Standards (NAAQS).
+Offers tools to estimate and visualize levels of major pollutants (CO, NO2, SO2, Ozone, PM2.5 and PM10) across the conterminous United States for user-defined time ranges. Provides functions to retrieve pollutant data from the U.S. Environmental Protection Agency’s 'Air Quality System' (AQS) API service \url{https://aqs.epa.gov/aqsweb/documents/data_api.html} for interactive visualization through a 'shiny' application, allowing users to explore pollutant levels for a given location over time relative to the National Ambient Air Quality Standards (NAAQS).
 }
 \author{
 \strong{Maintainer}: Jaehyun Joo \email{jaehyunjoo@outlook.com}

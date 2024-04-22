@@ -1,8 +1,8 @@
 ---
-title: "Getting Started"
+title: "Interactive Visualization of Major Pollutant Levels in the United States"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting Started}
+  %\VignetteIndexEntry{Interactive Visualization of Major Pollutant Levels in the United States}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -52,7 +52,7 @@ if (!requireNamespace("raqs", quietly = TRUE)) {
 }
 library(raqs)
 
-## Please use your eamil address to create an account
+## Please use your email address to create an account
 ## A verification email wille be sent to the eamil account speficied.
 aqs_signup('youremail@address.com')
 

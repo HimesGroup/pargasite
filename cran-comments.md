@@ -1,12 +1,19 @@
 ## Reviewer's comments:
 
-The Description field should not start with the package name, 'This package' or
-similar.
+Please always write package names, software names and API (application
+programming interface) names in single quotes in title and description.
+e.g: --> 'Air Quality System' API
+Please note that package names are case sensitive. -> 'shiny'
 
-Note that your package is called pargasite, not PARGASITE
+- We added single quotes for Air Quality System API
+- We changed 'Shiny' -> 'shiny'
 
-- We updated the description field based on reviewer's comment
+Please add a web reference for the API in the form <[https:.....]https:.....> to
+the description of the DESCRIPTION file with no space after 'https:' and angle
+brackets for auto-linking.
 
+- We added a web reference for the API with angle brackets in the DESCRIPTION
+  file.
 
 ## Test environments
 
