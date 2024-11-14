@@ -1,6 +1,6 @@
 .dimsub <- function(x, i = TRUE, dim = dimnames(x),
-                          value = stars::st_get_dimension_values(x, dim),
-                          drop = FALSE) {
+                    value = stars::st_get_dimension_values(x, dim),
+                    drop = FALSE) {
   if (!inherits(x, "stars")) {
     stop("'x' must be a stars object.")
   }

@@ -8,7 +8,9 @@
   ## sf doesn't have this issue
   ## see https://github.com/r-spatial/stars/issues/317
   x <- setNames(x, "value")
-  x <- aggregate(st_as_sf(x)["value"], by = us_map, FUN = function(x) mean(x, na.rm = TRUE))
+  x <- aggregate(
+    st_as_sf(x)["value"], by = us_map, FUN = function(x) mean(x, na.rm = TRUE)
+  )
   st_transform(st_join(us_map, x, join = st_equals), 4326) # WGS84
 }
 
