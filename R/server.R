@@ -20,7 +20,7 @@ server <- function(input, output, session) {
   )
 
   rv <- reactiveValues(pollutant = NULL, field_list = NULL, data_field = NULL,
-                       dat_grid = NULL, dat_geo = NULL)
+                       unit = NULL, dat_grid = NULL, dat_geo = NULL)
 
   output$dat_src <- renderText(
     if ("month" %ni% dimnames(getOption("pargasite.dat"))) {
@@ -39,6 +39,7 @@ server <- function(input, output, session) {
       ## Get the first entry from a nested list
       rv$pollutant <- unlist(pollutant_list)[1]
     }
+    rv$unit <- .get_pollutant_unit(rv$pollutant)
     if ("NAAQS_statistic" %in% field_list) {
       idx <- match("NAAQS_statistic", field_list)
       field_list[idx] <- .map_standard_to_field(rv$pollutant)
@@ -97,13 +98,15 @@ server <- function(input, output, session) {
       input$event, input$year, input$month
     )
     if (input$summary == "Grid") {
-      p <- .draw_grid(rv$dat_grid, monitor_dat, input$year, input$month)
+      p <- .draw_grid(rv$dat_grid, monitor_dat, input$year, input$month,
+                      unit = rv$unit)
     } else {
       rv$dat_geo <- .summarize_pargasite_data(
         rv$dat_grid, us_map = getOption("pargasite.map")[[tolower(input$summary)]],
         input$year, input$month
       )
-      p <- .draw_geoshape(rv$dat_geo, monitor_dat, input$year, input$month)
+      p <- .draw_geoshape(rv$dat_geo, monitor_dat, input$year, input$month,
+                          unit = rv$unit)
     }
     if ((is.null(input$month) && length(input$year) == 1) ||
         (!is.null(input$month) && length(input$month) == 1)) {
@@ -140,4 +143,16 @@ server <- function(input, output, session) {
   ##   }
   ## })
 
+}
+
+.get_pollutant_unit <- function(x) {
+  switch(
+    sub("^(.*?) (.*)", "\\1", x),
+    "CO" = "(ppm)",
+    "SO2" = "(ppb)",
+    "NO2" = "(ppb)",
+    "Ozone" = "(ppm)",
+    "PM25" = "(μg/m<sup>3</sup>)",
+    "PM10" = "(μg/m<sup>3</sup>)"
+  )
 }
