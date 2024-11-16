@@ -43,9 +43,9 @@ server <- function(input, output, session) {
     if ("NAAQS_statistic" %in% field_list) {
       idx <- match("NAAQS_statistic", field_list)
       field_list[idx] <- .map_standard_to_field(rv$pollutant)
-      ## If NAAQS statistic = arithmetic mean, drop duplicate
-      rv$field_list <- unique(field_list)
     }
+    ## If NAAQS statistic = arithmetic mean, drop duplicate
+    rv$field_list <- unique(field_list)
     pollutant_idx <- which(
       .criteria_pollutants$pollutant_standard == rv$pollutant
     )
