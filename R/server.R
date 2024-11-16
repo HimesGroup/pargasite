@@ -152,7 +152,7 @@ server <- function(input, output, session) {
     "SO2" = "(ppb)",
     "NO2" = "(ppb)",
     "Ozone" = "(ppm)",
-    "PM25" = "(μg/m<sup>3</sup>)",
-    "PM10" = "(μg/m<sup>3</sup>)"
+    "PM25" = "(\u03bcg/m<sup>3</sup>)",
+    "PM10" = "(\u03bcg/m<sup>3</sup>)"
   )
 }

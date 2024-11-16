@@ -1,6 +1,6 @@
 Package: pargasite
 Title: Pollution-Associated Risk Geospatial Analysis Site
-Version: 2.1.0
+Version: 2.1.1
 Authors@R: c(
     person(given = "Jaehyun",
            family = "Joo",
@@ -31,7 +31,7 @@ Description: Offers tools to estimate and visualize levels of major pollutants
 License: BSD_3_clause + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Imports:
     cli,
     gstat,
