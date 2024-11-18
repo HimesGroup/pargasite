@@ -1,4 +1,4 @@
-pollutant_ui <- function(pollutant_list, field_list, event_list, year_list,
+pollutant_ui <- function(pollutant_list, event_list, year_list,
                          month_list = NULL) {
   ## Month full name
   if (!is.null(month_list)) {
@@ -27,7 +27,8 @@ pollutant_ui <- function(pollutant_list, field_list, event_list, year_list,
       selectizeInput(
         inputId = "data_field",
         label = "",
-        choice = field_list,
+        ## choice = field_list,
+        choice = NULL,
         multiple = FALSE
       ),
       helpText(

@@ -131,3 +131,15 @@ aqi_draw_multi <- function(x, stat, year) {
   plist <- lapply(year, function(k) aqi_draw(x, stat, k))
   do.call(sync, plist)
 }
+
+.get_pollutant_unit <- function(x) {
+  switch(
+    sub("^(.*?) (.*)", "\\1", x),
+    "CO" = "(ppm)",
+    "SO2" = "(ppb)",
+    "NO2" = "(ppb)",
+    "Ozone" = "(ppm)",
+    "PM25" = "(\u03bcg/m<sup>3</sup>)",
+    "PM10" = "(\u03bcg/m<sup>3</sup>)"
+  )
+}

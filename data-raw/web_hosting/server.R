@@ -15,33 +15,41 @@ server <- function(input, output, session) {
 
   ## Render UI
   output$pollutant_ui <- renderUI(
-    tagList(pollutant_ui(pollutant_list, field_list, event_list, year_list,
-                         month_list))
+    tagList(pollutant_ui(pollutant_list, event_list, year_list, month_list))
   )
 
-  ## Pollutant information
-  observeEvent(input$pollutant, {
-    output$dat_src <- renderText(
-      if ("month" %ni% dimnames(getOption("pargasite.dat"))) {
-        "EPA's AQS API annualData service"
-      } else {
-        "EPA's AQS API dailyData service"
-      }
-    )
-    ## Select an appropriate field when NAAQS_statistic is given and update the
-    ## dropdown menu
+  
+  rv <- reactiveValues(pollutant = NULL, field_list = NULL, data_field = NULL,
+                       unit = NULL, dat_grid = NULL, dat_geo = NULL)
+
+  output$dat_src <- renderText(
+    if ("month" %ni% dimnames(getOption("pargasite.dat"))) {
+      "EPA's AQS API annualData service"
+    } else {
+      "EPA's AQS API dailyData service"
+    }
+  )
+
+  observeEvent({
+    input$pollutant # initialized as NULL
+  }, {
+    if (!is.null(input$pollutant)) {
+      rv$pollutant <- input$pollutant
+    } else {
+      ## Get the first entry from a nested list
+      rv$pollutant <- unlist(pollutant_list)[1]
+    }
+    rv$unit <- .get_pollutant_unit(rv$pollutant)
     if ("NAAQS_statistic" %in% field_list) {
       idx <- match("NAAQS_statistic", field_list)
-      field_list[idx] <- .map_standard_to_field(input$pollutant)
-      ## If NAAQS statistic = arithmetic mean, drop duplicate
-      field_list <- unique(field_list)
+      field_list[idx] <- .map_standard_to_field(rv$pollutant)
     }
-    updateSelectizeInput(session, inputId = "data_field", choices = field_list)
-    ## List a selected pollutant information
+    ## If NAAQS statistic = arithmetic mean, drop duplicate
+    rv$field_list <- unique(field_list)
     pollutant_idx <- which(
-      .criteria_pollutants$pollutant_standard == input$pollutant
+      .criteria_pollutants$pollutant_standard == rv$pollutant
     )
-    output$pollutant_std <- renderText(input$pollutant)
+    output$pollutant_std <- renderText(rv$pollutant)
     output$pollutant_desc <- renderText(
       .criteria_pollutants$pollutant_standard_description[pollutant_idx]
     )
@@ -57,34 +65,48 @@ server <- function(input, output, session) {
     output$primary_level <- renderText(
       .criteria_pollutants$primary_standard_level[pollutant_idx]
     )
-  })
-
-  r <- reactiveValues(dat_grid = NULL, dat_geo = NULL)
+  }, ignoreNULL = FALSE)
 
   observeEvent({
-    ## Ensure that it is triggered when non-NULL values are given.
-    req(input$summary)
-    req(input$pollutant)
-    req(input$data_field)
+    req(rv$pollutant)
+    input$data_field
+  }, {
+    if (is.null(input$data_field) || input$data_field %ni% rv$field_list) {
+      rv$data_field <- rv$field_list[1]
+      updateSelectizeInput(session, inputId = "data_field", choices = rv$field_list,
+                           selected = rv$data_field)
+    } else {
+      rv$data_field <- input$data_field
+      updateSelectizeInput(session, inputId = "data_field", choices = rv$field_list,
+                           selected = rv$data_field)
+    }
+  }, ignoreNULL = FALSE)
+
+  observeEvent({
+    req(rv$pollutant)
+    req(rv$data_field)
     req(input$event)
     req(input$year)
-    input$month # exception; it can be NULL
+    req(input$summary)
+    input$month
   }, {
     ## Get monitor location data
-    monitor_dat <- .subset_monitor_data(input$pollutant, input$year)
+    monitor_dat <- .subset_monitor_data(rv$pollutant, input$year)
     ## Subset pargasite data
-    r$dat_grid <- .subset_pargasite_data(
-      getOption("pargasite.dat"), input$pollutant, input$data_field,
+    rv$dat_grid <- .subset_pargasite_data(
+      getOption("pargasite.dat"), rv$pollutant, rv$data_field,
       input$event, input$year, input$month
     )
     if (input$summary == "Grid") {
-      p <- .draw_grid(r$dat_grid, monitor_dat, input$year, input$month)
+      p <- .draw_grid(rv$dat_grid, monitor_dat, input$year, input$month,
+                      unit = rv$unit)
     } else {
-      r$dat_geo <- .summarize_pargasite_data(
-        r$dat_grid, us_map = getOption("pargasite.map")[[tolower(input$summary)]],
+      rv$dat_geo <- .summarize_pargasite_data(
+        rv$dat_grid, us_map = getOption("pargasite.map")[[tolower(input$summary)]],
         input$year, input$month
       )
-      p <- .draw_geoshape(r$dat_geo, monitor_dat, input$year, input$month)
+      p <- .draw_geoshape(rv$dat_geo, monitor_dat, input$year, input$month,
+                          unit = rv$unit)
     }
     if ((is.null(input$month) && length(input$year) == 1) ||
         (!is.null(input$month) && length(input$month) == 1)) {
@@ -94,9 +116,7 @@ server <- function(input, output, session) {
     } else {
       output$mmap <- renderUI(p)
     }
-  },
-  ignoreNULL = FALSE # set FALSE as input$month can be NULL
-  )
+  }, ignoreNULL = FALSE)
 
   ## Display pollutant value for a single-panel grid map
   observeEvent(input$smap_click, {
@@ -104,7 +124,7 @@ server <- function(input, output, session) {
       if (input$summary == "Grid") {
         output$grid_val_ui <- renderUI(shiny::tableOutput("grid_val"))
         click_pos <- .get_click_pos(input$smap_click$lng, input$smap_click$lat)
-        tbl <- .extract_grid_value(r$dat_grid, click_pos)
+        tbl <- .extract_grid_value(rv$dat_grid, click_pos)
         output$grid_val <- shiny::renderTable(tbl)
       }
       ## is it necessary to display values for other summary types?
@@ -144,3 +164,4 @@ server <- function(input, output, session) {
   })
 
 }
+

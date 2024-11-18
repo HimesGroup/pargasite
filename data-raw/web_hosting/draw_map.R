@@ -5,7 +5,7 @@
 }
 
 ## Display pollutant estimates summarized by grids
-.draw_grid <- function(x, monitor_dat, year, month = NULL) {
+.draw_grid <- function(x, monitor_dat, year, month = NULL, unit = NULL) {
   min_val <- min(x[[1]], na.rm = TRUE) * 0.99 # small offset due to boundary
   max_val <- max(x[[1]], na.rm = TRUE) * 1.01
   if (is.null(month)) {
@@ -13,29 +13,32 @@
       plist <- lapply(year, function(k) {
         y <- .dimsub(x, dim = "year", value = k, drop = TRUE)
         .draw_leaflet(y, monitor_dat, min_val, max_val,
-                      title = paste0("Year: ", k), grid = TRUE)
+                      title = paste0("Year: ", k, "<br>", unit), grid = TRUE)
       })
       do.call(sync, plist)
     } else {
-      .draw_leaflet(x, monitor_dat, min_val, max_val, grid = TRUE)
+      .draw_leaflet(x, monitor_dat, min_val, max_val, title = unit, grid = TRUE)
     }
   } else {
     if (length(month) > 1) {
       plist <- lapply(month, function(k) {
         y <- .dimsub(x, dim = "month", value = k, drop = TRUE)
-        .draw_leaflet(y, monitor_dat, min_val, max_val,
-                      title = paste0(month.abb[as.integer(k)], " ", year),
-                      grid = TRUE)
+        .draw_leaflet(
+          y, monitor_dat, min_val, max_val,
+          title = paste0(month.abb[as.integer(k)], " ", year, "<br>", unit),
+          grid = TRUE
+        )
       })
       do.call(sync, plist)
     } else {
-      .draw_leaflet(x, monitor_dat, min_val, max_val, grid = TRUE)
+      .draw_leaflet(x, monitor_dat, min_val, max_val, title = unit, grid = TRUE)
     }
   }
 }
 
+
 ## Display pollutant estimates summarized by geographical boundaries
-.draw_geoshape <- function(x, monitor_dat, year, month) {
+.draw_geoshape <- function(x, monitor_dat, year, month, unit = NULL) {
   min_val <- min(x$value, na.rm = TRUE) * 0.99
   max_val <- max(x$value, na.rm = TRUE) * 1.01
   if (is.null(month)) {
@@ -43,23 +46,25 @@
       plist <- lapply(year, function(k) {
         y <- x[x$year == k, ]
         .draw_leaflet(y, monitor_dat, min_val, max_val,
-                      title = paste0("Year: ", k), grid = FALSE)
+                      title = paste0("Year: ", k, "<br>", unit), grid = FALSE)
       })
       do.call(sync, plist)
     } else {
-      .draw_leaflet(x, monitor_dat, min_val, max_val, grid = FALSE)
+      .draw_leaflet(x, monitor_dat, min_val, max_val, title = unit, grid = FALSE)
     }
   } else {
     if (length(month) > 1) {
       plist <- lapply(month, function(k) {
         y <- x[x$month == k, ]
-        .draw_leaflet(y, monitor_dat, min_val, max_val,
-                      title = paste0(month.abb[as.integer(k)], " ", year),
-                      grid = FALSE)
+        .draw_leaflet(
+          y, monitor_dat, min_val, max_val,
+          title = paste0(month.abb[as.integer(k)], " ", year, "<br>", unit),
+          grid = FALSE
+        )
       })
       do.call(sync, plist)
     } else {
-      .draw_leaflet(x, monitor_dat, min_val, max_val, grid = FALSE)
+      .draw_leaflet(x, monitor_dat, min_val, max_val, title = unit, grid = FALSE)
     }
   }
 }
